@@ -1,0 +1,96 @@
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent" >
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:orientation="vertical"
+        tools:context=".BabyInfoUpdateFragment">
+
+        <TextView
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:text="@string/nameOfBaby"
+            />
+
+        <EditText
+            android:id="@+id/baby_name"
+            android:layout_width="200dp"
+            android:layout_gravity="end"
+            android:layout_height="wrap_content"
+            />
+
+        <Switch
+            android:id="@+id/baby_gender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/babysGender"
+            android:showText="true"
+            android:textOff="BOY"
+            android:textOn="GIRL"
+            android:scrollbarSize="200dp"
+            />
+
+        <TextView
+            android:layout_width="200dp"
+            android:layout_height="20dp"
+            android:text="@string/babysDob"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/baby_dob"
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="date"
+                    android:focusable="false"
+                    android:text="@string/dateFormat"
+                    android:layout_marginLeft="150dp"
+                    />
+                <EditText
+                    android:id="@+id/baby_dobtime"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="time"
+                    android:focusable="false"
+                    android:text="@string/timeFormat"
+                    android:layout_gravity="end"
+                    />
+        </LinearLayout>
+        <TextView
+            android:layout_width="200dp"
+            android:layout_height="20dp"
+            android:text="Baby's Blood Group"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Spinner
+                android:layout_marginLeft="155dp"
+                android:id="@+id/baby_bgABO"
+                android:layout_width="60dp"
+                android:layout_height="40dp"
+                android:gravity="end"
+                />
+            <Spinner
+                android:id="@+id/baby_bgPH"
+                android:layout_height="40dp"
+                android:layout_width="40dp">
+            </Spinner>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/baby_add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/submit"
+            />
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,93 @@
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent" >
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".GrowthInfoUpdateFragment">
+
+        <TextView
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:text="Baby's Name"
+            />
+        <Spinner
+            android:id="@+id/spnBabyInfo"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end"
+            android:layout_marginRight="10dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:text="Baby's Weight"
+            />
+
+        <EditText
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:layout_gravity="end"
+            android:layout_marginRight="10dp"
+            android:id="@+id/etBabyWeight" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:text="Baby's Hight"
+            />
+
+        <EditText
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:layout_gravity="end"
+            android:layout_marginRight="10dp"
+            android:id="@+id/etBabyHeight" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:text="Baby's Head Circumferance"
+            />
+
+        <EditText
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:layout_gravity="end"
+            android:layout_marginRight="10dp"
+            android:id="@+id/etBabyHeadCircum" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:text="Date of Measurment"
+            />
+
+        <EditText
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:inputType="date"
+            android:focusable="false"
+            android:text="DD/MMM/YYYY"
+            android:layout_marginRight="10dp"
+            android:id="@+id/etInfoDate" />
+
+        <Button
+            android:id="@+id/btnGrowth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit"
+            />
+    </LinearLayout>
+</ScrollView>
