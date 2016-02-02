@@ -110,7 +110,7 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
         Integer gender = mGender.isChecked()?0:1;
         Long date = Utility.getDate();
         Long time = Utility.getTime();
-        GrowthDataProvider dp = GrowthDataProvider.getInstance(getContext());
+        GrowthDataProvider dp = GrowthDataProvider.get();
         if (dp.addBabyInfo(name, date, time, (gender==0?"Girl":"Boy"), strBGAbo, strBGPh) > -1) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
             if (BabysInfo.getCurrentBabyIndex() == 0) {

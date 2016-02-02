@@ -71,7 +71,7 @@ public class GrowthChartFragment extends Fragment {
 
         Utility.ChartType xChart = Utility.ChartType.values()[getArguments().getInt(ARG_X_AXIS)];
         Utility.ChartType yChart = Utility.ChartType.values()[getArguments().getInt(ARG_Y_AXIS)];
-        Cursor c1 = GrowthDataProvider.getInstance(getContext())
+        Cursor c1 = GrowthDataProvider.get()
                 .queryTable(IDataInfo.kBabyInfoTable, null, "_id=" + mKidsId,
                         null, null, null, null);
         if (c1 == null || c1.getCount() < 1)
@@ -219,7 +219,7 @@ public class GrowthChartFragment extends Fragment {
         ScatterData scatterData = new ScatterData();
 
         ArrayList<Entry> entries = new ArrayList<>();
-        Cursor c = GrowthDataProvider.getInstance(getContext())
+        Cursor c = GrowthDataProvider.get()
                 .queryTable(IDataInfo.kGrowthInfoTable, null,
                         IDataInfo.BABY_ID + "=" + mKidsId + " AND "
                         + IDataInfo.DATE + ">="

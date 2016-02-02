@@ -21,23 +21,19 @@ public class GrowthDataProvider extends SQLiteOpenHelper {
         super(context, kDatabaseName, null, 2);
     }
 
-    public static GrowthDataProvider getInstance(Context context) {
+    public static GrowthDataProvider create(final Context context) {
         if (instance == null) {
             instance = new GrowthDataProvider(context);
         }
         return instance;
     }
 
+    public static GrowthDataProvider get() {
+        return instance;
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + IDataInfo.kGrowthInfoTable + " ( "
-                + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + IDataInfo.DATE + " LONG, "
-                + IDataInfo.WEIGHT + " REAL, "
-                + IDataInfo.HEIGHT + " REAL, "
-                + IDataInfo.HEAD + " REAL, "
-                + IDataInfo.BABY_ID + " INTEGER);");
-
         db.execSQL("CREATE TABLE " + IDataInfo.kBabyInfoTable + " ( "
                 + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + IDataInfo.NAME + " TEXT, "
@@ -46,6 +42,14 @@ public class GrowthDataProvider extends SQLiteOpenHelper {
                 + IDataInfo.GENDER + " TEXT, "
                 + IDataInfo.BG_ABO + " TEXT, "
                 + IDataInfo.BG_PH + " TEXT);");
+
+        db.execSQL("CREATE TABLE " + IDataInfo.kGrowthInfoTable + " ( "
+                + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + IDataInfo.DATE + " LONG, "
+                + IDataInfo.BABY_ID + " INTEGER, "
+                + IDataInfo.WEIGHT + " REAL, "
+                + IDataInfo.HEIGHT + " REAL, "
+                + IDataInfo.HEAD + " REAL);");
 
         db.execSQL("CREATE TABLE " + IDataInfo.kLifeEventTable + " ( "
                 + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"

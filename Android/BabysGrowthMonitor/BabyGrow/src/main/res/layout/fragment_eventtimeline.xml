@@ -9,10 +9,11 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:layout_marginBottom="@dimen/list_margin"
-        android:textAppearance="?attr/textAppearanceListItem" />
+        android:textAppearance="?attr/textAppearanceListItem"
+        />
     <TextView
         android:id="@+id/blDate"
-        android:layout_width="50dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:textStyle="italic"
         android:textAppearance="?attr/textAppearanceListItem" />

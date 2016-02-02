@@ -167,7 +167,7 @@ public class GrowthChartActivity extends AppCompatActivity
         @Override
         public Fragment getItem(int position) {
             if (position == 3)
-                return BabiesListFragment.newInstance(0);
+                return EventTimelineFragment.newInstance(0);
             // getItem is called to instantiate the fragment for the given page.
             // Return a GrowthChartFragment (defined as a static inner class below).
             return GrowthChartFragment.newInstance(dChart[position][0], dChart[position][1]);

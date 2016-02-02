@@ -94,9 +94,14 @@ public class GrowthInfoUpdateFragment extends Fragment implements View.OnClickLi
             mDate.setTextColor(Color.RED);
             return;
         }
-        GrowthDataProvider dp = GrowthDataProvider.getInstance(getContext());
+        GrowthDataProvider dp = GrowthDataProvider.get();
         if (dp.addGrowthInfo(weight, height, head, date, 1L) > -1 ) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
+            EventsInfo info = EventsInfo.get(babyInfo.mId);
+            if ( info == null) {
+                info = EventsInfo.create(getContext(), babyInfo.mId);
+            }
+            info.update();
             getActivity().onBackPressed();
         } else {
             Toast.makeText(getContext(), "Update Failed", Toast.LENGTH_SHORT).show();

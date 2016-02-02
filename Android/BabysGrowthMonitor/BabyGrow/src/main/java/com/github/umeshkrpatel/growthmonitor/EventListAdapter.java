@@ -16,12 +16,12 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 
-public class BabiesListAdapter extends RecyclerView.Adapter<BabiesListAdapter.ViewHolder> {
+public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.ViewHolder> {
 
-    private final ArrayList<BabysInfo.BabyInfo> mValues;
+    private final ArrayList<EventsInfo.EventItem> mValues;
     private final GrowthActivity mListener;
 
-    public BabiesListAdapter(ArrayList<BabysInfo.BabyInfo> items, GrowthActivity listener) {
+    public EventListAdapter(ArrayList<EventsInfo.EventItem> items, GrowthActivity listener) {
         mValues = items;
         mListener = listener;
     }
@@ -29,22 +29,23 @@ public class BabiesListAdapter extends RecyclerView.Adapter<BabiesListAdapter.Vi
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_babieslist, parent, false);
+                .inflate(R.layout.fragment_eventtimeline, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        //holder.mInfoView.setText(holder.mItem.mName + (holder.mItem.mGender==0?"(Girl)":"(Boy)"));
+
         holder.mInfoView.setText(
                 generateSpannableText(
-                        Utility.getDateTimeFromMillisecond(holder.mItem.mDob),
-                        holder.mItem.mName,
-                        (holder.mItem.mGender)
+                        Utility.getDateTimeFromMillisecond(holder.mItem.getDate()),
+                        EventsInfo.getEventDetails(
+                                holder.mItem.getEventType(),
+                                holder.mItem.getEventID()), "."
                 )
         );
-        holder.mDateView.setText(Utility.getDateTimeFromMillisecond(holder.mItem.mDob));
+        holder.mDateView.setText(Utility.getDateTimeFromMillisecond(holder.mItem.getDate()));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,7 +68,7 @@ public class BabiesListAdapter extends RecyclerView.Adapter<BabiesListAdapter.Vi
         public final View mView;
         public final TextView mInfoView;
         public final TextView mDateView;
-        public BabysInfo.BabyInfo mItem;
+        public EventsInfo.EventItem mItem;
 
         public ViewHolder(View view) {
             super(view);

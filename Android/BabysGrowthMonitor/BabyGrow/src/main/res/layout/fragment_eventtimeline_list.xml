@@ -9,8 +9,8 @@
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context="com.github.umeshkrpatel.growthmonitor.BabiesListFragment"
-    tools:listitem="@layout/fragment_babieslist"
+    tools:context=".EventTimelineFragment"
+    tools:listitem="@layout/fragment_eventtimeline"
     style="@android:style/Widget.ListView"
     android:clickable="true"
     android:elevation="@android:dimen/app_icon_size" />

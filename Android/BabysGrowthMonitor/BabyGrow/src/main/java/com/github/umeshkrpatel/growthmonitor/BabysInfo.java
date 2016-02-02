@@ -48,7 +48,7 @@ public class BabysInfo {
 
     public void updateBabyInfo() {
         mBabyInfo.clear();
-        Cursor c = GrowthDataProvider.getInstance(mContext)
+        Cursor c = GrowthDataProvider.get()
                 .getInfoFromTable(IDataInfo.kBabyInfoTable);
         if (c == null || c.getCount() <= 0) {
             mBabyInfo.add(new BabyInfo(0, "<None>", 0L, 0L, "-", "-", "-"));

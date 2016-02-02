@@ -22,7 +22,7 @@ import android.widget.TextView;
 
 public class GrowthActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        BabiesListFragment.OnListFragmentInteractionListener {
+        EventTimelineFragment.OnListFragmentInteractionListener {
 
     private ImageView mBabyPicture;
     private TextView mBabyName, mBabyDob;
@@ -41,6 +41,8 @@ public class GrowthActivity extends AppCompatActivity
         setContentView(R.layout.activity_growth);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        GrowthDataProvider.create(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -87,6 +89,7 @@ public class GrowthActivity extends AppCompatActivity
             } else {
                 mBabyPicture.setImageResource(R.drawable.ic_face_boy);
             }
+            EventsInfo.create(this, mBabyId);
         }
     }
 
@@ -153,7 +156,7 @@ public class GrowthActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(BabysInfo.BabyInfo item) {
+    public void onListFragmentInteraction(EventsInfo.EventItem item) {
 
     }
 
@@ -167,7 +170,7 @@ public class GrowthActivity extends AppCompatActivity
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a GrowthChartFragment (defined as a static inner class below).
-            return BabiesListFragment.newInstance(0);
+            return EventTimelineFragment.newInstance(0);
         }
 
         @Override

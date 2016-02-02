@@ -84,7 +84,7 @@ public interface IDataInfo {
 
     // Event Below two row will help to map with actual event
     String EVENT_TYPE = "_EVENT_TYPE";
-    Integer INDEX_EVENT_TYOE = 3;
+    Integer INDEX_EVENT_TYPE = 3;
     String EVENT_ID = "_EVENT_ID";
     Integer INDEX_EVENT_ID = 4;
 

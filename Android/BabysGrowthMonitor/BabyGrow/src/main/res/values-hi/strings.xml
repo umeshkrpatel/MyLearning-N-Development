@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">शिशु के विकास की निरीक्षण</string>
+    <string name="babysDob">शिशु की जन्म तिथि</string>
+    <string name="babysGender">शिशु की लिंग</string>
+    <string name="nameOfBaby">शिशु के नाम</string>
+    <string name="pref_header_general">सामान्य</string>
+    <string name="pref_header_notifications">सूचनाएं</string>
+    <string name="pref_ringtone_silent">शांत</string>
+    <string name="title_activity_add_info">शिशु की जानकारी जोड़ें</string>
+    <string name="title_activity_baby_info">नई शिशु की जानकारी</string>
+    <string name="title_activity_growth_chart">शिशु के विकास की रूपरेखा</string>
+    <string name="submit">सुरक्षित</string>
+    <string name="settings">समायोजन</string>
+</resources>
