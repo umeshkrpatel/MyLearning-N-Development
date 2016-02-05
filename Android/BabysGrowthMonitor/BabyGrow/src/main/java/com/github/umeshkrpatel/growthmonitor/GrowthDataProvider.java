@@ -138,7 +138,7 @@ public class GrowthDataProvider extends SQLiteOpenHelper {
         return ret;
     }
 
-    public long addGrowthInfo(double weight, double height, double head, Long date, Long baby_id) {
+    public long addGrowthInfo(double weight, double height, double head, Long date, Integer baby_id) {
         long ret;
         Log.d(TAG, "Weight " + weight + " Height " + height + " Head " + head + " Date " + date);
         ContentValues cv = new ContentValues();
@@ -159,16 +159,18 @@ public class GrowthDataProvider extends SQLiteOpenHelper {
         return ret;
     }
 
-    public long addVaccinationInfo(Integer vaccineType, String vaccineInfo, Long date) {
+    public long addVaccinationInfo(Integer vaccineType, String vaccineInfo, Long date, Integer baby_id) {
         ContentValues cv = new ContentValues();
         cv.put(IDataInfo.VACCINE_TYPE, vaccineType);
         cv.put(IDataInfo.VACCINE_NOTE, vaccineInfo);
         cv.put(IDataInfo.DATE, date);
+        cv.put(IDataInfo.BABY_ID, baby_id);
         long ret = addInfo(IDataInfo.kVaccineTable, cv);
         if (ret > -1) {
             cv.clear();
             cv.put(IDataInfo.EVENT_TYPE, IDataInfo.EVENT_VACCINATION);
             cv.put(IDataInfo.EVENT_ID, ret);
+            cv.put(IDataInfo.BABY_ID, baby_id);
             cv.put(IDataInfo.DATE, date);
             return addInfo(IDataInfo.kEventTable, cv);
         }

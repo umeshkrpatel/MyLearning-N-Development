@@ -8,7 +8,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -86,46 +85,5 @@ public class Utility {
 
     public static float fromMiliSecondsToMonths(Long milliseconds) {
         return (milliseconds/(kMilliSecondsInDays*30));
-    }
-
-    public enum ChartType {
-        AGE,
-        WEIGHT,
-        HEIGHT,
-        HEADCIRCUM,
-    }
-    public static ArrayList<String> mMonth = new ArrayList<String>()
-        {{ add("Birth"); add("03Months"); add("06Months"); add("1.0Year");
-           add("1.5Years"); add("2.0Years"); add("2.5Years"); add("3.0Years");
-           add("3.5Years"); add("4.0Years"); add("4.5Years"); add("5.0Years");
-        }};
-    public static final int M3 = 0, M12 = 2, M60 = 10;
-    public static int monthsToRange(int months) {
-        int range = 0;
-        if (months > 3) {
-            range = months % 6 + 1;
-            if (range > 10)
-                range = 10;
-        }
-        return range;
-    }
-
-    public static int rangeToMaxIndex(int range) {
-        if (range == 0)
-            return 13;
-        else {
-            return range * 26;
-        }
-    }
-
-    public static int rangeToMinIndex(int range) {
-        if (range == 0)
-            return 0;
-        return rangeToMaxIndex(range - 1);
-    }
-
-    public static int rangeFromDobToToday(Long dob) {
-        int months = (int)Utility.fromMiliSecondsToMonths(System.currentTimeMillis() - dob);
-        return monthsToRange(months);
     }
 }

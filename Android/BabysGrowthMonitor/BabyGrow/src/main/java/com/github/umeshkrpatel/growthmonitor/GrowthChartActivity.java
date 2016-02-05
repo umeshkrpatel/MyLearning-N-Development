@@ -3,17 +3,18 @@ package com.github.umeshkrpatel.growthmonitor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,13 +22,17 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.PopupWindow;
 import android.widget.Spinner;
+
+import com.github.umeshkrpatel.growthmonitor.data.ChartData;
+
+import java.util.ArrayList;
 
 public class GrowthChartActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         AdapterView.OnItemSelectedListener {
 
+    private static final String TAG = "GrowthChartActivity";
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -38,17 +43,20 @@ public class GrowthChartActivity extends AppCompatActivity
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private Spinner mXAxisBar, mYAxisBar;
+    private Button mUpdate;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
     private int mBabyId;
-    private static Utility.ChartType[][] dChart = new Utility.ChartType[][] {
-            {Utility.ChartType.AGE, Utility.ChartType.WEIGHT},
-            {Utility.ChartType.AGE, Utility.ChartType.HEIGHT},
-            {Utility.ChartType.AGE, Utility.ChartType.HEADCIRCUM},
+    private static ChartData.ChartType[][] dChart = new ChartData.ChartType[][] {
+            {ChartData.ChartType.AGE, ChartData.ChartType.WEIGHT},
+            {ChartData.ChartType.AGE, ChartData.ChartType.HEIGHT},
+            {ChartData.ChartType.AGE, ChartData.ChartType.HEADCIRCUM},
     };
+
+    private static Integer sFragmentCount = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,13 +78,38 @@ public class GrowthChartActivity extends AppCompatActivity
         mXAxisBar = (Spinner) navigationView.getHeaderView(0).findViewById(R.id.sbXAxis);
         mXAxisBar.setOnItemSelectedListener(this);
         mXAxisBar.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_listview,
-                R.id.spinner_textview, Utility.mMonth));
+                R.id.tvSpinnerList, ChartData.mMonth));
+        mXAxisBar.setSelection(ChartData.minRange());
 
         mYAxisBar = (Spinner) navigationView.getHeaderView(0).findViewById(R.id.sbYAxis);
         mYAxisBar.setOnItemSelectedListener(this);
         mYAxisBar.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_listview,
-                R.id.spinner_textview, Utility.mMonth));
+                R.id.tvSpinnerList, ChartData.mMonth));
+        mYAxisBar.setSelection(ChartData.maxRange());
+        mUpdate = (Button) navigationView.getHeaderView(0).findViewById(R.id.nvBtnUpdate);
+        mUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ChartData.setMinRange(mXAxisBar.getSelectedItemPosition());
+                ChartData.setMaxRange(mYAxisBar.getSelectedItemPosition());
+                Integer pos = mSectionsPagerAdapter.getCurrentPosition();
+                GrowthChartFragment gf;
+                if (pos != 1) {
+                    gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(pos);
+                    gf.updateChart();
+                    gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(1);
+                    gf.updateChart();
+                } else {
+                    for (int i = 0; i < sFragmentCount; i++) {
+                        gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(i);
+                        gf.updateChart();
+                    }
+                }
 
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.chart_drawer_layout);
+                drawer.closeDrawer(GravityCompat.END);
+            }
+        });
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -93,27 +126,11 @@ public class GrowthChartActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                //        .setAction("Action", null).show();
-                LayoutInflater layoutInflater =
-                        (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-                View popupView = layoutInflater.inflate(R.layout.growthchart_filter, null);
-                final PopupWindow popupWindow =
-                        new PopupWindow(
-                                popupView,
-                                ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT);
-                Button button = (Button) popupView.findViewById(R.id.fltOk);
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        popupWindow.dismiss();
-                    }
-                });
-                popupWindow.showAsDropDown(tabLayout, Gravity.CENTER, 100, 100);
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
         });
-        mBabyId = BabysInfo.getInstance().getBabyInfoId(BabysInfo.getCurrentBabyIndex());
+        mBabyId = BabysInfo.getCurrentBabyId();
     }
 
 
@@ -146,7 +163,23 @@ public class GrowthChartActivity extends AppCompatActivity
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+        if (parent == mXAxisBar) {
+            if (position == (ChartData.mMonth.size() - 1)) {
+                mXAxisBar.setSelection(position - 1);
+                return;
+            }
+            if (position >= mYAxisBar.getSelectedItemPosition()) {
+                mYAxisBar.setSelection(position + 1, true);
+            }
+        } else {
+            if (position == 0) {
+                mYAxisBar.setSelection(position + 1);
+                return;
+            }
+            if (position <= mXAxisBar.getSelectedItemPosition()) {
+                mXAxisBar.setSelection(position - 1, true);
+            }
+        }
     }
 
     @Override
@@ -160,23 +193,28 @@ public class GrowthChartActivity extends AppCompatActivity
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+        private ArrayList<GrowthChartFragment> mf = new ArrayList<>();
+        private int mCurrent = 0;
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
+            for (int i = 0; i < sFragmentCount; i++) {
+                mf.add(GrowthChartFragment.newInstance(dChart[i][0], dChart[i][1]));
+            }
         }
 
         @Override
         public Fragment getItem(int position) {
-            if (position == 3)
-                return EventTimelineFragment.newInstance(0);
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a GrowthChartFragment (defined as a static inner class below).
-            return GrowthChartFragment.newInstance(dChart[position][0], dChart[position][1]);
+            return mf.get(position);
+        }
+
+        public Integer getCurrentPosition() {
+            return mCurrent;
         }
 
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 4;
+            return sFragmentCount;
         }
 
         @Override
@@ -185,6 +223,12 @@ public class GrowthChartActivity extends AppCompatActivity
                 return "Check";
             }
             return dChart[position][0].toString() + "-" + dChart[position][1].toString();
+        }
+        @Override
+        public void setPrimaryItem(ViewGroup container, int position, Object object) {
+            super.setPrimaryItem(container, position, object);
+            Log.d(TAG, "I am in right place or Not");
+            mCurrent = position;
         }
     }
 }

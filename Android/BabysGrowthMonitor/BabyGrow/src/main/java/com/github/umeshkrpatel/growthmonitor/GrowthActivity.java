@@ -24,8 +24,8 @@ public class GrowthActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         EventTimelineFragment.OnListFragmentInteractionListener {
 
-    private ImageView mBabyPicture;
-    private TextView mBabyName, mBabyDob;
+    private ImageView ivMainBabyPicture, ivNvBabyPic, ivNvBabyPicExtra;
+    private TextView tvMainBabyName, tvNvBabyName, mBabyDob;
     private int mBabyId;
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
@@ -62,35 +62,37 @@ public class GrowthActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.gcNavView);
         navigationView.setNavigationItemSelectedListener(this);
 
+        ivNvBabyPic = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imgBabyIcon);
+        ivNvBabyPicExtra = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imgBabyIconExt);
+        tvNvBabyName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.tvBabyName);
+        ivNvBabyPicExtra.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BabysInfo.setToNextIndex();
+                updateMainView();
+            }
+        });
+
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        BabysInfo babysInfo = BabysInfo.getInstance();
-        if (babysInfo == null)
-            babysInfo = BabysInfo.CreateInstance(this);
-        int Index = BabysInfo.getCurrentBabyIndex();
-        if (babysInfo.getBabyInfoCount() <= 0 && Index > 0) {
+        BabysInfo babysInfo = BabysInfo.create();
+        int Index = BabysInfo.getCurrentIndex();
+        if (BabysInfo.size() == 0 && Index > 0) {
             Intent intent = new Intent(this, InfoActivity.class);
             startActivity(intent);
         } else {
-            mBabyName = (TextView)findViewById(R.id.cgBabyName);
-            mBabyDob = (TextView) findViewById(R.id.cgBabyDob);
-            mBabyPicture = (ImageView) findViewById(R.id.cgBabyView);
-            mBabyId = babysInfo.getBabyInfoId(Index);
-            Long dob = babysInfo.getBabyInfoDob(Index);
-            String gen = babysInfo.getBabyInfoGender(Index);
-            mBabyName.setText(babysInfo.getBabyInfoName(Index));
-            mBabyDob.setText(Utility.getDateTimeFromMillisecond(dob));
-            if (gen.equals("Girl")) {
-                mBabyPicture.setImageResource(R.drawable.ic_face_girl);
-            } else {
-                mBabyPicture.setImageResource(R.drawable.ic_face_boy);
-            }
+            updateMainView();
             EventsInfo.create(this, mBabyId);
         }
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateMainView();
     }
 
     @Override
@@ -190,6 +192,39 @@ public class GrowthActivity extends AppCompatActivity
                     return "SECTION 3";
             }
             return null;
+        }
+    }
+
+    private void updateMainView() {
+        BabysInfo babysInfo = BabysInfo.get();
+        Integer Index = BabysInfo.getCurrentIndex();
+        tvMainBabyName = (TextView)findViewById(R.id.cgBabyName);
+        mBabyDob = (TextView) findViewById(R.id.cgBabyDob);
+        ivMainBabyPicture = (ImageView) findViewById(R.id.cgBabyView);
+        mBabyId = babysInfo.getBabyInfoId(Index);
+        Long dob = babysInfo.getBabyInfoDob(Index);
+        String gen = babysInfo.getBabyInfoGender(Index);
+        tvMainBabyName.setText(babysInfo.getBabyInfoName(Index));
+        tvNvBabyName.setText(babysInfo.getBabyInfoName(Index));
+        mBabyDob.setText(Utility.getDateTimeFromMillisecond(dob));
+        if (gen.equals("Girl")) {
+            ivMainBabyPicture.setImageResource(R.drawable.girl_face);
+            ivNvBabyPic.setImageResource(R.drawable.girl_face);
+        } else {
+            ivMainBabyPicture.setImageResource(R.drawable.boy_face);
+            ivNvBabyPic.setImageResource(R.drawable.boy_face);
+        }
+        if (babysInfo.getBabyInfoCount() > 1) {
+            ivNvBabyPic.setVisibility(View.VISIBLE);
+            Index = (Index + 1) % BabysInfo.size();
+            gen = babysInfo.getBabyInfoGender(Index);
+            if (gen.equals("Girl")) {
+                ivNvBabyPicExtra.setImageResource(R.drawable.girl_face);
+            } else {
+                ivNvBabyPicExtra.setImageResource(R.drawable.boy_face);
+            }
+        } else {
+            ivNvBabyPic.setVisibility(View.GONE);
         }
     }
 }

@@ -75,7 +75,7 @@ public class GrowthInfoUpdateFragment extends Fragment implements View.OnClickLi
         ArrayList<BabysInfo.BabyInfo> babyInfos = BabysInfo.getBabyInfoList();
         ArrayAdapter<BabysInfo.BabyInfo> babyInfoArrayAdapter =
                 new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
-                        R.id.spinner_textview, babyInfos);
+                        R.id.tvSpinnerList, babyInfos);
         mBabyInfo.setAdapter(babyInfoArrayAdapter);
         return rootView;
     }
@@ -95,7 +95,7 @@ public class GrowthInfoUpdateFragment extends Fragment implements View.OnClickLi
             return;
         }
         GrowthDataProvider dp = GrowthDataProvider.get();
-        if (dp.addGrowthInfo(weight, height, head, date, 1L) > -1 ) {
+        if (dp.addGrowthInfo(weight, height, head, date, babyInfo.mId) > -1 ) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
             EventsInfo info = EventsInfo.get(babyInfo.mId);
             if ( info == null) {

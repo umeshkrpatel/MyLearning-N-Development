@@ -97,16 +97,21 @@ public class InfoActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            if (position == 0)
-                return BabyInfoUpdateFragment.newInstance(IDataInfo.ACTION_NEW, 0);
-            else
-                return GrowthInfoUpdateFragment.newInstance(IDataInfo.ACTION_NEW, 0);
+            switch (position) {
+                case 0:
+                    return BabyInfoUpdateFragment.newInstance(IDataInfo.ACTION_NEW, 0);
+                case 1:
+                    return GrowthInfoUpdateFragment.newInstance(IDataInfo.ACTION_NEW, 0);
+                case 2:
+                    return VaccineInfoUpdateFragment.newInstance(IDataInfo.ACTION_NEW, 0);
+            }
+            return null;
         }
 
         @Override
         public int getCount() {
             // Baby Info and Growth Info
-            return 2;
+            return 3;
         }
 
         @Override
@@ -116,6 +121,8 @@ public class InfoActivity extends AppCompatActivity {
                     return "ADD BABY INFO";
                 case 1:
                     return "ADD GROWTH INFO";
+                case 2:
+                    return "ADD VACCINATION INFO";
             }
             return null;
         }

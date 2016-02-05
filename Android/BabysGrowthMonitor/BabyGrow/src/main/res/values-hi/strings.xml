@@ -12,4 +12,12 @@
     <string name="title_activity_growth_chart">शिशु के विकास की रूपरेखा</string>
     <string name="submit">सुरक्षित</string>
     <string name="settings">समायोजन</string>
+    <string name="weightOfBaby">Baby\'s Weight</string>
+    <string name="heightOfBaby">Baby\'s Height</string>
+    <string name="headcOfBaby">Baby\'s Head Circumferance</string>
+    <string name="dateOfMeasure">Date of Measurment</string>
+    <string name="vaccineType">Vaccination Type</string>
+    <string name="vaccineDetails">Vaccination Details</string>
+    <string name="vaccineDate">Vaccination Date</string>
+    <string name="update">Update</string>
 </resources>

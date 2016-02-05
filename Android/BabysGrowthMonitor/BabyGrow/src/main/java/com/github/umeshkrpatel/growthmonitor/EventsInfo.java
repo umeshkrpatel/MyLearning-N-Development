@@ -8,9 +8,6 @@ import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * Created by weumeshweta on 01-Feb-2016.
- */
 public class EventsInfo {
     private final Integer mBabyID;
     private final Context mContext;
@@ -39,7 +36,7 @@ public class EventsInfo {
         mEventItems.clear();
         Cursor c = GrowthDataProvider.get()
                 .queryTable(IDataInfo.kEventTable, null, IDataInfo.BABY_ID + "=" + mBabyID,
-                        null, null, null, null);
+                        null, null, null, IDataInfo.DATE + " DESC");
         if (c==null || c.getCount()==0) {
             mEventItems.add(new EventItem(0,0L, 0, 0));
             return;

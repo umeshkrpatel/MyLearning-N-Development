@@ -9,7 +9,7 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:context=".GrowthInfoUpdateFragment">
 
@@ -25,57 +25,43 @@
             android:layout_height="40dp"
             android:layout_gravity="end"
             android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:text="@string/weightOfBaby"
-            />
-
-        <EditText
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:ems="10"
-            android:layout_gravity="end"
-            android:layout_marginRight="10dp"
-            android:id="@+id/etBabyWeight" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:text="@string/heightOfBaby"
+            android:text="@string/vaccineType"
             />
 
         <EditText
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:ems="10"
             android:layout_gravity="end"
             android:layout_marginRight="10dp"
-            android:id="@+id/etBabyHeight" />
+            android:layout_marginEnd="10dp"
+            android:id="@+id/etVaccineType"
+            android:inputType="text" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:text="@string/headcOfBaby"
+            android:text="@string/vaccineDetails"
             />
 
         <EditText
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:ems="10"
             android:layout_gravity="end"
             android:layout_marginRight="10dp"
-            android:id="@+id/etBabyHeadCircum" />
+            android:layout_marginEnd="10dp"
+            android:id="@+id/etVaccineDetail"
+            android:inputType="text" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:text="@string/dateOfMeasure"
+            android:text="@string/vaccineDate"
             />
 
         <EditText
@@ -86,10 +72,11 @@
             android:focusable="false"
             android:text="@string/dateFormat"
             android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:id="@+id/etInfoDate" />
 
         <Button
-            android:id="@+id/btnGrowth"
+            android:id="@+id/btnVaccine"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/submit"

@@ -1,6 +1,11 @@
 <ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
-    android:layout_width="match_parent" >
+    android:layout_width="match_parent"
+    android:layout_marginLeft="@dimen/activity_vertical_margin"
+    android:layout_marginRight="@dimen/activity_vertical_margin"
+    android:layout_marginTop="@dimen/activity_horizontal_margin"
+    android:layout_marginBottom="@dimen/activity_horizontal_margin"
+    >
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -29,34 +34,33 @@
         <Switch
             android:id="@+id/baby_gender"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:text="@string/babysGender"
-            android:showText="true"
-            android:textOff="BOY"
-            android:textOn="GIRL"
-            android:scrollbarSize="200dp"
+            android:scrollbarStyle="outsideOverlay"
+            android:scrollbarSize="250dp"
             />
 
         <TextView
-            android:layout_width="200dp"
+            android:layout_width="wrap_content"
             android:layout_height="20dp"
             android:text="@string/babysDob"
             />
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            >
                 <EditText
                     android:id="@+id/baby_dob"
-                    android:layout_width="130dp"
+                    android:layout_width="135dp"
                     android:layout_height="wrap_content"
                     android:inputType="date"
                     android:focusable="false"
                     android:text="@string/dateFormat"
-                    android:layout_marginLeft="150dp"
                     />
                 <EditText
                     android:id="@+id/baby_dobtime"
-                    android:layout_width="60dp"
+                    android:layout_width="65dp"
                     android:layout_height="wrap_content"
                     android:inputType="time"
                     android:focusable="false"
@@ -67,26 +71,31 @@
         <TextView
             android:layout_width="200dp"
             android:layout_height="20dp"
-            android:text="Baby's Blood Group"
+            android:text="@string/bloodGroupOfBaby"
             />
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            >
             <Spinner
-                android:layout_marginLeft="155dp"
                 android:id="@+id/baby_bgABO"
-                android:layout_width="60dp"
+                android:layout_width="65dp"
                 android:layout_height="40dp"
                 android:gravity="end"
                 />
             <Spinner
                 android:id="@+id/baby_bgPH"
-                android:layout_height="40dp"
-                android:layout_width="40dp">
+                android:layout_height="45dp"
+                android:layout_width="40dp"
+                android:layout_marginRight="90dp"
+                android:layout_marginEnd="90dp"
+                >
             </Spinner>
         </LinearLayout>
 
         <Button
+            android:layout_marginTop="@dimen/text_margin"
             android:id="@+id/baby_add"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

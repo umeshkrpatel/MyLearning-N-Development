@@ -1,49 +1,56 @@
 package com.github.umeshkrpatel.growthmonitor;
 
-import android.content.Context;
 import android.database.Cursor;
 
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 
 import java.util.ArrayList;
 
-/**
- * Created by weumeshweta on 26-Jan-2016.
- */
 public class BabysInfo {
 
     private static BabysInfo ourInstance = null;
     ArrayList<BabyInfo> mBabyInfo = new ArrayList<>();
-    private static Integer mCurrentBabyId = 0;
-    private final Context mContext;
-    public static BabysInfo CreateInstance(Context context) {
+    private final BabyInfo mDummyInfo;
+    private static Integer mCurrentBabyInfoIndex = 0;
+
+    public static BabysInfo create() {
         if (ourInstance == null) {
-            ourInstance = new BabysInfo(context);
+            ourInstance = new BabysInfo();
             ourInstance.updateBabyInfo();
         }
         return ourInstance;
     }
 
-    public static BabysInfo getInstance() {
+    public static BabysInfo get() {
         return ourInstance;
     }
 
-    public static void setCurrentBabyIndex(int index) {
-        mCurrentBabyId = index;
+    public static void setCurrentIndex(int index) {
+        mCurrentBabyInfoIndex = index;
     }
 
-    public static Integer getCurrentBabyIndex() {
-        return mCurrentBabyId;
+    public static void setToNextIndex() {
+        mCurrentBabyInfoIndex = (mCurrentBabyInfoIndex + 1) % size();
     }
 
-    private BabysInfo(Context context) {
-        mContext = context;
+    public static Integer getCurrentIndex() {
+        return mCurrentBabyInfoIndex;
+    }
+    
+    public static Integer getCurrentBabyId() {
+        return BabysInfo.get().getBabyInfoId(mCurrentBabyInfoIndex);
+    }
+
+    private BabysInfo() {
+        mDummyInfo = new BabyInfo(0, "<Dummy>", 0L, 0L, "X", "X", "X");
     }
 
     public Integer getBabyInfoCount() {
-        if (mBabyInfo == null)
-            return 0;
         return mBabyInfo.size();
+    }
+
+    public static Integer size() {
+        return BabysInfo.get().getBabyInfoCount();
     }
 
     public void updateBabyInfo() {
@@ -51,7 +58,6 @@ public class BabysInfo {
         Cursor c = GrowthDataProvider.get()
                 .getInfoFromTable(IDataInfo.kBabyInfoTable);
         if (c == null || c.getCount() <= 0) {
-            mBabyInfo.add(new BabyInfo(0, "<None>", 0L, 0L, "-", "-", "-"));
             return;
         }
         while (c.moveToNext()) {
@@ -68,24 +74,30 @@ public class BabysInfo {
     }
 
     public Integer getBabyInfoId(int index) {
-        if (mBabyInfo.size() == 0 || index < 0)
-            return -1;
+        if (index == -1)
+            return mDummyInfo.mId;
         return mBabyInfo.get(index).mId;
     }
     public String getBabyInfoName(int index) {
+        if (index == -1)
+            return mDummyInfo.mName;
         return mBabyInfo.get(index).mName;
     }
     public Long getBabyInfoDob(int index) {
+        if (index == -1)
+            return mDummyInfo.mDob;
         return mBabyInfo.get(index).mDob;
     }
     public String getBabyInfoGender(int index) {
+        if (index == -1)
+            return mDummyInfo.mGender;
         return mBabyInfo.get(index).mGender;
     }
     private ArrayList<BabyInfo> babyInfoList() {
         return mBabyInfo;
     }
     public static ArrayList<BabyInfo> getBabyInfoList() {
-        return BabysInfo.getInstance().babyInfoList();
+        return BabysInfo.get().babyInfoList();
     }
     public CharSequence[] babyNamesList() {
         CharSequence[] names = new CharSequence[mBabyInfo.size()];
@@ -97,7 +109,7 @@ public class BabysInfo {
         return names;
     }
     public static CharSequence[] getBabyNamesList() {
-        return BabysInfo.getInstance().babyNamesList();
+        return BabysInfo.get().babyNamesList();
     }
     public class BabyInfo {
         final Integer mId;

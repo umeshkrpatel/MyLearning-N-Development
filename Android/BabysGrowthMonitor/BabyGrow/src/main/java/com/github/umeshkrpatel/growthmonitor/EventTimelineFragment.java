@@ -47,10 +47,10 @@ public class EventTimelineFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            Integer index = 1;//BabysInfo.getCurrentBabyIndex();
-            EventsInfo info = EventsInfo.get(index);
+            Integer babyId = BabysInfo.getCurrentBabyId();
+            EventsInfo info = EventsInfo.get(babyId);
             if ( info == null) {
-                info = EventsInfo.create(getContext(), index);
+                info = EventsInfo.create(getContext(), babyId);
                 info.update();
             }
             ArrayList<EventsInfo.EventItem> eventItems = info.getList();
@@ -62,12 +62,6 @@ public class EventTimelineFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        //if (context instanceof OnListFragmentInteractionListener) {
-        //    mListener = (GrowthActivity) context;
-        //} else {
-        //    throw new RuntimeException(context.toString()
-        //            + " must implement OnListFragmentInteractionListener");
-        //}
     }
 
     @Override

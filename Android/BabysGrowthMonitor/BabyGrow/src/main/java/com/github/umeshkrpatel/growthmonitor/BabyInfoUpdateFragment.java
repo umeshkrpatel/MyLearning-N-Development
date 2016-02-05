@@ -1,5 +1,7 @@
 package com.github.umeshkrpatel.growthmonitor;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -26,11 +28,12 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
     private static final String ARG_ACTION_TYPE = "action_type";
     private static final String ARG_INFO_ID = "info_id";
 
-    private EditText mName, mDobDate, mDobTime;
-    private Switch mGender;
-    private Spinner mBGABO, mBGPH;
-    private Button mSubmit;
+    private EditText etName, etDobDate, etDobTime;
+    private Switch swGender;
+    private Spinner spBGAbo, spBGPh;
+    private Button btSubmit;
     private String strBGAbo = "-", strBGPh = "-";
+    private String mGender = "Boy";
 
     public BabyInfoUpdateFragment() {
         Utility.resetDateTime();
@@ -49,20 +52,35 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
         return fragment;
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.baby_info_fragment, container, false);
-        mName = (EditText) rootView.findViewById(R.id.baby_name);
-        mGender = (Switch) rootView.findViewById(R.id.baby_gender);
-        mDobDate = (EditText) rootView.findViewById(R.id.baby_dob);
-        mDobTime = (EditText) rootView.findViewById(R.id.baby_dobtime);
-        mDobDate.setText(Utility.getDateTimeInFormat(Utility.getDate(), Utility.kDateInddMMyyyy));
-        mDobTime.setText(Utility.getDateTimeInFormat(Utility.getTime(), Utility.kTimeInkkmm));
-        mBGABO = (Spinner) rootView.findViewById(R.id.baby_bgABO);
-        mBGABO.setAdapter(new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
-                R.id.spinner_textview, IDataInfo.BloodGroupABO));
-        mBGABO.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        etName = (EditText) rootView.findViewById(R.id.baby_name);
+        swGender = (Switch) rootView.findViewById(R.id.baby_gender);
+        swGender.setThumbResource(R.drawable.boy_face);
+        swGender.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (swGender.isChecked()) {
+                    mGender = "Girl";
+                    swGender.setThumbResource(R.drawable.girl_face);
+                } else {
+                    mGender = "Boy";
+                    swGender.setThumbResource(R.drawable.boy_face);
+                }
+            }
+        });
+
+        etDobDate = (EditText) rootView.findViewById(R.id.baby_dob);
+        etDobTime = (EditText) rootView.findViewById(R.id.baby_dobtime);
+        etDobDate.setText(Utility.getDateTimeInFormat(Utility.getDate(), Utility.kDateInddMMyyyy));
+        etDobTime.setText(Utility.getDateTimeInFormat(Utility.getTime(), Utility.kTimeInkkmm));
+        spBGAbo = (Spinner) rootView.findViewById(R.id.baby_bgABO);
+        spBGAbo.setAdapter(new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
+                R.id.tvSpinnerList, IDataInfo.BloodGroupABO));
+        spBGAbo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 strBGAbo = parent.getItemAtPosition(position).toString();
@@ -73,10 +91,10 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
                 strBGAbo = "-";
             }
         });
-        mBGPH = (Spinner) rootView.findViewById(R.id.baby_bgPH);
-        mBGPH.setAdapter(new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
-                R.id.spinner_textview, IDataInfo.BloodGroupPH));
-        mBGPH.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spBGPh = (Spinner) rootView.findViewById(R.id.baby_bgPH);
+        spBGPh.setAdapter(new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
+                R.id.tvSpinnerList, IDataInfo.BloodGroupPH));
+        spBGPh.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 strBGPh = parent.getItemAtPosition(position).toString();
@@ -87,35 +105,32 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
                 strBGPh = "-";
             }
         });
-        mDobDate.setOnClickListener(new View.OnClickListener() {
+        etDobDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Utility.PopupDatePicker(getContext(), mDobDate, Utility.kDateInddMMyyyy);
+                Utility.PopupDatePicker(getContext(), etDobDate, Utility.kDateInddMMyyyy);
             }
         });
-        mDobTime.setOnClickListener(new View.OnClickListener() {
+        etDobTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Utility.PopupTimePicker(getContext(), mDobTime, Utility.kTimeInkkmm);
+                Utility.PopupTimePicker(getContext(), etDobTime, Utility.kTimeInkkmm);
             }
         });
-        mSubmit = (Button) rootView.findViewById(R.id.baby_add);
-        mSubmit.setOnClickListener(this);
+        btSubmit = (Button) rootView.findViewById(R.id.baby_add);
+        btSubmit.setOnClickListener(this);
         return rootView;
     }
 
     @Override
     public void onClick(View v) {
-        String name = mName.getText().toString();
-        Integer gender = mGender.isChecked()?0:1;
+        String name = etName.getText().toString();
         Long date = Utility.getDate();
         Long time = Utility.getTime();
         GrowthDataProvider dp = GrowthDataProvider.get();
-        if (dp.addBabyInfo(name, date, time, (gender==0?"Girl":"Boy"), strBGAbo, strBGPh) > -1) {
+        if (dp.addBabyInfo(name, date, time, mGender, strBGAbo, strBGPh) > -1) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
-            if (BabysInfo.getCurrentBabyIndex() == 0) {
-                BabysInfo.getInstance().updateBabyInfo();
-            }
+            BabysInfo.get().updateBabyInfo();
             getActivity().onBackPressed();
         } else {
             Toast.makeText(getContext(), "Update Failed", Toast.LENGTH_SHORT).show();

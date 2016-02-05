@@ -6,16 +6,45 @@
     android:layout_gravity="bottom|right"
     android:divider="#c71313"
     android:layoutMode="clipBounds">
-    <Spinner
-        android:id="@+id/sbXAxis"
+    <LinearLayout
+        android:layout_marginTop="50dp"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        />
-    <Spinner
-        android:id="@+id/sbYAxis"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <TextView
+            android:layout_width="100dp"
+            android:layout_marginLeft="@dimen/fab_margin"
+            android:layout_height="wrap_content"
+            android:textStyle="italic"
+            android:text="@string/start_from"/>
+        <Spinner
+            android:id="@+id/sbXAxis"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:textStyle="italic"
+                android:text="@string/end_to"/>
+            <Spinner
+                android:id="@+id/sbYAxis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+    </LinearLayout>
+    <Button
+        android:id="@+id/nvBtnUpdate"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:max="60"
+        android:layout_height="wrap_content"
+        android:text="@string/update"
         />
-
 </LinearLayout>

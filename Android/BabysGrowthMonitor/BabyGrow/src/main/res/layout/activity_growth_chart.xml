@@ -60,6 +60,6 @@
         android:layout_gravity="end"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/header_drawer_growth_chart"
-        app:menu="@menu/activity_growth_drawer" />
+        app:menu="@menu/menu_drawer_growth_chart" />
 
 </android.support.v4.widget.DrawerLayout>
