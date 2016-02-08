@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
+
 import java.util.ArrayList;
 
 /**
@@ -99,7 +101,7 @@ public class GrowthInfoUpdateFragment extends Fragment implements View.OnClickLi
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
             EventsInfo info = EventsInfo.get(babyInfo.mId);
             if ( info == null) {
-                info = EventsInfo.create(getContext(), babyInfo.mId);
+                info = EventsInfo.create(babyInfo.mId);
             }
             info.update();
             getActivity().onBackPressed();

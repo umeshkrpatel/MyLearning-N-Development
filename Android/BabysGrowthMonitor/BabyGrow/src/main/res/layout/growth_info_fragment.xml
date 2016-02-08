@@ -9,7 +9,7 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:context=".GrowthInfoUpdateFragment">
 
@@ -25,12 +25,13 @@
             android:layout_height="40dp"
             android:layout_gravity="end"
             android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:text="@string/weightOfBaby"
+            android:text="@string/weight"
             />
 
         <EditText
@@ -40,12 +41,13 @@
             android:ems="10"
             android:layout_gravity="end"
             android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:id="@+id/etBabyWeight" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:text="@string/heightOfBaby"
+            android:text="@string/height"
             />
 
         <EditText
@@ -55,12 +57,14 @@
             android:ems="10"
             android:layout_gravity="end"
             android:layout_marginRight="10dp"
-            android:id="@+id/etBabyHeight" />
+            android:layout_marginEnd="10dp"
+            android:id="@+id/etBabyHeight"
+            />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:text="@string/headcOfBaby"
+            android:text="@string/headc"
             />
 
         <EditText
@@ -70,7 +74,9 @@
             android:ems="10"
             android:layout_gravity="end"
             android:layout_marginRight="10dp"
-            android:id="@+id/etBabyHeadCircum" />
+            android:layout_marginEnd="10dp"
+            android:id="@+id/etBabyHeadCircum"
+            />
 
         <TextView
             android:layout_width="match_parent"
@@ -86,6 +92,7 @@
             android:focusable="false"
             android:text="@string/dateFormat"
             android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:id="@+id/etInfoDate" />
 
         <Button

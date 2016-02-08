@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="birth">जन्म</string>
+    <string name="months6">6 महीने</string>
+    <string name="year1">1.0 वर्ष</string>
+    <string name="year2">2.0 वर्ष</string>
+    <string name="year3">3.0 वर्ष</string>
+</resources>

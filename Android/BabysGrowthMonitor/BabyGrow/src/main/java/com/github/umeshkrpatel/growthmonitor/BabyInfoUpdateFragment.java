@@ -15,7 +15,9 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
+import com.github.umeshkrpatel.growthmonitor.data.VaccineScheduler;
 
 /**
  * Created by umpatel on 1/25/2016.
@@ -30,8 +32,6 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
 
     private EditText etName, etDobDate, etDobTime;
     private Switch swGender;
-    private Spinner spBGAbo, spBGPh;
-    private Button btSubmit;
     private String strBGAbo = "-", strBGPh = "-";
     private String mGender = "Boy";
 
@@ -77,7 +77,7 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
         etDobTime = (EditText) rootView.findViewById(R.id.baby_dobtime);
         etDobDate.setText(Utility.getDateTimeInFormat(Utility.getDate(), Utility.kDateInddMMyyyy));
         etDobTime.setText(Utility.getDateTimeInFormat(Utility.getTime(), Utility.kTimeInkkmm));
-        spBGAbo = (Spinner) rootView.findViewById(R.id.baby_bgABO);
+        Spinner spBGAbo = (Spinner) rootView.findViewById(R.id.baby_bgABO);
         spBGAbo.setAdapter(new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
                 R.id.tvSpinnerList, IDataInfo.BloodGroupABO));
         spBGAbo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -91,7 +91,7 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
                 strBGAbo = "-";
             }
         });
-        spBGPh = (Spinner) rootView.findViewById(R.id.baby_bgPH);
+        Spinner spBGPh = (Spinner) rootView.findViewById(R.id.baby_bgPH);
         spBGPh.setAdapter(new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
                 R.id.tvSpinnerList, IDataInfo.BloodGroupPH));
         spBGPh.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -117,7 +117,7 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
                 Utility.PopupTimePicker(getContext(), etDobTime, Utility.kTimeInkkmm);
             }
         });
-        btSubmit = (Button) rootView.findViewById(R.id.baby_add);
+        Button btSubmit = (Button) rootView.findViewById(R.id.baby_add);
         btSubmit.setOnClickListener(this);
         return rootView;
     }
@@ -128,10 +128,16 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
         Long date = Utility.getDate();
         Long time = Utility.getTime();
         GrowthDataProvider dp = GrowthDataProvider.get();
-        if (dp.addBabyInfo(name, date, time, mGender, strBGAbo, strBGPh) > -1) {
+        Long id = dp.addBabyInfo(name, date, time, mGender, strBGAbo, strBGPh);
+        if (id > -1) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
             BabysInfo.get().updateBabyInfo();
+            if (BabysInfo.getCurrentIndex() == -1) {
+                BabysInfo.setCurrentIndex(0);
+            }
+            EventsInfo.create(id.intValue());
             getActivity().onBackPressed();
+            VaccineScheduler.scheduleVaccination(id);
         } else {
             Toast.makeText(getContext(), "Update Failed", Toast.LENGTH_SHORT).show();
         }

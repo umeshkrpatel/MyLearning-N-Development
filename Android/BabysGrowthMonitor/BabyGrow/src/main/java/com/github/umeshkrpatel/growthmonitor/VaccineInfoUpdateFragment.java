@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
+
 import java.util.ArrayList;
 
 
@@ -86,11 +88,11 @@ public class VaccineInfoUpdateFragment extends Fragment implements View.OnClickL
             return;
         }
         GrowthDataProvider dp = GrowthDataProvider.get();
-        if (dp.addVaccinationInfo(0, vaccineDetails, date, babyInfo.mId) > -1 ) {
+        if (dp.addVaccinationInfo("", vaccineDetails, date, babyInfo.mId) > -1 ) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
             EventsInfo info = EventsInfo.get(babyInfo.mId);
             if ( info == null) {
-                info = EventsInfo.create(getContext(), babyInfo.mId);
+                info = EventsInfo.create(babyInfo.mId);
             }
             info.update();
             getActivity().onBackPressed();

@@ -56,7 +56,7 @@ public class ChartData {
         AGE,
         WEIGHT,
         HEIGHT,
-        HEADCIRCUM;
+        HEADCIRCUM
     }
 
     public static ChartType fromInt(int value) {

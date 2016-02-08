@@ -20,16 +20,18 @@ import java.util.ArrayList;
 public class EventTimelineFragment extends Fragment {
 
     private GrowthActivity mListener;
+    private RecyclerView mView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public EventTimelineFragment() {
-    }
+    public static EventTimelineFragment instance;
 
-    public static EventTimelineFragment newInstance(int columnCount) {
-        return new EventTimelineFragment();
+    public static EventTimelineFragment newInstance() {
+        if (instance == null)
+            instance = new EventTimelineFragment();
+        return instance;
     }
 
     @Override
@@ -45,16 +47,16 @@ public class EventTimelineFragment extends Fragment {
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            mView = (RecyclerView) view;
+            mView.setLayoutManager(new LinearLayoutManager(context));
             Integer babyId = BabysInfo.getCurrentBabyId();
             EventsInfo info = EventsInfo.get(babyId);
             if ( info == null) {
-                info = EventsInfo.create(getContext(), babyId);
+                info = EventsInfo.create(babyId);
                 info.update();
             }
             ArrayList<EventsInfo.EventItem> eventItems = info.getList();
-            recyclerView.setAdapter(new EventListAdapter(eventItems, mListener));
+            mView.setAdapter(new EventListAdapter(eventItems, mListener));
         }
         return view;
     }
@@ -82,5 +84,12 @@ public class EventTimelineFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(EventsInfo.EventItem item);
+    }
+
+    public void update() {
+        Integer babyId = BabysInfo.getCurrentBabyId();
+        EventsInfo info = EventsInfo.get(babyId);
+        ArrayList<EventsInfo.EventItem> eventItems = info.getList();
+        mView.setAdapter(new EventListAdapter(eventItems, mListener));
     }
 }

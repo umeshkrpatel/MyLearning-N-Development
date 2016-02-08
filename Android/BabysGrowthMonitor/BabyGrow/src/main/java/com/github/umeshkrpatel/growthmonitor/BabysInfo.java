@@ -2,16 +2,18 @@ package com.github.umeshkrpatel.growthmonitor;
 
 import android.database.Cursor;
 
+import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class BabysInfo {
 
     private static BabysInfo ourInstance = null;
     ArrayList<BabyInfo> mBabyInfo = new ArrayList<>();
     private final BabyInfo mDummyInfo;
-    private static Integer mCurrentBabyInfoIndex = 0;
+    private static Integer mCurrentBabyInfoIndex = -1;
 
     public static BabysInfo create() {
         if (ourInstance == null) {
@@ -19,6 +21,22 @@ public class BabysInfo {
             ourInstance.updateBabyInfo();
         }
         return ourInstance;
+    }
+
+    private static final int[][] BabyImageIDs = new int[][] {
+            {R.drawable.boy_sleeping, R.drawable.girl_sleeping} ,
+            {R.drawable.boy_sitting, R.drawable.girl_sitting} ,
+            {R.drawable.boy_crawling, R.drawable.girl_crawling} ,
+    };
+
+    public static int getBabyImage(int gen, float ageMonths) {
+        int ageId = 0;
+        if (ageMonths >= 12) {
+            ageId = 2;
+        } else if (ageMonths >= 6) {
+            ageId = 1;
+        }
+        return BabyImageIDs[ageId][gen];
     }
 
     public static BabysInfo get() {
@@ -96,6 +114,13 @@ public class BabysInfo {
     private ArrayList<BabyInfo> babyInfoList() {
         return mBabyInfo;
     }
+    public static HashMap<Integer,BabyInfo> getBabyInfoMap() {
+        HashMap<Integer, BabyInfo> babyInfos = new HashMap<>();
+        for (BabyInfo info: getBabyInfoList()) {
+            babyInfos.put(info.getId(), info);
+        }
+        return babyInfos;
+    }
     public static ArrayList<BabyInfo> getBabyInfoList() {
         return BabysInfo.get().babyInfoList();
     }
@@ -128,6 +153,26 @@ public class BabysInfo {
 
         @Override
         public String toString() {
+            return mName;
+        }
+
+        public Integer getId() {
+            return mId;
+        }
+
+        public Long getDob() {
+            return mDob;
+        }
+
+        public Long getTime() {
+            return mTime;
+        }
+
+        public String getGender() {
+            return mGender;
+        }
+
+        public String getName() {
             return mName;
         }
     }

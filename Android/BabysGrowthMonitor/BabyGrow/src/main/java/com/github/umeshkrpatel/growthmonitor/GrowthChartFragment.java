@@ -21,6 +21,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
 import com.github.umeshkrpatel.growthmonitor.data.ChartData;
+import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 import com.github.umeshkrpatel.growthmonitor.data.IHCPercentileData;
 import com.github.umeshkrpatel.growthmonitor.data.IHPercentileData;

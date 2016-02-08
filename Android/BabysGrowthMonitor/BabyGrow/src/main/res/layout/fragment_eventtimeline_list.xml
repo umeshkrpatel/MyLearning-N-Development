@@ -13,4 +13,5 @@
     tools:listitem="@layout/fragment_eventtimeline"
     style="@android:style/Widget.ListView"
     android:clickable="true"
-    android:elevation="@android:dimen/app_icon_size" />
+    android:elevation="@android:dimen/app_icon_size"
+    tools:ignore="UnusedAttribute" />

@@ -20,6 +20,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.umeshkrpatel.growthmonitor.prefs.Preferences;
+
 public class GrowthActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         EventTimelineFragment.OnListFragmentInteractionListener {
@@ -38,11 +40,10 @@ public class GrowthActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_growth);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        GrowthDataProvider.create(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -70,6 +71,7 @@ public class GrowthActivity extends AppCompatActivity
             public void onClick(View v) {
                 BabysInfo.setToNextIndex();
                 updateMainView();
+                EventTimelineFragment.newInstance().update();
             }
         });
 
@@ -79,20 +81,25 @@ public class GrowthActivity extends AppCompatActivity
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        BabysInfo babysInfo = BabysInfo.create();
         int Index = BabysInfo.getCurrentIndex();
         if (BabysInfo.size() == 0 && Index > 0) {
             Intent intent = new Intent(this, InfoActivity.class);
             startActivity(intent);
         } else {
             updateMainView();
-            EventsInfo.create(this, mBabyId);
+            EventsInfo.create(mBabyId);
         }
     }
     @Override
     public void onResume() {
         super.onResume();
         updateMainView();
+    }
+
+    @Override
+    protected void onDestroy() {
+        finish();
+        super.onDestroy();
     }
 
     @Override
@@ -172,7 +179,7 @@ public class GrowthActivity extends AppCompatActivity
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a GrowthChartFragment (defined as a static inner class below).
-            return EventTimelineFragment.newInstance(0);
+            return EventTimelineFragment.newInstance();
         }
 
         @Override
@@ -207,24 +214,26 @@ public class GrowthActivity extends AppCompatActivity
         tvMainBabyName.setText(babysInfo.getBabyInfoName(Index));
         tvNvBabyName.setText(babysInfo.getBabyInfoName(Index));
         mBabyDob.setText(Utility.getDateTimeFromMillisecond(dob));
-        if (gen.equals("Girl")) {
-            ivMainBabyPicture.setImageResource(R.drawable.girl_face);
-            ivNvBabyPic.setImageResource(R.drawable.girl_face);
-        } else {
-            ivMainBabyPicture.setImageResource(R.drawable.boy_face);
-            ivNvBabyPic.setImageResource(R.drawable.boy_face);
-        }
+        int genId = gen.equals("Girl")?1:0;
+        float age = Utility.fromMiliSecondsToMonths(System.currentTimeMillis() - dob);
+        int imgR = BabysInfo.getBabyImage(genId, age);
+        ivMainBabyPicture.setImageResource(imgR);
+        ivNvBabyPic.setImageResource(imgR);
         if (babysInfo.getBabyInfoCount() > 1) {
-            ivNvBabyPic.setVisibility(View.VISIBLE);
+            ivNvBabyPicExtra.setVisibility(View.VISIBLE);
             Index = (Index + 1) % BabysInfo.size();
+            dob = babysInfo.getBabyInfoDob(Index);
             gen = babysInfo.getBabyInfoGender(Index);
-            if (gen.equals("Girl")) {
-                ivNvBabyPicExtra.setImageResource(R.drawable.girl_face);
-            } else {
-                ivNvBabyPicExtra.setImageResource(R.drawable.boy_face);
-            }
+            genId = gen.equals("Girl")?1:0;
+            age = Utility.fromMiliSecondsToMonths(System.currentTimeMillis() - dob);
+            imgR = BabysInfo.getBabyImage(genId, age);
+            ivNvBabyPicExtra.setImageResource(imgR);
         } else {
-            ivNvBabyPic.setVisibility(View.GONE);
+            ivNvBabyPicExtra.setVisibility(View.GONE);
         }
+    }
+
+    public void finish() {
+        Preferences.saveValue(Preferences.kCurrentBabyID, BabysInfo.getCurrentIndex());
     }
 }

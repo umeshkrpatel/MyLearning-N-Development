@@ -1,4 +1,4 @@
-package com.github.umeshkrpatel.growthmonitor;
+package com.github.umeshkrpatel.growthmonitor.data;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,8 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-
-import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 
 /**
  * Created by umpatel on 1/25/2016.
@@ -62,8 +60,9 @@ public class GrowthDataProvider extends SQLiteOpenHelper {
                 + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + IDataInfo.DATE + " LONG, "
                 + IDataInfo.BABY_ID + " INTEGER, "
-                + IDataInfo.VACCINE_TYPE + " INTEGER, "
-                + IDataInfo.VACCINE_NOTE + " TEXT);");
+                + IDataInfo.VACCINE_TYPE + " TEXT, "
+                + IDataInfo.VACCINE_NOTE + " TEXT, "
+                + IDataInfo.VACCINE_DATE + " LONG);");
 
         db.execSQL("CREATE TABLE " + IDataInfo.kEventTable + " ( "
                 + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -159,7 +158,7 @@ public class GrowthDataProvider extends SQLiteOpenHelper {
         return ret;
     }
 
-    public long addVaccinationInfo(Integer vaccineType, String vaccineInfo, Long date, Integer baby_id) {
+    public long addVaccinationInfo(String vaccineType, String vaccineInfo, Long date, Integer baby_id) {
         ContentValues cv = new ContentValues();
         cv.put(IDataInfo.VACCINE_TYPE, vaccineType);
         cv.put(IDataInfo.VACCINE_NOTE, vaccineInfo);

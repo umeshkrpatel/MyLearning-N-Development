@@ -1,8 +1,8 @@
 package com.github.umeshkrpatel.growthmonitor;
 
-import android.content.Context;
 import android.database.Cursor;
 
+import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 
 import java.util.ArrayList;
@@ -10,18 +10,16 @@ import java.util.HashMap;
 
 public class EventsInfo {
     private final Integer mBabyID;
-    private final Context mContext;
     public static HashMap<Integer, EventsInfo> mEventTimeline = new HashMap<>();
     private ArrayList<EventItem> mEventItems = new ArrayList<>();
-    private EventsInfo(final Context context, final Integer babyId) {
+    private EventsInfo(final Integer babyId) {
         mBabyID = babyId;
-        mContext = context;
     }
 
-    public static EventsInfo create(final Context context, final Integer babyId) {
+    public static EventsInfo create(final Integer babyId) {
         EventsInfo eventsInfo = mEventTimeline.get(babyId);
         if (eventsInfo == null) {
-            eventsInfo = new EventsInfo(context, babyId);
+            eventsInfo = new EventsInfo(babyId);
             eventsInfo.update();
             mEventTimeline.put(babyId, eventsInfo);
         }
@@ -56,26 +54,39 @@ public class EventsInfo {
         return mEventItems;
     }
 
-    public static String getEventDetails(Integer eventType, Integer eventID) {
-        Cursor c = null;
-        switch (eventType) {
+    public static String getEventDetails(EventItem item) {
+        Cursor c;
+        switch (item.mEventType) {
             case IDataInfo.EVENT_MEASUREMENT:
                 c = GrowthDataProvider.get()
                         .queryTable(IDataInfo.kGrowthInfoTable, null,
-                                IDataInfo.ID + "=" + eventID, null, null, null, null);
-                if (c!=null && c.getCount()>0) {
+                                IDataInfo.ID + "=" + item.mEventID, null, null, null, null);
+                if (c != null && c.getCount() > 0) {
                     if (c.moveToNext()) {
-                        return ("She is " + c.getFloat(IDataInfo.INDEX_WEIGHT) + "kg heavy, "
-                                + c.getFloat(IDataInfo.INDEX_HEIGHT) + "cm tall, and her head has become "
-                                + c.getFloat(IDataInfo.INDEX_HEAD) + "cm big");
+                        String msg = ResourceReader.getString(R.string.event_measurment);
+                        String pronoun1, pronoun2;
+                        if (BabysInfo.get().getBabyInfoGender(BabysInfo.getCurrentIndex()).equals("Girl")) {
+                            pronoun1 = ResourceReader.getString(R.string.she);
+                            pronoun2 = ResourceReader.getString(R.string.her);
+                        } else {
+                            pronoun1 = ResourceReader.getString(R.string.he);
+                            pronoun2 = ResourceReader.getString(R.string.his);
+                        }
+                        msg = String.format(msg, pronoun1,
+                                c.getFloat(IDataInfo.INDEX_WEIGHT),
+                                c.getFloat(IDataInfo.INDEX_HEIGHT),
+                                pronoun2,
+                                c.getFloat(IDataInfo.INDEX_HEAD)
+                                );
+                        return msg;
                     }
                 }
                 break;
             case IDataInfo.EVENT_LIFEEVENT:
                 c = GrowthDataProvider.get()
                         .queryTable(IDataInfo.kLifeEventTable, null,
-                                IDataInfo.ID + "=" + eventID, null, null, null, null);
-                if (c!=null && c.getCount()>0) {
+                                IDataInfo.ID + "=" + item.mEventID, null, null, null, null);
+                if (c != null && c.getCount() > 0) {
                     if (c.moveToNext()) {
                         return ("She has her first " + c.getInt(IDataInfo.INDEX_LE_TYPE) + " today");
                     }
@@ -84,10 +95,14 @@ public class EventsInfo {
             case IDataInfo.EVENT_VACCINATION:
                 c = GrowthDataProvider.get()
                         .queryTable(IDataInfo.kVaccineTable, null,
-                                IDataInfo.ID + "=" + eventID, null, null, null, null);
-                if (c!=null && c.getCount()>0) {
+                                IDataInfo.ID + "=" + item.mEventID, null, null, null, null);
+                if (c != null && c.getCount() > 0) {
                     if (c.moveToNext()) {
-                        return ("She has her vaccine " + c.getInt(IDataInfo.INDEX_VACCINE_TYPE) + " today");
+                        String msg = ResourceReader.getString(R.string.event_vaccine);
+                        BabysInfo.BabyInfo info =
+                                BabysInfo.getBabyInfoMap().get(BabysInfo.getCurrentBabyId());
+                        msg = String.format(msg, info.getName(), c.getString(IDataInfo.INDEX_VACCINE_TYPE));
+                        return msg;
                     }
                 }
                 break;
@@ -108,6 +123,9 @@ public class EventsInfo {
             mID = id; mDate = date; mEventType = eventType; mEventID = eventID;
         }
 
+        Integer getID() {
+            return mID;
+        }
         Long getDate() {
             return mDate;
         }

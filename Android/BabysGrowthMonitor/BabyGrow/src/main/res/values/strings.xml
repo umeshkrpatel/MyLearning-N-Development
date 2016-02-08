@@ -12,25 +12,7 @@
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
 
-    <string name="pref_title_social_recommendations" translatable="false">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations" translatable="false">Recommendations for people to contact
-        based on your message history
-    </string>
-
-    <string name="pref_title_display_name" translatable="false">Display name</string>
-    <string name="pref_default_display_name" translatable="false">John Smith</string>
-
-    <string name="pref_title_current_baby" translatable="false">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
+    <string name="pref_title_language_change">Switch to Hindi language</string>
 
     <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync" translatable="false">Data &amp; sync</string>
@@ -71,22 +53,36 @@
     <string name="dateFormat" translatable="false">DD/MMM/YYYY</string>
     <string name="timeFormat" translatable="false">hh:mm</string>
     <string name="submit">Save</string>
-    <string name="babysDob">Baby\'s Date of Birth</string>
-    <string name="babysGender">Baby\'s Gender</string>
+    <string name="babysDob">Date of Birth</string>
+    <string name="babysGender">Gender</string>
     <string name="settings">Settings</string>
     <string name="title_activity_milestone" translatable="false">MilestoneActivity</string>
     <string name="start_from">Start From</string>
     <string name="end_to">End To</string>
-    <string name="weightOfBaby">Baby\'s Weight</string>
-    <string name="heightOfBaby">Baby\'s Height</string>
-    <string name="headcOfBaby">Baby\'s Head Circumferance</string>
+    <string name="weight">Weight</string>
+    <string name="height">Height</string>
+    <string name="headc">Head Circumferance</string>
     <string name="dateOfMeasure">Date of Measurment</string>
-    <string name="bloodGroupOfBaby">Baby\'s Blood Group</string>
+    <string name="bloodGroupOfBaby">Blood Group</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="vaccineType">Vaccination Type</string>
     <string name="vaccineDetails">Vaccination Details</string>
     <string name="vaccineDate">Vaccination Date</string>
     <string name="update">Update</string>
+    <string name="addInformation">Add Information</string>
+    <string name="viewGrowthChart">View Growth Chart</string>
+    <string name="allBabyLists">All Babies List</string>
+    <string name="communicate">Communicate</string>
+    <string name="share">Share</string>
+    <string name="send">Send</string>
+    <string name="age">Age</string>
+    <string name="event_measurment">%1$s is %2$.2fkg heavy, %3$.2f cm tall and %4$s has become %5$.2f cm big</string>
+    <string name="she">She</string>
+    <string name="he">He</string>
+    <string name="her">her</string>
+    <string name="his">his</string>
+    <string name="event_vaccine">%1$s has %2$s vaccination today</string>
+    <string name="title_activity_notification">NotificationActivity</string>
 </resources>

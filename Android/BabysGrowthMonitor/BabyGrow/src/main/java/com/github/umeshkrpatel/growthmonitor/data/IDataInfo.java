@@ -44,6 +44,7 @@ public interface IDataInfo {
     String kLifeEventTable = "LifeEventInfo";
     String kEventTable = "EventInfo";
     String kVaccineTable = "VaccineInfo";
+
     /*
      * Common rows in table
      */
@@ -93,4 +94,6 @@ public interface IDataInfo {
     Integer INDEX_VACCINE_TYPE = 3;
     String VACCINE_NOTE = "_VACCINE_NOTE";
     Integer INDEX_VACCINE_NOTE = 4;
+    String VACCINE_DATE = "_ACTUAL_DATE";
+    Integer INDEX_VACCINE_DATE = 5;
 }

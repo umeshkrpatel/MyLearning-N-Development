@@ -10,6 +10,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
+    android:background="@android:color/white"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.github.umeshkrpatel.growthmonitor.GrowthActivity"
     tools:showIn="@layout/app_bar_growth">
@@ -18,7 +19,14 @@
         android:layout_height="wrap_content"
         android:rowCount="3"
         android:columnCount="2"
-        >
+        android:layout_marginTop="@dimen/list_margin"
+        android:layout_marginLeft="@dimen/list_margin"
+        android:layout_marginStart="@dimen/list_margin"
+        android:layout_marginRight="@dimen/list_margin"
+        android:layout_marginEnd="@dimen/list_margin"
+        android:elevation="2dp"
+        android:background="@drawable/bg_shadow"
+        tools:ignore="UnusedAttribute">
         <ImageView
             android:id="@+id/cgBabyView"
             android:layout_width="100dp"
@@ -27,13 +35,16 @@
             android:layout_column="0"
             android:layout_rowSpan="3"
             android:layout_marginRight="@dimen/list_margin"
-            />
+            android:layout_marginEnd="@dimen/list_margin"
+            android:background="@drawable/sg_baby_image"
+            android:contentDescription="@string/nameOfBaby" />
         <TextView
             android:id="@+id/cgBabyName"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:textSize="30sp"
             android:text="@string/nameOfBaby"
+            style="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
             android:layout_row="0"
             android:layout_column="1"
             />
@@ -41,14 +52,21 @@
             android:id="@+id/cgBabyDob"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:textSize="25sp"
+            android:textSize="15sp"
             android:layout_row="1"
             android:layout_column="1"
+            style="@style/TextAppearance.StatusBar.EventContent.Info"
             />
     </GridLayout>
     <android.support.v4.view.ViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_margin"
+        android:layout_marginBottom="@dimen/list_margin"
+        android:layout_marginLeft="@dimen/list_margin"
+        android:layout_marginStart="@dimen/list_margin"
+        android:layout_marginRight="@dimen/list_margin"
+        android:layout_marginEnd="@dimen/list_margin"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 </LinearLayout>
