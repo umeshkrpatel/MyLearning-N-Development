@@ -8,7 +8,7 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingTop="@dimen/fab_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <LinearLayout
@@ -21,7 +21,6 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:paddingTop="@dimen/nav_header_vertical_spacing"
-            android:src="@android:drawable/sym_def_app_icon"
             android:contentDescription="@string/nameOfBaby" />
         <ImageView
             android:id="@+id/imgBabyIconExt"
@@ -29,7 +28,6 @@
             android:layout_height="48dp"
             android:layout_marginLeft="100dp"
             android:layout_marginStart="100dp"
-            android:src="@android:drawable/sym_def_app_icon"
             android:contentDescription="@string/nameOfBaby" />
     </LinearLayout>
 
@@ -37,7 +35,7 @@
         android:id="@+id/tvBabyName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:paddingTop="@dimen/list_margin"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         />
 

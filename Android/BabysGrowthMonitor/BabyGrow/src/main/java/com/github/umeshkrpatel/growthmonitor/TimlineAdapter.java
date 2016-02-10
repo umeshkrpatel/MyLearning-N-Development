@@ -2,7 +2,7 @@ package com.github.umeshkrpatel.growthmonitor;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.support.v7.widget.RecyclerView;
+import android.support.annotation.NonNull;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
@@ -14,10 +14,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.umeshkrpatel.growthmonitor.data.IAdapter;
 
 import java.util.ArrayList;
 
-public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.ViewHolder> {
+public class TimlineAdapter extends IAdapter {
 
     private final ArrayList<EventsInfo.EventItem> mValues;
     private final GrowthActivity mListener;
@@ -43,22 +44,24 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.View
         return sTimeLineImageIDs[timelineId];
     }
 
-    public EventListAdapter(ArrayList<EventsInfo.EventItem> items, GrowthActivity listener) {
+    public TimlineAdapter(ArrayList<EventsInfo.EventItem> items, GrowthActivity listener) {
         mValues = items;
         mListener = listener;
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_eventtimeline, parent, false);
+                .inflate(R.layout.timeline_listview, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final IViewHolder iholder, int position) {
+        final ViewHolder holder = (ViewHolder)iholder;
         holder.mItem = mValues.get(position);
-        String gen = BabysInfo.get().getBabyInfoGender(BabysInfo.getCurrentIndex());
+        String gen = BabiesInfo.get().getBabyInfoGender(BabiesInfo.getCurrentIndex());
         if (gen.equals("Girl")) {
             holder.mView.setBackgroundResource(R.drawable.sg_bg_round_pink);
         } else {
@@ -73,7 +76,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.View
         holder.mTimeline.setImageResource(
                 getTimelineImage(
                         holder.mItem.getDate(),
-                        BabysInfo.get().getBabyInfoDob(BabysInfo.getCurrentIndex())
+                        BabiesInfo.get().getBabyInfoDob(BabiesInfo.getCurrentIndex())
                 ));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -82,7 +85,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.View
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onEventInfoInteraction(holder.mItem);
                 }
             }
         });
@@ -93,27 +96,32 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.View
         return mValues.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends IAdapter.IViewHolder {
+        @NonNull
         public final View mView;
+        @NonNull
         public final TextView mInfoView;
         //public final TextView mDateView;
+        @NonNull
         public final ImageView mTimeline;
         public EventsInfo.EventItem mItem;
 
-        public ViewHolder(View view) {
+        public ViewHolder(@NonNull View view) {
             super(view);
             mView = view;
             mInfoView = (TextView) view.findViewById(R.id.blInfo);
             mTimeline = (ImageView) view.findViewById(R.id.ivTimeline);
         }
 
+        @NonNull
         @Override
         public String toString() {
             return super.toString() + " '" + mInfoView.getText() + "'";
         }
     }
 
-    private static SpannableString generateSpannableText(String first, String second, String third) {
+    @NonNull
+    private static SpannableString generateSpannableText(@NonNull String first, @NonNull String second, @NonNull String third) {
         int flen = first.length(), slen = second.length(), tlen = third.length();
         SpannableString s = new SpannableString(first + '\n' + second + '\n' + third);
         s.setSpan(new RelativeSizeSpan(1f), 0, flen, 0);

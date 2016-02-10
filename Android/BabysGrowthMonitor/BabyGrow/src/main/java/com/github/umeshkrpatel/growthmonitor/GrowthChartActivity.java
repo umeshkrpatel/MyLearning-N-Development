@@ -2,6 +2,8 @@ package com.github.umeshkrpatel.growthmonitor;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -26,6 +28,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 
 import com.github.umeshkrpatel.growthmonitor.data.ChartData;
+import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 
 import java.util.ArrayList;
 
@@ -34,6 +37,12 @@ public class GrowthChartActivity extends AppCompatActivity
         AdapterView.OnItemSelectedListener {
 
     private static final String TAG = "GrowthChartActivity";
+
+    public static final String ACTION_TYPE = "action_type";
+    public static final String ACTION_VALUE1 = "action_value1";
+    public static final String ACTION_VALUE2 = "action_value2";
+
+    @Nullable
     private static String[] sChartList = null;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -45,24 +54,21 @@ public class GrowthChartActivity extends AppCompatActivity
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private Spinner mXAxisBar, mYAxisBar;
-    private Button mUpdate;
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
-    private int mBabyId;
+    @NonNull
     private static ChartData.ChartType[] dChart = new ChartData.ChartType[] {
             ChartData.ChartType.WEIGHT, ChartData.ChartType.HEIGHT, ChartData.ChartType.HEADCIRCUM,
     };
 
+    @NonNull
     private int[] rIDs = new int[] {
             R.string.weight, R.string.height, R.string.headc
     };
 
+    @NonNull
     private static Integer sFragmentCount = 3;
 
-    public static void createChartList(Context context) {
+    public static void createChartList(@NonNull Context context) {
         if (sChartList == null)
             sChartList = context.getResources().getStringArray(R.array.chartListItems);
     }
@@ -88,6 +94,7 @@ public class GrowthChartActivity extends AppCompatActivity
 
         mXAxisBar = (Spinner) navigationView.getHeaderView(0).findViewById(R.id.sbXAxis);
         mXAxisBar.setOnItemSelectedListener(this);
+        assert sChartList != null;
         mXAxisBar.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_listview,
                 R.id.tvSpinnerList, sChartList));
         mXAxisBar.setSelection(ChartData.minRange());
@@ -97,8 +104,8 @@ public class GrowthChartActivity extends AppCompatActivity
         mYAxisBar.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_listview,
                 R.id.tvSpinnerList, sChartList));
         mYAxisBar.setSelection(ChartData.maxRange());
-        mUpdate = (Button) navigationView.getHeaderView(0).findViewById(R.id.nvBtnUpdate);
-        mUpdate.setOnClickListener(new View.OnClickListener() {
+        Button btnUpdate = (Button) navigationView.getHeaderView(0).findViewById(R.id.nvBtnUpdate);
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ChartData.setMinRange(mXAxisBar.getSelectedItemPosition());
@@ -127,21 +134,25 @@ public class GrowthChartActivity extends AppCompatActivity
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        /*
+      The {@link ViewPager} that will host the section contents.
+     */
+        ViewPager viewPager = (ViewPager) findViewById(R.id.container);
+        viewPager.setAdapter(mSectionsPagerAdapter);
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        tabLayout.setupWithViewPager(viewPager);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(@NonNull View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
-        mBabyId = BabysInfo.getCurrentBabyId();
+
+        handleIntent(savedInstanceState);
     }
 
 
@@ -153,7 +164,7 @@ public class GrowthChartActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -175,6 +186,7 @@ public class GrowthChartActivity extends AppCompatActivity
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         if (parent == mXAxisBar) {
+            assert sChartList != null;
             if (position == (sChartList.length - 1)) {
                 mXAxisBar.setSelection(position - 1);
                 return;
@@ -204,6 +216,7 @@ public class GrowthChartActivity extends AppCompatActivity
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+        @NonNull
         private ArrayList<GrowthChartFragment> mf = new ArrayList<>();
         private int mCurrent = 0;
         private final Context mContext;
@@ -230,6 +243,7 @@ public class GrowthChartActivity extends AppCompatActivity
             return sFragmentCount;
         }
 
+        @NonNull
         @Override
         public CharSequence getPageTitle(int position) {
             return mContext.getResources().getString(R.string.age)
@@ -240,6 +254,22 @@ public class GrowthChartActivity extends AppCompatActivity
             super.setPrimaryItem(container, position, object);
             Log.d(TAG, "I am in right place or Not");
             mCurrent = position;
+        }
+    }
+
+    void handleIntent(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            Bundle bundle = getIntent().getExtras();
+            if (bundle != null) {
+                Integer actionType = bundle.getInt(ACTION_TYPE);
+                if (actionType == IDataInfo.ACTION_UPDATE) {
+                    Integer actionEvent = bundle.getInt(ACTION_VALUE1);
+                    Integer actionValue = bundle.getInt(ACTION_VALUE2);
+                    if (actionEvent == IDataInfo.EVENT_LIFEEVENT) {
+
+                    }
+                }
+            }
         }
     }
 }

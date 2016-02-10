@@ -8,16 +8,9 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.github.umeshkrpatel.growthmonitor.NotificationActivity;
+import com.github.umeshkrpatel.growthmonitor.GrowthActivity;
 import com.github.umeshkrpatel.growthmonitor.R;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p/>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
 public class NotificationService extends IntentService {
 
     public NotificationService() {
@@ -26,7 +19,9 @@ public class NotificationService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        handleAction("AlarmTest");
+        String message = "Alarm Test";
+        message = VaccineScheduler.notificationMessage();
+        handleAction(message);
     }
 
     private void handleAction(String param) {
@@ -35,7 +30,7 @@ public class NotificationService extends IntentService {
                 .getSystemService(Context.NOTIFICATION_SERVICE);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, NotificationActivity.class), 0);
+                new Intent(this, GrowthActivity.class), 0);
 
         NotificationCompat.Builder alamNotificationBuilder = new NotificationCompat.Builder(
                 this).setContentTitle("Alarm").setSmallIcon(R.mipmap.ic_launcher)

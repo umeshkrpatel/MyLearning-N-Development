@@ -1,6 +1,7 @@
 package com.github.umeshkrpatel.growthmonitor;
 
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 
 import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
@@ -10,7 +11,9 @@ import java.util.HashMap;
 
 public class EventsInfo {
     private final Integer mBabyID;
+    @NonNull
     public static HashMap<Integer, EventsInfo> mEventTimeline = new HashMap<>();
+    @NonNull
     private ArrayList<EventItem> mEventItems = new ArrayList<>();
     private EventsInfo(final Integer babyId) {
         mBabyID = babyId;
@@ -50,11 +53,12 @@ public class EventsInfo {
         }
     }
 
+    @NonNull
     public ArrayList<EventItem> getList() {
         return mEventItems;
     }
 
-    public static String getEventDetails(EventItem item) {
+    public static String getEventDetails(@NonNull EventItem item) {
         Cursor c;
         switch (item.mEventType) {
             case IDataInfo.EVENT_MEASUREMENT:
@@ -65,7 +69,7 @@ public class EventsInfo {
                     if (c.moveToNext()) {
                         String msg = ResourceReader.getString(R.string.event_measurment);
                         String pronoun1, pronoun2;
-                        if (BabysInfo.get().getBabyInfoGender(BabysInfo.getCurrentIndex()).equals("Girl")) {
+                        if (BabiesInfo.get().getBabyInfoGender(BabiesInfo.getCurrentIndex()).equals("Girl")) {
                             pronoun1 = ResourceReader.getString(R.string.she);
                             pronoun2 = ResourceReader.getString(R.string.her);
                         } else {
@@ -99,8 +103,8 @@ public class EventsInfo {
                 if (c != null && c.getCount() > 0) {
                     if (c.moveToNext()) {
                         String msg = ResourceReader.getString(R.string.event_vaccine);
-                        BabysInfo.BabyInfo info =
-                                BabysInfo.getBabyInfoMap().get(BabysInfo.getCurrentBabyId());
+                        BabiesInfo.BabyInfo info =
+                                BabiesInfo.getBabyInfoMap().get(BabiesInfo.getCurrentBabyId());
                         msg = String.format(msg, info.getName(), c.getString(IDataInfo.INDEX_VACCINE_TYPE));
                         return msg;
                     }

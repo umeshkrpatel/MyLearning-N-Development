@@ -2,6 +2,8 @@ package com.github.umeshkrpatel.growthmonitor;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -17,38 +19,42 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
+import com.github.umeshkrpatel.growthmonitor.data.IAdapter;
+import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
+import com.github.umeshkrpatel.growthmonitor.data.VaccineScheduler;
 import com.github.umeshkrpatel.growthmonitor.prefs.Preferences;
+
+import java.util.ArrayList;
 
 public class GrowthActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        EventTimelineFragment.OnListFragmentInteractionListener {
+        GrowthFragment.OnListFragmentInteractionListener {
 
-    private ImageView ivMainBabyPicture, ivNvBabyPic, ivNvBabyPicExtra;
-    private TextView tvMainBabyName, tvNvBabyName, mBabyDob;
+    private ImageView ivNvBabyPic, ivNvBabyPicExtra;
+    private GridLayout glDetails;
+    private TextView tvNvBabyName;
     private int mBabyId;
-
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_growth);
+
+        initialize();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(@NonNull View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -63,26 +69,30 @@ public class GrowthActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.gcNavView);
         navigationView.setNavigationItemSelectedListener(this);
 
+        glDetails = (GridLayout) findViewById(R.id.glDetails);
         ivNvBabyPic = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imgBabyIcon);
         ivNvBabyPicExtra = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imgBabyIconExt);
         tvNvBabyName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.tvBabyName);
         ivNvBabyPicExtra.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BabysInfo.setToNextIndex();
+                BabiesInfo.setToNextIndex();
                 updateMainView();
-                EventTimelineFragment.newInstance().update();
+                Integer babyId = BabiesInfo.getCurrentBabyId();
+                EventsInfo info = EventsInfo.get(babyId);
+                ArrayList<EventsInfo.EventItem> eventItems = info.getList();
+                IAdapter adapter = new TimlineAdapter(eventItems, null);
+                GrowthFragment.get().setAdapter(adapter);
             }
         });
 
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.container);
+        viewPager.setAdapter(sectionsPagerAdapter);
 
-        int Index = BabysInfo.getCurrentIndex();
-        if (BabysInfo.size() == 0 && Index > 0) {
+        int Index = BabiesInfo.getCurrentIndex();
+        if (BabiesInfo.size() == 0 && Index > 0) {
             Intent intent = new Intent(this, InfoActivity.class);
             startActivity(intent);
         } else {
@@ -120,7 +130,7 @@ public class GrowthActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -138,7 +148,7 @@ public class GrowthActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -149,7 +159,8 @@ public class GrowthActivity extends AppCompatActivity
             Intent intent = new Intent(this, InfoActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_babies_list) {
-
+            IAdapter adapter = new BabiesAdapter(BabiesInfo.getBabyInfoList(), this);
+            GrowthFragment.get().setAdapter(adapter);
         } else if (id == R.id.nav_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
@@ -165,8 +176,17 @@ public class GrowthActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(EventsInfo.EventItem item) {
+    public void onEventInfoInteraction(EventsInfo.EventItem item) {
 
+    }
+
+    @Override
+    public void onBabyInfoInteraction(BabiesInfo.BabyInfo item) {
+        Intent intent = new Intent(this, GrowthChartActivity.class);
+        intent.putExtra(GrowthChartActivity.ACTION_TYPE, IDataInfo.ACTION_UPDATE);
+        intent.putExtra(GrowthChartActivity.ACTION_VALUE1, IDataInfo.EVENT_LIFEEVENT);
+        intent.putExtra(GrowthChartActivity.ACTION_VALUE2, item.getId());
+        startActivity(intent);
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -179,7 +199,7 @@ public class GrowthActivity extends AppCompatActivity
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a GrowthChartFragment (defined as a static inner class below).
-            return EventTimelineFragment.newInstance();
+            return GrowthFragment.get();
         }
 
         @Override
@@ -188,6 +208,7 @@ public class GrowthActivity extends AppCompatActivity
             return 1;
         }
 
+        @Nullable
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
@@ -203,30 +224,35 @@ public class GrowthActivity extends AppCompatActivity
     }
 
     private void updateMainView() {
-        BabysInfo babysInfo = BabysInfo.get();
-        Integer Index = BabysInfo.getCurrentIndex();
-        tvMainBabyName = (TextView)findViewById(R.id.cgBabyName);
-        mBabyDob = (TextView) findViewById(R.id.cgBabyDob);
-        ivMainBabyPicture = (ImageView) findViewById(R.id.cgBabyView);
-        mBabyId = babysInfo.getBabyInfoId(Index);
-        Long dob = babysInfo.getBabyInfoDob(Index);
-        String gen = babysInfo.getBabyInfoGender(Index);
-        tvMainBabyName.setText(babysInfo.getBabyInfoName(Index));
-        tvNvBabyName.setText(babysInfo.getBabyInfoName(Index));
-        mBabyDob.setText(Utility.getDateTimeFromMillisecond(dob));
+        BabiesInfo babiesInfo = BabiesInfo.get();
+        Integer Index = BabiesInfo.getCurrentIndex();
+        TextView tvBabyName = (TextView) findViewById(R.id.cgBabyName);
+        TextView tvBabyDOB = (TextView) findViewById(R.id.cgBabyDob);
+        ImageView ivBabyPicture = (ImageView) findViewById(R.id.cgBabyView);
+        mBabyId = babiesInfo.getBabyInfoId(Index);
+        Long dob = babiesInfo.getBabyInfoDob(Index);
+        String gen = babiesInfo.getBabyInfoGender(Index);
+        tvBabyName.setText(babiesInfo.getBabyInfoName(Index));
+        tvNvBabyName.setText(babiesInfo.getBabyInfoName(Index));
+        tvBabyDOB.setText(Utility.getDateTimeFromMillisecond(dob));
         int genId = gen.equals("Girl")?1:0;
         float age = Utility.fromMiliSecondsToMonths(System.currentTimeMillis() - dob);
-        int imgR = BabysInfo.getBabyImage(genId, age);
-        ivMainBabyPicture.setImageResource(imgR);
+        if (gen.equals("Girl")) {
+            glDetails.setBackgroundResource(R.drawable.sg_bg_round_pink);
+        } else {
+            glDetails.setBackgroundResource(R.drawable.sg_bg_round_blue);
+        }
+        int imgR = BabiesInfo.getBabyImage(genId, age);
+        ivBabyPicture.setImageResource(imgR);
         ivNvBabyPic.setImageResource(imgR);
-        if (babysInfo.getBabyInfoCount() > 1) {
+        if (babiesInfo.getBabyInfoCount() > 1) {
             ivNvBabyPicExtra.setVisibility(View.VISIBLE);
-            Index = (Index + 1) % BabysInfo.size();
-            dob = babysInfo.getBabyInfoDob(Index);
-            gen = babysInfo.getBabyInfoGender(Index);
+            Index = (Index + 1) % BabiesInfo.size();
+            dob = babiesInfo.getBabyInfoDob(Index);
+            gen = babiesInfo.getBabyInfoGender(Index);
             genId = gen.equals("Girl")?1:0;
             age = Utility.fromMiliSecondsToMonths(System.currentTimeMillis() - dob);
-            imgR = BabysInfo.getBabyImage(genId, age);
+            imgR = BabiesInfo.getBabyImage(genId, age);
             ivNvBabyPicExtra.setImageResource(imgR);
         } else {
             ivNvBabyPicExtra.setVisibility(View.GONE);
@@ -234,6 +260,22 @@ public class GrowthActivity extends AppCompatActivity
     }
 
     public void finish() {
-        Preferences.saveValue(Preferences.kCurrentBabyID, BabysInfo.getCurrentIndex());
+        Preferences.saveValue(Preferences.kCurrentBabyID, BabiesInfo.getCurrentIndex());
+    }
+
+    private void initialize() {
+        Preferences.create(getPreferences(MODE_PRIVATE));
+
+        BabiesInfo.setCurrentIndex(
+                Preferences.readValue(Preferences.kCurrentBabyID, Preferences.kDefCurrentBabyID));
+
+        ResourceReader.create(this);
+
+        GrowthDataProvider.create(this);
+        VaccineScheduler.create(this);
+        BabiesInfo babiesInfo = BabiesInfo.create();
+        for (int i = 0; i < BabiesInfo.size(); i++) {
+            EventsInfo.create(babiesInfo.getBabyInfoId(i));
+        }
     }
 }

@@ -2,12 +2,16 @@ package com.github.umeshkrpatel.growthmonitor;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.github.umeshkrpatel.growthmonitor.data.IAdapter;
 
 import java.util.ArrayList;
 
@@ -17,8 +21,9 @@ import java.util.ArrayList;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class EventTimelineFragment extends Fragment {
+public class GrowthFragment extends Fragment {
 
+    @Nullable
     private GrowthActivity mListener;
     private RecyclerView mView;
 
@@ -26,11 +31,11 @@ public class EventTimelineFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public static EventTimelineFragment instance;
+    public static GrowthFragment instance;
 
-    public static EventTimelineFragment newInstance() {
+    public static GrowthFragment get() {
         if (instance == null)
-            instance = new EventTimelineFragment();
+            instance = new GrowthFragment();
         return instance;
     }
 
@@ -40,7 +45,7 @@ public class EventTimelineFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_eventtimeline_list, container, false);
 
@@ -49,14 +54,14 @@ public class EventTimelineFragment extends Fragment {
             Context context = view.getContext();
             mView = (RecyclerView) view;
             mView.setLayoutManager(new LinearLayoutManager(context));
-            Integer babyId = BabysInfo.getCurrentBabyId();
+            Integer babyId = BabiesInfo.getCurrentBabyId();
             EventsInfo info = EventsInfo.get(babyId);
             if ( info == null) {
                 info = EventsInfo.create(babyId);
                 info.update();
             }
             ArrayList<EventsInfo.EventItem> eventItems = info.getList();
-            mView.setAdapter(new EventListAdapter(eventItems, mListener));
+            mView.setAdapter(new TimlineAdapter(eventItems, mListener));
         }
         return view;
     }
@@ -83,13 +88,18 @@ public class EventTimelineFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(EventsInfo.EventItem item);
+        void onEventInfoInteraction(EventsInfo.EventItem item);
+        void onBabyInfoInteraction(BabiesInfo.BabyInfo item);
+    }
+
+    public void setAdapter(IAdapter adapter) {
+        mView.setAdapter(adapter);
     }
 
     public void update() {
-        Integer babyId = BabysInfo.getCurrentBabyId();
+        Integer babyId = BabiesInfo.getCurrentBabyId();
         EventsInfo info = EventsInfo.get(babyId);
         ArrayList<EventsInfo.EventItem> eventItems = info.getList();
-        mView.setAdapter(new EventListAdapter(eventItems, mListener));
+        mView.setAdapter(new TimlineAdapter(eventItems, mListener));
     }
 }

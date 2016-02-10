@@ -2,6 +2,7 @@ package com.github.umeshkrpatel.growthmonitor;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +39,7 @@ public class GrowthInfoUpdateFragment extends Fragment implements View.OnClickLi
      * Returns a new instance of this fragment for the given section
      * number.
      */
+    @NonNull
     public static GrowthInfoUpdateFragment newInstance(int sectionNumber, int infoId) {
         GrowthInfoUpdateFragment fragment = new GrowthInfoUpdateFragment();
         Bundle args = new Bundle();
@@ -48,7 +50,7 @@ public class GrowthInfoUpdateFragment extends Fragment implements View.OnClickLi
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.growth_info_fragment, container, false);
         mBabyInfo = (Spinner) rootView.findViewById(R.id.spnBabyInfo);
@@ -74,8 +76,8 @@ public class GrowthInfoUpdateFragment extends Fragment implements View.OnClickLi
 
         mSubmit = (Button) rootView.findViewById(R.id.btnGrowth);
         mSubmit.setOnClickListener(this);
-        ArrayList<BabysInfo.BabyInfo> babyInfos = BabysInfo.getBabyInfoList();
-        ArrayAdapter<BabysInfo.BabyInfo> babyInfoArrayAdapter =
+        ArrayList<BabiesInfo.BabyInfo> babyInfos = BabiesInfo.getBabyInfoList();
+        ArrayAdapter<BabiesInfo.BabyInfo> babyInfoArrayAdapter =
                 new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
                         R.id.tvSpinnerList, babyInfos);
         mBabyInfo.setAdapter(babyInfoArrayAdapter);
@@ -86,7 +88,7 @@ public class GrowthInfoUpdateFragment extends Fragment implements View.OnClickLi
     public void onClick(View v) {
         Double weight, height, head;
         Long date;
-        BabysInfo.BabyInfo babyInfo = (BabysInfo.BabyInfo)mBabyInfo.getSelectedItem();
+        BabiesInfo.BabyInfo babyInfo = (BabiesInfo.BabyInfo)mBabyInfo.getSelectedItem();
         weight = Double.parseDouble(mWeight.getText().toString());
         height = Double.parseDouble(mHeight.getText().toString());
         head = Double.parseDouble(mHead.getText().toString());

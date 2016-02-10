@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/sg_bg_round_pink"
+    android:layout_marginBottom="20dp"
+    >
+    <ImageView
+        android:id="@+id/blvBabyImage"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/nameOfBaby"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/sg_baby_image"
+        />
+    <TextView
+        android:id="@+id/blvBabyName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_toRightOf="@+id/blvBabyImage"
+        android:layout_toEndOf="@+id/blvBabyImage"
+        android:textAppearance="?attr/textAppearanceListItem"
+        />
+</RelativeLayout>

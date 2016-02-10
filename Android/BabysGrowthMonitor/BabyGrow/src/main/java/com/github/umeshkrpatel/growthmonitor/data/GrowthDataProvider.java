@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 /**
@@ -12,6 +14,7 @@ import android.util.Log;
  */
 public class GrowthDataProvider extends SQLiteOpenHelper {
     private static final String TAG = "GrowthDataProvider";
+    @Nullable
     private static GrowthDataProvider instance = null;
     private static final String kDatabaseName = "GrowthData.db";
 
@@ -19,6 +22,7 @@ public class GrowthDataProvider extends SQLiteOpenHelper {
         super(context, kDatabaseName, null, 2);
     }
 
+    @Nullable
     public static GrowthDataProvider create(final Context context) {
         if (instance == null) {
             instance = new GrowthDataProvider(context);
@@ -26,12 +30,13 @@ public class GrowthDataProvider extends SQLiteOpenHelper {
         return instance;
     }
 
+    @Nullable
     public static GrowthDataProvider get() {
         return instance;
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db) {
+    public void onCreate(@NonNull SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + IDataInfo.kBabyInfoTable + " ( "
                 + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + IDataInfo.NAME + " TEXT, "
@@ -60,7 +65,7 @@ public class GrowthDataProvider extends SQLiteOpenHelper {
                 + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + IDataInfo.DATE + " LONG, "
                 + IDataInfo.BABY_ID + " INTEGER, "
-                + IDataInfo.VACCINE_TYPE + " TEXT, "
+                + IDataInfo.VACCINE_TYPE + " INTEGER, "
                 + IDataInfo.VACCINE_NOTE + " TEXT, "
                 + IDataInfo.VACCINE_DATE + " LONG);");
 
@@ -158,7 +163,7 @@ public class GrowthDataProvider extends SQLiteOpenHelper {
         return ret;
     }
 
-    public long addVaccinationInfo(String vaccineType, String vaccineInfo, Long date, Integer baby_id) {
+    public long addVaccinationInfo(Integer vaccineType, String vaccineInfo, Long date, Integer baby_id) {
         ContentValues cv = new ContentValues();
         cv.put(IDataInfo.VACCINE_TYPE, vaccineType);
         cv.put(IDataInfo.VACCINE_NOTE, vaccineInfo);

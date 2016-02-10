@@ -3,6 +3,7 @@ package com.github.umeshkrpatel.growthmonitor;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +36,7 @@ public class VaccineInfoUpdateFragment extends Fragment implements View.OnClickL
         // Required empty public constructor
     }
 
+    @NonNull
     public static VaccineInfoUpdateFragment newInstance(int sectionNumber, int infoId) {
         VaccineInfoUpdateFragment fragment = new VaccineInfoUpdateFragment();
         Bundle args = new Bundle();
@@ -50,7 +52,7 @@ public class VaccineInfoUpdateFragment extends Fragment implements View.OnClickL
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_vaccine_info_update, container, false);
@@ -66,8 +68,8 @@ public class VaccineInfoUpdateFragment extends Fragment implements View.OnClickL
         });
         btSubmit = (Button) view.findViewById(R.id.btnVaccine);
         btSubmit.setOnClickListener(this);
-        ArrayList<BabysInfo.BabyInfo> babyInfos = BabysInfo.getBabyInfoList();
-        ArrayAdapter<BabysInfo.BabyInfo> babyInfoArrayAdapter =
+        ArrayList<BabiesInfo.BabyInfo> babyInfos = BabiesInfo.getBabyInfoList();
+        ArrayAdapter<BabiesInfo.BabyInfo> babyInfoArrayAdapter =
                 new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
                         R.id.tvSpinnerList, babyInfos);
         spBabyInfo.setAdapter(babyInfoArrayAdapter);
@@ -78,7 +80,7 @@ public class VaccineInfoUpdateFragment extends Fragment implements View.OnClickL
     public void onClick(View v) {
         String vaccineType, vaccineDetails;
         Long date;
-        BabysInfo.BabyInfo babyInfo = (BabysInfo.BabyInfo)spBabyInfo.getSelectedItem();
+        BabiesInfo.BabyInfo babyInfo = (BabiesInfo.BabyInfo)spBabyInfo.getSelectedItem();
         vaccineType = etVType.getText().toString();
         vaccineDetails = etVDetails.getText().toString();
         date = Utility.getDate();
@@ -88,7 +90,7 @@ public class VaccineInfoUpdateFragment extends Fragment implements View.OnClickL
             return;
         }
         GrowthDataProvider dp = GrowthDataProvider.get();
-        if (dp.addVaccinationInfo("", vaccineDetails, date, babyInfo.mId) > -1 ) {
+        if (dp != null && dp.addVaccinationInfo(0, vaccineDetails, date, babyInfo.mId) > -1 ) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
             EventsInfo info = EventsInfo.get(babyInfo.mId);
             if ( info == null) {

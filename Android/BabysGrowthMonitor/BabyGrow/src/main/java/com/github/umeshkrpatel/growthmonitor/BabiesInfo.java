@@ -1,6 +1,8 @@
 package com.github.umeshkrpatel.growthmonitor;
 
 import android.database.Cursor;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
@@ -8,16 +10,20 @@ import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class BabysInfo {
+public class BabiesInfo {
 
-    private static BabysInfo ourInstance = null;
+    @Nullable
+    private static BabiesInfo ourInstance = null;
+    @NonNull
     ArrayList<BabyInfo> mBabyInfo = new ArrayList<>();
+    @NonNull
     private final BabyInfo mDummyInfo;
     private static Integer mCurrentBabyInfoIndex = -1;
 
-    public static BabysInfo create() {
+    @NonNull
+    public static BabiesInfo create() {
         if (ourInstance == null) {
-            ourInstance = new BabysInfo();
+            ourInstance = new BabiesInfo();
             ourInstance.updateBabyInfo();
         }
         return ourInstance;
@@ -39,7 +45,7 @@ public class BabysInfo {
         return BabyImageIDs[ageId][gen];
     }
 
-    public static BabysInfo get() {
+    public static BabiesInfo get() {
         return ourInstance;
     }
 
@@ -56,10 +62,10 @@ public class BabysInfo {
     }
     
     public static Integer getCurrentBabyId() {
-        return BabysInfo.get().getBabyInfoId(mCurrentBabyInfoIndex);
+        return BabiesInfo.get().getBabyInfoId(mCurrentBabyInfoIndex);
     }
 
-    private BabysInfo() {
+    private BabiesInfo() {
         mDummyInfo = new BabyInfo(0, "<Dummy>", 0L, 0L, "X", "X", "X");
     }
 
@@ -68,13 +74,15 @@ public class BabysInfo {
     }
 
     public static Integer size() {
-        return BabysInfo.get().getBabyInfoCount();
+        return BabiesInfo.get().getBabyInfoCount();
     }
 
     public void updateBabyInfo() {
         mBabyInfo.clear();
-        Cursor c = GrowthDataProvider.get()
-                .getInfoFromTable(IDataInfo.kBabyInfoTable);
+        GrowthDataProvider dp = GrowthDataProvider.get();
+        if (dp == null)
+            return;
+        Cursor c = dp.getInfoFromTable(IDataInfo.kBabyInfoTable);
         if (c == null || c.getCount() <= 0) {
             return;
         }
@@ -111,9 +119,11 @@ public class BabysInfo {
             return mDummyInfo.mGender;
         return mBabyInfo.get(index).mGender;
     }
+    @NonNull
     private ArrayList<BabyInfo> babyInfoList() {
         return mBabyInfo;
     }
+    @NonNull
     public static HashMap<Integer,BabyInfo> getBabyInfoMap() {
         HashMap<Integer, BabyInfo> babyInfos = new HashMap<>();
         for (BabyInfo info: getBabyInfoList()) {
@@ -121,21 +131,11 @@ public class BabysInfo {
         }
         return babyInfos;
     }
+    @NonNull
     public static ArrayList<BabyInfo> getBabyInfoList() {
-        return BabysInfo.get().babyInfoList();
+        return BabiesInfo.get().babyInfoList();
     }
-    public CharSequence[] babyNamesList() {
-        CharSequence[] names = new CharSequence[mBabyInfo.size()];
-        int i = 0;
-        for (BabyInfo info : mBabyInfo) {
-            names[i] = info.mName;
-            i++;
-        }
-        return names;
-    }
-    public static CharSequence[] getBabyNamesList() {
-        return BabysInfo.get().babyNamesList();
-    }
+
     public class BabyInfo {
         final Integer mId;
         final String mName;
@@ -168,12 +168,11 @@ public class BabysInfo {
             return mTime;
         }
 
-        public String getGender() {
-            return mGender;
-        }
-
         public String getName() {
             return mName;
+        }
+        public String getGender() {
+            return mGender;
         }
     }
 }
