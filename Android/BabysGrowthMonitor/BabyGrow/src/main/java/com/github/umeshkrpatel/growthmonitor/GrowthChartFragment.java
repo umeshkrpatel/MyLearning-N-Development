@@ -69,7 +69,7 @@ public class GrowthChartFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_growth_chart, container, false);
         mGrowthChart = (CombinedChart) rootView.findViewById(R.id.growth_chart);
 
-        mKidsId = BabysInfo.getCurrentBabyId();
+        mKidsId = BabiesInfo.getCurrentBabyId();
 
         ixChart = getArguments().getInt(ARG_X_AXIS);
         iyChart = getArguments().getInt(ARG_Y_AXIS);

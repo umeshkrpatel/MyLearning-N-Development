@@ -1,1 +1,1 @@
-include ':BabyGrow'
+include ':BabyGrow', ':multispinner'

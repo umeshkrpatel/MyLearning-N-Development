@@ -34,14 +34,22 @@
             android:text="@string/vaccineType"
             />
 
-        <EditText
+        <!--<EditText-->
+            <!--android:layout_width="200dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="end"-->
+            <!--android:layout_marginRight="10dp"-->
+            <!--android:layout_marginEnd="10dp"-->
+            <!--android:id="@+id/etVaccineType"-->
+            <!--android:inputType="text" />-->
+
+        <MultiSpinner
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginRight="10dp"
             android:layout_marginEnd="10dp"
-            android:id="@+id/etVaccineType"
-            android:inputType="text" />
+            android:id="@+id/etVaccineType" />
 
         <TextView
             android:layout_width="match_parent"

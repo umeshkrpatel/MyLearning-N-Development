@@ -15,14 +15,14 @@ import android.util.Log;
 public class GrowthDataProvider extends SQLiteOpenHelper {
     private static final String TAG = "GrowthDataProvider";
     @Nullable
-    private static GrowthDataProvider instance = null;
+    private static GrowthDataProvider instance;
     private static final String kDatabaseName = "GrowthData.db";
 
     private GrowthDataProvider(Context context) {
         super(context, kDatabaseName, null, 2);
     }
 
-    @Nullable
+    @NonNull
     public static GrowthDataProvider create(final Context context) {
         if (instance == null) {
             instance = new GrowthDataProvider(context);
@@ -30,8 +30,9 @@ public class GrowthDataProvider extends SQLiteOpenHelper {
         return instance;
     }
 
-    @Nullable
+    @NonNull
     public static GrowthDataProvider get() {
+        assert instance != null;
         return instance;
     }
 

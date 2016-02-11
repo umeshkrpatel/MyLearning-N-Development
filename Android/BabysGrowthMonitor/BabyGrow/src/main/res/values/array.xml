@@ -15,6 +15,22 @@
         <item>@string/year5</item>
     </string-array>
 
+    <string-array name="vaccineListType">
+        <item>@string/birth</item>
+        <item>@string/months3</item>
+        <item>@string/months6</item>
+        <item>@string/year1</item>
+        <item>@string/year1h</item>
+        <item>@string/year2</item>
+        <item>@string/year2h</item>
+        <item>@string/year3</item>
+        <item>@string/year3h</item>
+        <item>@string/year4</item>
+        <item>@string/year4h</item>
+        <item>@string/year5</item>
+    </string-array>
+
+
     <string name="birth">Birth</string>
     <string name="months3">3 Months</string>
     <string name="months6">6 Months</string>

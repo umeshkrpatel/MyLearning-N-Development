@@ -1,6 +1,7 @@
 package com.github.umeshkrpatel.growthmonitor;
 
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
+import com.github.umeshkrpatel.multispinner.MultiSpinner;
 
 import java.util.ArrayList;
 
@@ -24,19 +26,28 @@ import java.util.ArrayList;
  * Use the {@link VaccineInfoUpdateFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class VaccineInfoUpdateFragment extends Fragment implements View.OnClickListener {
+public class VaccineInfoUpdateFragment extends Fragment
+        implements View.OnClickListener,
+        MultiSpinner.MultiSpinnerListener {
     private static final String ARG_ACTION_TYPE = "action_type";
     private static final String ARG_INFO_ID = "info_id";
 
     private Spinner spBabyInfo;
-    private EditText etVType, etVDetails, etDate;
+    private MultiSpinner msVaccineList;
+    private EditText etVDetails, etDate;
     private Button btSubmit;
+
+    private static String[] vaccineTypes = null;
 
     public VaccineInfoUpdateFragment() {
         // Required empty public constructor
     }
 
-    @NonNull
+    public static void createVaccineType(Context context) {
+        if (vaccineTypes == null)
+            vaccineTypes = context.getResources().getStringArray(R.array.vaccineListType);
+    }
+
     public static VaccineInfoUpdateFragment newInstance(int sectionNumber, int infoId) {
         VaccineInfoUpdateFragment fragment = new VaccineInfoUpdateFragment();
         Bundle args = new Bundle();
@@ -49,6 +60,7 @@ public class VaccineInfoUpdateFragment extends Fragment implements View.OnClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        createVaccineType(getContext());
     }
 
     @Override
@@ -57,7 +69,8 @@ public class VaccineInfoUpdateFragment extends Fragment implements View.OnClickL
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_vaccine_info_update, container, false);
         spBabyInfo = (Spinner) view.findViewById(R.id.spnBabyInfo);
-        etVType = (EditText) view.findViewById(R.id.etVaccineType);
+        msVaccineList = (MultiSpinner) view.findViewById(R.id.etVaccineType);
+        //etVType = (EditText) view.findViewById(R.id.etVaccineType);
         etVDetails = (EditText) view.findViewById(R.id.etVaccineDetail);
         etDate = (EditText) view.findViewById(R.id.etInfoDate);
         etDate.setOnClickListener(new View.OnClickListener() {
@@ -73,15 +86,18 @@ public class VaccineInfoUpdateFragment extends Fragment implements View.OnClickL
                 new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
                         R.id.tvSpinnerList, babyInfos);
         spBabyInfo.setAdapter(babyInfoArrayAdapter);
+
+        msVaccineList.setAdapter(
+                new ArrayAdapter<>(getContext(), R.layout.spinner_listview, R.id.tvSpinnerList, vaccineTypes),
+                false, this);
         return view;
     }
 
     @Override
     public void onClick(View v) {
-        String vaccineType, vaccineDetails;
+        String vaccineDetails;
         Long date;
         BabiesInfo.BabyInfo babyInfo = (BabiesInfo.BabyInfo)spBabyInfo.getSelectedItem();
-        vaccineType = etVType.getText().toString();
         vaccineDetails = etVDetails.getText().toString();
         date = Utility.getDate();
         if (date < babyInfo.mDob) {
@@ -101,5 +117,10 @@ public class VaccineInfoUpdateFragment extends Fragment implements View.OnClickL
         } else {
             Toast.makeText(getContext(), "Update Failed", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onItemsSelected(boolean[] selected) {
+
     }
 }

@@ -131,9 +131,9 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
         Long id = dp.addBabyInfo(name, date, time, mGender, strBGAbo, strBGPh);
         if (id > -1) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
-            BabysInfo.get().updateBabyInfo();
-            if (BabysInfo.getCurrentIndex() == -1) {
-                BabysInfo.setCurrentIndex(0);
+            BabiesInfo.get().updateBabyInfo();
+            if (BabiesInfo.getCurrentIndex() == -1) {
+                BabiesInfo.setCurrentIndex(0);
             }
             EventsInfo.create(id.intValue());
             getActivity().onBackPressed();
