@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+import android.text.SpannableStringBuilder;
 import android.util.Log;
 
 import com.github.umeshkrpatel.growthmonitor.GrowthActivity;
@@ -19,12 +20,11 @@ public class NotificationService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        String message = "Alarm Test";
-        message = VaccineScheduler.notificationMessage();
+        SpannableStringBuilder message = VaccineScheduler.notificationMessage();
         handleAction(message);
     }
 
-    private void handleAction(String param) {
+    private void handleAction(SpannableStringBuilder param) {
         Log.d("NotificationService", "Preparing to send notification...: " + param);
         NotificationManager notificationManager = (NotificationManager) this
                 .getSystemService(Context.NOTIFICATION_SERVICE);

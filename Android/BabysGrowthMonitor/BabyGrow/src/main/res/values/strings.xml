@@ -69,14 +69,15 @@
     <string name="his">his</string>
     <string name="event_vaccine">%1$s has %2$s vaccination today</string>
 
-    <string name="BCG">Bacillus Calmette–Guérin (BCG)</string>
-    <string name="OPV">Oral Polio (OPV)</string>
-    <string name="IPV">Inactivated Polio (IPV)</string>
-    <string name="HEPB">Hepatitis B (Hep-B)</string>
-    <string name="HIB">Haemophilus influenzae type B (HIB)</string>
-    <string name="PCV">Pneumococcal Conjugate (PCV)</string>
-    <string name="DTP">Diphtheria, Tetanus and Pertussis (DTP)</string>
-    <string name="RVV">Rotavirus (RVV)</string>
-    <string name="MMR">Measles, Mumps, and Rubella (MMR)</string>
-    <string name="TCV">Typhoid Conjugate (TCV)</string>
+    <string name="BCG" translatable="false">Bacillus Calmette–Guérin (BCG)</string>
+    <string name="OPV" translatable="false">Oral Polio (OPV)</string>
+    <string name="IPV" translatable="false">Inactivated Polio (IPV)</string>
+    <string name="HEPB" translatable="false">Hepatitis B (Hep-B)</string>
+    <string name="HIB" translatable="false">Haemophilus influenzae type B (HIB)</string>
+    <string name="PCV" translatable="false">Pneumococcal Conjugate (PCV)</string>
+    <string name="DTP" translatable="false">Diphtheria, Tetanus and Pertussis (DTP)</string>
+    <string name="RVV" translatable="false">Rotavirus (RVV)</string>
+    <string name="MMR" translatable="false">Measles, Mumps, and Rubella (MMR)</string>
+    <string name="TCV" translatable="false">Typhoid Conjugate (TCV)</string>
+    <string name="vaccine_pending_msg">Following vaccination are pending...</string>
 </resources>

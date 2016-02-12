@@ -15,7 +15,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
+import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 import com.github.umeshkrpatel.growthmonitor.data.VaccineScheduler;
 
@@ -127,7 +127,7 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
         String name = etName.getText().toString();
         Long date = Utility.getDate();
         Long time = Utility.getTime();
-        GrowthDataProvider dp = GrowthDataProvider.get();
+        IDataProvider dp = IDataProvider.get();
         Long id = dp.addBabyInfo(name, date, time, mGender, strBGAbo, strBGPh);
         if (id > -1) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
@@ -135,7 +135,6 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
             if (BabiesInfo.getCurrentIndex() == -1) {
                 BabiesInfo.setCurrentIndex(0);
             }
-            EventsInfo.create(id.intValue());
             getActivity().onBackPressed();
             VaccineScheduler.scheduleVaccination(id);
         } else {

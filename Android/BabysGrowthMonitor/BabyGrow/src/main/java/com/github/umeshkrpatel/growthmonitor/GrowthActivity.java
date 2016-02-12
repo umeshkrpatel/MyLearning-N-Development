@@ -23,7 +23,7 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
+import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
 import com.github.umeshkrpatel.growthmonitor.data.IAdapter;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 import com.github.umeshkrpatel.growthmonitor.data.VaccineScheduler;
@@ -271,7 +271,7 @@ public class GrowthActivity extends AppCompatActivity
 
         ResourceReader.create(this);
 
-        GrowthDataProvider.create(this);
+        IDataProvider.create(this);
         VaccineScheduler.create(this);
         BabiesInfo babiesInfo = BabiesInfo.create();
         for (int i = 0; i < BabiesInfo.size(); i++) {

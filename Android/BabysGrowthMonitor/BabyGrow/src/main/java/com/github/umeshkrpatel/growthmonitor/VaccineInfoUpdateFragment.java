@@ -15,7 +15,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
+import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
 import com.github.umeshkrpatel.multispinner.MultiSpinner;
 
 import java.util.ArrayList;
@@ -105,7 +105,7 @@ public class VaccineInfoUpdateFragment extends Fragment
             etDate.setTextColor(Color.RED);
             return;
         }
-        GrowthDataProvider dp = GrowthDataProvider.get();
+        IDataProvider dp = IDataProvider.get();
         if (dp != null && dp.addVaccinationInfo(0, vaccineDetails, date, babyInfo.mId) > -1 ) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
             EventsInfo info = EventsInfo.get(babyInfo.mId);

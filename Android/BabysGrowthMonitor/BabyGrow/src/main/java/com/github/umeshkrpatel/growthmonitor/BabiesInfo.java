@@ -4,7 +4,7 @@ import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
+import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 
 import java.util.ArrayList;
@@ -79,10 +79,10 @@ public class BabiesInfo {
 
     public void updateBabyInfo() {
         mBabyInfo.clear();
-        GrowthDataProvider dp = GrowthDataProvider.get();
+        IDataProvider dp = IDataProvider.get();
         if (dp == null)
             return;
-        Cursor c = dp.getInfoFromTable(IDataInfo.kBabyInfoTable);
+        Cursor c = dp.queryTable(IDataInfo.kBabyInfoTable);
         if (c == null || c.getCount() <= 0) {
             return;
         }

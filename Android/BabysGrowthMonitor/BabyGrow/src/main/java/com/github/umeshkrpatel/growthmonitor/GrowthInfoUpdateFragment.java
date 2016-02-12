@@ -13,7 +13,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
+import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
 
 import java.util.ArrayList;
 
@@ -98,7 +98,7 @@ public class GrowthInfoUpdateFragment extends Fragment implements View.OnClickLi
             mDate.setTextColor(Color.RED);
             return;
         }
-        GrowthDataProvider dp = GrowthDataProvider.get();
+        IDataProvider dp = IDataProvider.get();
         if (dp.addGrowthInfo(weight, height, head, date, babyInfo.mId) > -1 ) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
             EventsInfo info = EventsInfo.get(babyInfo.mId);

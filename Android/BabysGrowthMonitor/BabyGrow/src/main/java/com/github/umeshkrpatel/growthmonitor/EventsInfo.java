@@ -3,7 +3,7 @@ package com.github.umeshkrpatel.growthmonitor;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 
-import com.github.umeshkrpatel.growthmonitor.data.GrowthDataProvider;
+import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class EventsInfo {
 
     public void update() {
         mEventItems.clear();
-        Cursor c = GrowthDataProvider.get()
+        Cursor c = IDataProvider.get()
                 .queryTable(IDataInfo.kEventTable, null, IDataInfo.BABY_ID + "=" + mBabyID,
                         null, null, null, IDataInfo.DATE + " DESC");
         if (c==null || c.getCount()==0) {
@@ -62,7 +62,7 @@ public class EventsInfo {
         Cursor c;
         switch (item.mEventType) {
             case IDataInfo.EVENT_MEASUREMENT:
-                c = GrowthDataProvider.get()
+                c = IDataProvider.get()
                         .queryTable(IDataInfo.kGrowthInfoTable, null,
                                 IDataInfo.ID + "=" + item.mEventID, null, null, null, null);
                 if (c != null && c.getCount() > 0) {
@@ -87,7 +87,7 @@ public class EventsInfo {
                 }
                 break;
             case IDataInfo.EVENT_LIFEEVENT:
-                c = GrowthDataProvider.get()
+                c = IDataProvider.get()
                         .queryTable(IDataInfo.kLifeEventTable, null,
                                 IDataInfo.ID + "=" + item.mEventID, null, null, null, null);
                 if (c != null && c.getCount() > 0) {
@@ -97,7 +97,7 @@ public class EventsInfo {
                 }
                 break;
             case IDataInfo.EVENT_VACCINATION:
-                c = GrowthDataProvider.get()
+                c = IDataProvider.get()
                         .queryTable(IDataInfo.kVaccineTable, null,
                                 IDataInfo.ID + "=" + item.mEventID, null, null, null, null);
                 if (c != null && c.getCount() > 0) {

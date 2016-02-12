@@ -8,8 +8,12 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.SpannableStringBuilder;
 
 import com.github.umeshkrpatel.growthmonitor.BabiesInfo;
+import com.github.umeshkrpatel.growthmonitor.EventsInfo;
+import com.github.umeshkrpatel.growthmonitor.R;
+import com.github.umeshkrpatel.growthmonitor.ResourceReader;
 import com.github.umeshkrpatel.growthmonitor.Utility;
 
 /**
@@ -31,11 +35,49 @@ public class VaccineScheduler {
     @Nullable
     private static Context mNorificationContext = null;
     private static VaccineScheduler vaccineScheduler;
+    private static String[] vaccineList;
 
     public static VaccineScheduler create(Context context) {
-        if (vaccineScheduler == null)
+        if (vaccineScheduler == null) {
             vaccineScheduler = new VaccineScheduler(context);
+            vaccineList = context.getResources().getStringArray(R.array.vaccineListType);
+        }
         return vaccineScheduler;
+    }
+
+    public static SpannableStringBuilder getVaccineName(Integer index) {
+        SpannableStringBuilder vaccines = new SpannableStringBuilder();
+        if ( (index|BCG) != 0) {
+            vaccines.append("\n").append(vaccineList[0]);
+        }
+        if ( (index|OPV) != 0) {
+            vaccines.append("\n").append(vaccineList[1]);
+        }
+        if ( (index|IPV) != 0) {
+            vaccines.append("\n").append(vaccineList[2]);
+        }
+        if ( (index|HEPB) != 0) {
+            vaccines.append("\n").append(vaccineList[3]);
+        }
+        if ( (index|HIB) != 0) {
+            vaccines.append("\n").append(vaccineList[4]);
+        }
+        if ( (index|PCV) != 0) {
+            vaccines.append("\n").append(vaccineList[5]);
+        }
+        if ( (index|DTP) != 0) {
+            vaccines.append("\n").append(vaccineList[6]);
+        }
+        if ( (index|RVV) != 0) {
+            vaccines.append("\n").append(vaccineList[7]);
+        }
+        if ( (index|MMR) != 0) {
+            vaccines.append("\n").append(vaccineList[8]);
+        }
+        if ( (index|TCV) != 0) {
+            vaccines.append("\n").append(vaccineList[9]);
+        }
+        return vaccines;
     }
 
     public static VaccineScheduler get() {
@@ -83,17 +125,17 @@ public class VaccineScheduler {
     };
 
     public static void scheduleVaccination(Long id) {
-        new UpdateVaccineSchedule().execute(id);
+        ScheduleTask task = new ScheduleTask();
+        task.execute(id);
+        EventsInfo.create(id.intValue());
     }
 
-    public static class UpdateVaccineSchedule extends AsyncTask<Long, Integer, Integer> {
+    private static class ScheduleTask extends AsyncTask<Long, Integer, Integer> {
 
         @NonNull
         @Override
         protected Integer doInBackground(@NonNull Long... params) {
-            GrowthDataProvider dp = GrowthDataProvider.get();
-            if (dp == null)
-                return 0;
+            IDataProvider dp = IDataProvider.get();
 
             for (Long id: params) {
                 BabiesInfo.BabyInfo info = BabiesInfo.getBabyInfoMap().get(id.intValue());
@@ -106,26 +148,21 @@ public class VaccineScheduler {
             }
             return 0;
         }
-
-        @Override
-        protected void onPostExecute(Integer integer) {
-            super.onPostExecute(integer);
-        }
     }
 
-    public static String notificationMessage() {
+    public static SpannableStringBuilder notificationMessage() {
         Long now = System.currentTimeMillis();
-        GrowthDataProvider dp = GrowthDataProvider.get();
-        String message = "Missing item in your calender";
-        if (dp != null) {
-            Cursor c = dp.queryTable(IDataInfo.kVaccineTable, new String[] {IDataInfo.VACCINE_TYPE},
-                    IDataInfo.DATE + " between " + (now - Utility.kMilliSecondsInDays) + " and " + now,
-                    null, null, null, null);
-            if (c != null && c.getCount() > 0) {
-                message = "Follwoing vaccination are pending ";
-                while (c.moveToNext()) {
-                    message =  message + c.getInt(0) + ", ";
-                }
+        IDataProvider dp = IDataProvider.get();
+        SpannableStringBuilder message = new SpannableStringBuilder();
+        message.append("Missing item in your calender");
+        Cursor c = dp.queryTable(IDataInfo.kVaccineTable, new String[] {IDataInfo.VACCINE_TYPE},
+                IDataInfo.DATE + " between " + (now - Utility.kMilliSecondsInDays) + " and " + now,
+                null, null, null, null);
+        if (c != null && c.getCount() > 0) {
+            message.clear();
+            message.append(ResourceReader.getString(R.string.vaccine_pending_msg));
+            while (c.moveToNext()) {
+                message.append(getVaccineName(c.getInt(0)));
             }
         }
         return message;

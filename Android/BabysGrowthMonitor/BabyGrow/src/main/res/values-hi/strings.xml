@@ -44,4 +44,5 @@
     <string name="his">उसका</string>
     <string name="she">वह</string>
     <string name="event_vaccine">%1$s का आज %2$s का टीकाकरण हुआ है.</string>
+    <string name="vaccine_pending_msg">अनुगामी टीकाकरण अपूर्ण हैं...</string>
 </resources>
