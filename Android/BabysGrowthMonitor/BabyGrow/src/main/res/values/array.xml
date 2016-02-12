@@ -16,31 +16,16 @@
     </string-array>
 
     <string-array name="vaccineListType">
-        <item>@string/birth</item>
-        <item>@string/months3</item>
-        <item>@string/months6</item>
-        <item>@string/year1</item>
-        <item>@string/year1h</item>
-        <item>@string/year2</item>
-        <item>@string/year2h</item>
-        <item>@string/year3</item>
-        <item>@string/year3h</item>
-        <item>@string/year4</item>
-        <item>@string/year4h</item>
-        <item>@string/year5</item>
+        <item>@string/BCG</item>
+        <item>@string/OPV</item>
+        <item>@string/IPV</item>
+        <item>@string/HEPB</item>
+        <item>@string/HIB</item>
+        <item>@string/PCV</item>
+        <item>@string/DTP</item>
+        <item>@string/RVV</item>
+        <item>@string/MMR</item>
+        <item>@string/TCV</item>
     </string-array>
 
-
-    <string name="birth">Birth</string>
-    <string name="months3">3 Months</string>
-    <string name="months6">6 Months</string>
-    <string name="year1">1.0 Year</string>
-    <string name="year1h">1.5 Years</string>
-    <string name="year2">2.0 Years</string>
-    <string name="year2h">2.5 Years</string>
-    <string name="year3">3.0 Years</string>
-    <string name="year3h">3.5 Years</string>
-    <string name="year4">4.0 Years</string>
-    <string name="year4h">4.5 Years</string>
-    <string name="year5">5.0 Years</string>
 </resources>

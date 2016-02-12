@@ -80,10 +80,9 @@ public class BabiesInfo {
     public void updateBabyInfo() {
         mBabyInfo.clear();
         IDataProvider dp = IDataProvider.get();
-        if (dp == null)
-            return;
         Cursor c = dp.queryTable(IDataInfo.kBabyInfoTable);
         if (c == null || c.getCount() <= 0) {
+            mCurrentBabyInfoIndex = -1;
             return;
         }
         while (c.moveToNext()) {
@@ -97,6 +96,10 @@ public class BabiesInfo {
                             c.getString(IDataInfo.INDEX_BG_ABO),
                             c.getString(IDataInfo.INDEX_BG_PH)));
         }
+    }
+
+    public static void RemoveBabyInfo(int babyId) {
+        IDataProvider.get().deleteBabyInfo(babyId);
     }
 
     public Integer getBabyInfoId(int index) {

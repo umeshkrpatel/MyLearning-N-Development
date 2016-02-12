@@ -16,6 +16,8 @@ import com.github.umeshkrpatel.growthmonitor.R;
 import com.github.umeshkrpatel.growthmonitor.ResourceReader;
 import com.github.umeshkrpatel.growthmonitor.Utility;
 
+import java.util.HashMap;
+
 /**
  * Created by weumeshweta on 07-Feb-2016.
  */
@@ -36,6 +38,21 @@ public class VaccineScheduler {
     private static Context mNorificationContext = null;
     private static VaccineScheduler vaccineScheduler;
     private static String[] vaccineList;
+    private static HashMap<Integer,Integer> vaccineMap;
+    static {
+        Integer i = 0;
+        vaccineMap = new HashMap<>();
+        vaccineMap.put(i++,BCG);
+        vaccineMap.put(i++,OPV);
+        vaccineMap.put(i++,IPV);
+        vaccineMap.put(i++,HEPB);
+        vaccineMap.put(i++,HIB);
+        vaccineMap.put(i++,PCV);
+        vaccineMap.put(i++,DTP);
+        vaccineMap.put(i++,RVV);
+        vaccineMap.put(i++,MMR);
+        vaccineMap.put(i,TCV);
+    };
 
     public static VaccineScheduler create(Context context) {
         if (vaccineScheduler == null) {
@@ -45,6 +62,15 @@ public class VaccineScheduler {
         return vaccineScheduler;
     }
 
+    public static Integer GetSelectedVaccines(boolean[] selecion) {
+        Integer mappedVaccine = 0;
+        for (Integer i : vaccineMap.keySet()) {
+            if (selecion[i]) {
+                mappedVaccine = (mappedVaccine | vaccineMap.get(i));
+            }
+        }
+        return mappedVaccine;
+    }
     public static SpannableStringBuilder getVaccineName(Integer index) {
         SpannableStringBuilder vaccines = new SpannableStringBuilder();
         if ( (index|BCG) != 0) {

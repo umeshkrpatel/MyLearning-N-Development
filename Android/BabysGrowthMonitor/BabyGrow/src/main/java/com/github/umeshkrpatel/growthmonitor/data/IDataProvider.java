@@ -49,6 +49,8 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
     public abstract long addBabyInfo(
             String name, Long dobDate, Long dobTime, String gender, String bgABO, String bgPH);
 
+    public abstract void deleteBabyInfo(Integer id);
+
     public abstract long updateBabyInfo(Integer id, String name, Long dobDate, Long dobTime,
                                         String gender, String bgABO, String bgPH);
 
@@ -160,6 +162,13 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
             }
             return rowId;
         }
+
+        @Override
+        public void deleteBabyInfo(Integer id) {
+            SQLiteDatabase db = getWritableDatabase();
+            db.delete(IDataInfo.kBabyInfoTable, IDataInfo.ID + "=" + id, null);
+        }
+
         public long updateBabyInfo(Integer id, String name, Long dobDate, Long dobTime,
                                    String gender, String bgABO, String bgPH) {
             long ret;
@@ -267,6 +276,11 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
         public long addBabyInfo(
                 String name, Long dobDate, Long dobTime, String gender, String bgABO, String bgPH) {
             return 0;
+        }
+
+        @Override
+        public void deleteBabyInfo(Integer id) {
+            return;
         }
 
         @Override

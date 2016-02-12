@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
@@ -121,7 +122,8 @@ public class TimlineAdapter extends IAdapter {
     }
 
     @NonNull
-    private static SpannableString generateSpannableText(@NonNull String first, @NonNull String second, @NonNull String third) {
+    private static SpannableString generateSpannableText(
+            @NonNull String first, @NonNull SpannableStringBuilder second, @NonNull String third) {
         int flen = first.length(), slen = second.length(), tlen = third.length();
         SpannableString s = new SpannableString(first + '\n' + second + '\n' + third);
         s.setSpan(new RelativeSizeSpan(1f), 0, flen, 0);
@@ -131,7 +133,8 @@ public class TimlineAdapter extends IAdapter {
         s.setSpan(new RelativeSizeSpan(.8f), flen + 1, flen + slen + 1, 0);
         s.setSpan(new ForegroundColorSpan(Color.BLACK), flen + 1, flen + slen + 1, 0);
         s.setSpan(new StyleSpan(Typeface.ITALIC), flen + slen + 1, flen + slen + tlen + 1, 0);
-        s.setSpan(new ForegroundColorSpan(ColorTemplate.getHoloBlue()), flen + slen + 1, flen + slen + tlen + 2, 0);
+        s.setSpan(new ForegroundColorSpan(
+                ColorTemplate.getHoloBlue()), flen + slen + 1, flen + slen + tlen + 2, 0);
         return s;
     }
 }

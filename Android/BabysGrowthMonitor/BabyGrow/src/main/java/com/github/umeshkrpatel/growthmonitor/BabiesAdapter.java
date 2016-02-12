@@ -53,7 +53,7 @@ public class BabiesAdapter extends IAdapter {
         //@NonNull
         //public final TextView mDate;
         @NonNull
-        public final ImageView mTimeline;
+        public final ImageView mTimeline, mBabyRemove;
         public BabiesInfo.BabyInfo mItem;
 
         public ViewHolder(@NonNull View view) {
@@ -61,7 +61,14 @@ public class BabiesAdapter extends IAdapter {
             mView = view;
             mInfoView = (TextView) view.findViewById(R.id.blvBabyName);
             mTimeline = (ImageView) view.findViewById(R.id.blvBabyImage);
+            mBabyRemove = (ImageView) view.findViewById(R.id.blvBabyRemove);
             mView.setOnClickListener(this);
+            mBabyRemove.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    BabiesInfo.RemoveBabyInfo(mItem.getId());
+                }
+            });
         }
 
         @NonNull

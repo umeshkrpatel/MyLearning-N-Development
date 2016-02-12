@@ -2,9 +2,11 @@ package com.github.umeshkrpatel.growthmonitor;
 
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.text.SpannableStringBuilder;
 
 import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
+import com.github.umeshkrpatel.growthmonitor.data.VaccineScheduler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,8 +60,9 @@ public class EventsInfo {
         return mEventItems;
     }
 
-    public static String getEventDetails(@NonNull EventItem item) {
+    public static SpannableStringBuilder getEventDetails(@NonNull EventItem item) {
         Cursor c;
+        SpannableStringBuilder message = new SpannableStringBuilder();
         switch (item.mEventType) {
             case IDataInfo.EVENT_MEASUREMENT:
                 c = IDataProvider.get()
@@ -82,7 +85,8 @@ public class EventsInfo {
                                 pronoun2,
                                 c.getFloat(IDataInfo.INDEX_HEAD)
                                 );
-                        return msg;
+                        message.append(msg);
+                        return message;
                     }
                 }
                 break;
@@ -92,7 +96,9 @@ public class EventsInfo {
                                 IDataInfo.ID + "=" + item.mEventID, null, null, null, null);
                 if (c != null && c.getCount() > 0) {
                     if (c.moveToNext()) {
-                        return ("She has her first " + c.getInt(IDataInfo.INDEX_LE_TYPE) + " today");
+                        return message.append("She has her first ")
+                                .append((char) c.getInt(IDataInfo.INDEX_LE_TYPE))
+                                .append(" today");
                     }
                 }
                 break;
@@ -105,15 +111,21 @@ public class EventsInfo {
                         String msg = ResourceReader.getString(R.string.event_vaccine);
                         BabiesInfo.BabyInfo info =
                                 BabiesInfo.getBabyInfoMap().get(BabiesInfo.getCurrentBabyId());
-                        msg = String.format(msg, info.getName(), c.getString(IDataInfo.INDEX_VACCINE_TYPE));
-                        return msg;
+                        msg = String.format(msg, info.getName());
+                        message.append(msg);
+                        message.append(
+                                VaccineScheduler.getVaccineName(
+                                        c.getInt(IDataInfo.INDEX_VACCINE_TYPE)
+                                )
+                        );
+                        return message;
                     }
                 }
                 break;
             default:
                 break;
         }
-        return "Are we missing something";
+        return message;
     }
 
     /* Event Timeline Items */

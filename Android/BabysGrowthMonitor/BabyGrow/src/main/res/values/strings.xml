@@ -67,7 +67,7 @@
     <string name="he">He</string>
     <string name="her">her</string>
     <string name="his">his</string>
-    <string name="event_vaccine">%1$s has %2$s vaccination today</string>
+    <string name="event_vaccine">%1$s has following vaccination today</string>
 
     <string name="BCG" translatable="false">Bacillus Calmette–Guérin (BCG)</string>
     <string name="OPV" translatable="false">Oral Polio (OPV)</string>
@@ -79,5 +79,20 @@
     <string name="RVV" translatable="false">Rotavirus (RVV)</string>
     <string name="MMR" translatable="false">Measles, Mumps, and Rubella (MMR)</string>
     <string name="TCV" translatable="false">Typhoid Conjugate (TCV)</string>
-    <string name="vaccine_pending_msg">Following vaccination are pending...</string>
+    <string name="vaccine_pending_msg">Pending vaccination!</string>
+
+
+    <string name="birth">Birth</string>
+    <string name="months3">3 Months</string>
+    <string name="months6">6 Months</string>
+    <string name="year1">1.0 Year</string>
+    <string name="year1h">1.5 Years</string>
+    <string name="year2">2.0 Years</string>
+    <string name="year2h">2.5 Years</string>
+    <string name="year3">3.0 Years</string>
+    <string name="year3h">3.5 Years</string>
+    <string name="year4">4.0 Years</string>
+    <string name="year4h">4.5 Years</string>
+    <string name="year5">5.0 Years</string>
+    <string name="delete">delete</string>
 </resources>

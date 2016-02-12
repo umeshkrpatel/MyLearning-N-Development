@@ -28,13 +28,18 @@
     <string name="send">भेजें</string>
     <string name="bloodGroupOfBaby">रक्त समूह</string>
     <string name="start_from">प्रारंभ</string>
+    <string name="birth">जन्म</string>
+    <string name="months3">3 महीने</string>
+    <string name="months6">6 महीने</string>
+    <string name="year1">1.0 वर्ष</string>
+    <string name="year1h">1.5 वर्ष</string>
+    <string name="year2">2.0 वर्ष</string>
+    <string name="year3">3.0 वर्ष</string>
     <string name="year2h">2.5 वर्ष</string>
     <string name="year3h">3.5 वर्ष</string>
     <string name="year4">4.0 वर्ष</string>
     <string name="year4h">4.5 वर्ष</string>
     <string name="year5">5.0 वर्ष</string>
-    <string name="months3">3 महीने</string>
-    <string name="year1h">1.5 वर्ष</string>
     <string name="end_to">अंत</string>
     <string name="age">उम्र</string>
     <string name="pref_title_language_change">अंग्रेजी भाषा में बदलें</string>
@@ -43,6 +48,7 @@
     <string name="her">उसका</string>
     <string name="his">उसका</string>
     <string name="she">वह</string>
-    <string name="event_vaccine">%1$s का आज %2$s का टीकाकरण हुआ है.</string>
-    <string name="vaccine_pending_msg">अनुगामी टीकाकरण अपूर्ण हैं...</string>
+    <string name="event_vaccine">%1$s का आज निम्न का टीकाकरण हुआ है.</string>
+    <string name="vaccine_pending_msg">अनुगामी टीकाकरण!</string>
+    <string name="delete">delete</string>
 </resources>

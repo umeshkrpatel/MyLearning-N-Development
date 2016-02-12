@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
+import com.github.umeshkrpatel.growthmonitor.data.VaccineScheduler;
 import com.github.umeshkrpatel.multispinner.MultiSpinner;
 
 import java.util.ArrayList;
@@ -33,9 +34,8 @@ public class VaccineInfoUpdateFragment extends Fragment
     private static final String ARG_INFO_ID = "info_id";
 
     private Spinner spBabyInfo;
-    private MultiSpinner msVaccineList;
     private EditText etVDetails, etDate;
-    private Button btSubmit;
+    private Integer mSelectedVaccine;
 
     private static String[] vaccineTypes = null;
 
@@ -69,8 +69,7 @@ public class VaccineInfoUpdateFragment extends Fragment
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_vaccine_info_update, container, false);
         spBabyInfo = (Spinner) view.findViewById(R.id.spnBabyInfo);
-        msVaccineList = (MultiSpinner) view.findViewById(R.id.etVaccineType);
-        //etVType = (EditText) view.findViewById(R.id.etVaccineType);
+
         etVDetails = (EditText) view.findViewById(R.id.etVaccineDetail);
         etDate = (EditText) view.findViewById(R.id.etInfoDate);
         etDate.setOnClickListener(new View.OnClickListener() {
@@ -79,7 +78,8 @@ public class VaccineInfoUpdateFragment extends Fragment
                 Utility.PopupDatePicker(getContext(), etDate, "dd/MM/yyyy");
             }
         });
-        btSubmit = (Button) view.findViewById(R.id.btnVaccine);
+
+        Button btSubmit = (Button) view.findViewById(R.id.btnVaccine);
         btSubmit.setOnClickListener(this);
         ArrayList<BabiesInfo.BabyInfo> babyInfos = BabiesInfo.getBabyInfoList();
         ArrayAdapter<BabiesInfo.BabyInfo> babyInfoArrayAdapter =
@@ -87,8 +87,10 @@ public class VaccineInfoUpdateFragment extends Fragment
                         R.id.tvSpinnerList, babyInfos);
         spBabyInfo.setAdapter(babyInfoArrayAdapter);
 
-        msVaccineList.setAdapter(
-                new ArrayAdapter<>(getContext(), R.layout.spinner_listview, R.id.tvSpinnerList, vaccineTypes),
+        MultiSpinner vaccineList = (MultiSpinner) view.findViewById(R.id.etVaccineType);
+        vaccineList.setAdapter(
+                new ArrayAdapter<>(
+                        getContext(), R.layout.spinner_listview, R.id.tvSpinnerList, vaccineTypes),
                 false, this);
         return view;
     }
@@ -106,7 +108,7 @@ public class VaccineInfoUpdateFragment extends Fragment
             return;
         }
         IDataProvider dp = IDataProvider.get();
-        if (dp != null && dp.addVaccinationInfo(0, vaccineDetails, date, babyInfo.mId) > -1 ) {
+        if (dp.addVaccinationInfo(mSelectedVaccine, vaccineDetails, date, babyInfo.mId) > -1) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
             EventsInfo info = EventsInfo.get(babyInfo.mId);
             if ( info == null) {
@@ -121,6 +123,6 @@ public class VaccineInfoUpdateFragment extends Fragment
 
     @Override
     public void onItemsSelected(boolean[] selected) {
-
+        mSelectedVaccine = VaccineScheduler.GetSelectedVaccines(selected);
     }
 }
