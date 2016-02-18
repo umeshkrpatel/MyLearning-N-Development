@@ -38,10 +38,6 @@ public class GrowthChartActivity extends AppCompatActivity
 
     private static final String TAG = "GrowthChartActivity";
 
-    public static final String ACTION_TYPE = "action_type";
-    public static final String ACTION_VALUE1 = "action_value1";
-    public static final String ACTION_VALUE2 = "action_value2";
-
     @Nullable
     private static String[] sChartList = null;
     /**
@@ -53,20 +49,20 @@ public class GrowthChartActivity extends AppCompatActivity
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private ViewPager viewPager;
     private Spinner mXAxisBar, mYAxisBar;
 
     @NonNull
-    private static ChartData.ChartType[] dChart = new ChartData.ChartType[] {
-            ChartData.ChartType.WEIGHT, ChartData.ChartType.HEIGHT, ChartData.ChartType.HEADCIRCUM,
+    private static final ChartData.ChartType[] dChart = new ChartData.ChartType[] {
+        ChartData.ChartType.WEIGHT, ChartData.ChartType.HEIGHT, ChartData.ChartType.HEADCIRCUM,
     };
 
     @NonNull
-    private int[] rIDs = new int[] {
-            R.string.weight, R.string.height, R.string.headc
+    private static final int[] mNameIDs = new int[] {
+        R.string.weight, R.string.height, R.string.headc
     };
 
-    @NonNull
-    private static Integer sFragmentCount = 3;
+    private static final int sFragmentCount = 3;
 
     public static void createChartList(@NonNull Context context) {
         if (sChartList == null)
@@ -110,7 +106,7 @@ public class GrowthChartActivity extends AppCompatActivity
             public void onClick(View v) {
                 ChartData.setMinRange(mXAxisBar.getSelectedItemPosition());
                 ChartData.setMaxRange(mYAxisBar.getSelectedItemPosition());
-                Integer pos = mSectionsPagerAdapter.getCurrentPosition();
+                int pos = mSectionsPagerAdapter.getCurrentPosition();
                 GrowthChartFragment gf;
                 if (pos != 1) {
                     gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(pos);
@@ -137,7 +133,7 @@ public class GrowthChartActivity extends AppCompatActivity
         /*
       The {@link ViewPager} that will host the section contents.
      */
-        ViewPager viewPager = (ViewPager) findViewById(R.id.container);
+        viewPager = (ViewPager) findViewById(R.id.container);
         viewPager.setAdapter(mSectionsPagerAdapter);
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -233,7 +229,7 @@ public class GrowthChartActivity extends AppCompatActivity
             return mf.get(position);
         }
 
-        public Integer getCurrentPosition() {
+        public int getCurrentPosition() {
             return mCurrent;
         }
 
@@ -247,7 +243,7 @@ public class GrowthChartActivity extends AppCompatActivity
         @Override
         public CharSequence getPageTitle(int position) {
             return mContext.getResources().getString(R.string.age)
-                    + "-" + mContext.getResources().getString(rIDs[position]);
+                    + "-" + mContext.getResources().getString(mNameIDs[position]);
         }
         @Override
         public void setPrimaryItem(ViewGroup container, int position, Object object) {
@@ -261,12 +257,12 @@ public class GrowthChartActivity extends AppCompatActivity
         if (savedInstanceState == null) {
             Bundle bundle = getIntent().getExtras();
             if (bundle != null) {
-                Integer actionType = bundle.getInt(ACTION_TYPE);
+                int actionType = bundle.getInt(IDataInfo.ACTION_TYPE);
                 if (actionType == IDataInfo.ACTION_UPDATE) {
-                    Integer actionEvent = bundle.getInt(ACTION_VALUE1);
-                    Integer actionValue = bundle.getInt(ACTION_VALUE2);
+                    int actionEvent = bundle.getInt(IDataInfo.ACTION_EVENT);
+                    int actionValue = bundle.getInt(IDataInfo.ACTION_VALUE);
                     if (actionEvent == IDataInfo.EVENT_LIFEEVENT) {
-
+                        viewPager.setCurrentItem(1);
                     }
                 }
             }

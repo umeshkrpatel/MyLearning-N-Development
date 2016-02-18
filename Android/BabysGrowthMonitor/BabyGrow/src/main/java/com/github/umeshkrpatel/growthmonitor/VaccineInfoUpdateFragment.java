@@ -15,8 +15,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.github.umeshkrpatel.growthmonitor.data.IBabyInfo;
 import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
-import com.github.umeshkrpatel.growthmonitor.data.VaccineScheduler;
+import com.github.umeshkrpatel.growthmonitor.data.IVaccines;
 import com.github.umeshkrpatel.multispinner.MultiSpinner;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class VaccineInfoUpdateFragment extends Fragment
 
     private Spinner spBabyInfo;
     private EditText etVDetails, etDate;
-    private Integer mSelectedVaccine;
+    private int mSelectedVaccine;
 
     private static String[] vaccineTypes = null;
 
@@ -81,8 +82,8 @@ public class VaccineInfoUpdateFragment extends Fragment
 
         Button btSubmit = (Button) view.findViewById(R.id.btnVaccine);
         btSubmit.setOnClickListener(this);
-        ArrayList<BabiesInfo.BabyInfo> babyInfos = BabiesInfo.getBabyInfoList();
-        ArrayAdapter<BabiesInfo.BabyInfo> babyInfoArrayAdapter =
+        ArrayList<IBabyInfo> babyInfos = IBabyInfo.getBabyInfoList();
+        ArrayAdapter<IBabyInfo> babyInfoArrayAdapter =
                 new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
                         R.id.tvSpinnerList, babyInfos);
         spBabyInfo.setAdapter(babyInfoArrayAdapter);
@@ -98,23 +99,18 @@ public class VaccineInfoUpdateFragment extends Fragment
     @Override
     public void onClick(View v) {
         String vaccineDetails;
-        Long date;
-        BabiesInfo.BabyInfo babyInfo = (BabiesInfo.BabyInfo)spBabyInfo.getSelectedItem();
+        long date;
+        IBabyInfo babyInfo = (IBabyInfo)spBabyInfo.getSelectedItem();
         vaccineDetails = etVDetails.getText().toString();
         date = Utility.getDate();
-        if (date < babyInfo.mDob) {
+        if (date < babyInfo.getBirthDate()) {
             Toast.makeText(getContext(), "Invalid Date", Toast.LENGTH_LONG).show();
             etDate.setTextColor(Color.RED);
             return;
         }
         IDataProvider dp = IDataProvider.get();
-        if (dp.addVaccinationInfo(mSelectedVaccine, vaccineDetails, date, babyInfo.mId) > -1) {
+        if (dp.addVaccinationInfo(mSelectedVaccine, vaccineDetails, date, babyInfo.getId()) > -1) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
-            EventsInfo info = EventsInfo.get(babyInfo.mId);
-            if ( info == null) {
-                info = EventsInfo.create(babyInfo.mId);
-            }
-            info.update();
             getActivity().onBackPressed();
         } else {
             Toast.makeText(getContext(), "Update Failed", Toast.LENGTH_SHORT).show();
@@ -123,6 +119,6 @@ public class VaccineInfoUpdateFragment extends Fragment
 
     @Override
     public void onItemsSelected(boolean[] selected) {
-        mSelectedVaccine = VaccineScheduler.GetSelectedVaccines(selected);
+        mSelectedVaccine = IVaccines.GetSelectedVaccines(selected);
     }
 }

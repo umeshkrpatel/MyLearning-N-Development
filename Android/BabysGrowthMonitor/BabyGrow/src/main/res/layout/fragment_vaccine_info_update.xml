@@ -43,7 +43,7 @@
             <!--android:id="@+id/etVaccineType"-->
             <!--android:inputType="text" />-->
 
-        <MultiSpinner
+        <com.github.umeshkrpatel.multispinner.MultiSpinner
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_gravity="end"

@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.umeshkrpatel.growthmonitor.data.IAdapter;
+import com.github.umeshkrpatel.growthmonitor.data.IBabyInfo;
+import com.github.umeshkrpatel.growthmonitor.data.IEventInfo;
 
 import java.util.ArrayList;
 
@@ -40,11 +42,6 @@ public class GrowthFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_eventtimeline_list, container, false);
@@ -54,21 +51,11 @@ public class GrowthFragment extends Fragment {
             Context context = view.getContext();
             mView = (RecyclerView) view;
             mView.setLayoutManager(new LinearLayoutManager(context));
-            Integer babyId = BabiesInfo.getCurrentBabyId();
-            EventsInfo info = EventsInfo.get(babyId);
-            if ( info == null) {
-                info = EventsInfo.create(babyId);
-                info.update();
-            }
-            ArrayList<EventsInfo.EventItem> eventItems = info.getList();
-            mView.setAdapter(new TimlineAdapter(eventItems, mListener));
+            int babyId = IBabyInfo.currentBabyInfo().getId();
+            ArrayList<IEventInfo> eventItems = IEventInfo.create(babyId);
+            mView.setAdapter(new TimelineAdapter(eventItems, mListener));
         }
         return view;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
     }
 
     @Override
@@ -88,8 +75,8 @@ public class GrowthFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        void onEventInfoInteraction(EventsInfo.EventItem item);
-        void onBabyInfoInteraction(BabiesInfo.BabyInfo item);
+        void onEventInfoInteraction(IEventInfo item);
+        void onBabyInfoInteraction(int babyId, int action);
     }
 
     public void setAdapter(IAdapter adapter) {
@@ -97,9 +84,8 @@ public class GrowthFragment extends Fragment {
     }
 
     public void update() {
-        Integer babyId = BabiesInfo.getCurrentBabyId();
-        EventsInfo info = EventsInfo.get(babyId);
-        ArrayList<EventsInfo.EventItem> eventItems = info.getList();
-        mView.setAdapter(new TimlineAdapter(eventItems, mListener));
+        int babyId = IBabyInfo.currentBabyInfo().getId();
+        ArrayList<IEventInfo> eventItems = IEventInfo.get(babyId);
+        mView.setAdapter(new TimelineAdapter(eventItems, mListener));
     }
 }

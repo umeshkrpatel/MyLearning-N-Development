@@ -16,17 +16,18 @@ import android.widget.TextView;
 
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.umeshkrpatel.growthmonitor.data.IAdapter;
+import com.github.umeshkrpatel.growthmonitor.data.IBabyInfo;
+import com.github.umeshkrpatel.growthmonitor.data.IEventInfo;
 
 import java.util.ArrayList;
 
-public class TimlineAdapter extends IAdapter {
+public class TimelineAdapter extends IAdapter {
 
-    private final ArrayList<EventsInfo.EventItem> mValues;
+    private final ArrayList<IEventInfo> mValues;
     private final GrowthActivity mListener;
     private static final int[] sTimeLineImageIDs = new int[] {
-            R.drawable.life_newborn,
-            R.drawable.life_3months, R.drawable.life_6months,
-            R.drawable.life_1years, R.drawable.life_2years
+        R.drawable.life_newborn, R.drawable.life_3months, R.drawable.life_6months,
+        R.drawable.life_1years, R.drawable.life_2years
     };
 
     public static int getTimelineImage(long date, long dob) {
@@ -45,7 +46,7 @@ public class TimlineAdapter extends IAdapter {
         return sTimeLineImageIDs[timelineId];
     }
 
-    public TimlineAdapter(ArrayList<EventsInfo.EventItem> items, GrowthActivity listener) {
+    public TimelineAdapter(ArrayList<IEventInfo> items, GrowthActivity listener) {
         mValues = items;
         mListener = listener;
     }
@@ -62,32 +63,29 @@ public class TimlineAdapter extends IAdapter {
     public void onBindViewHolder(@NonNull final IViewHolder iholder, int position) {
         final ViewHolder holder = (ViewHolder)iholder;
         holder.mItem = mValues.get(position);
-        String gen = BabiesInfo.get().getBabyInfoGender(BabiesInfo.getCurrentIndex());
-        if (gen.equals("Girl")) {
-            holder.mView.setBackgroundResource(R.drawable.sg_bg_round_pink);
-        } else {
-            holder.mView.setBackgroundResource(R.drawable.sg_bg_round_blue);
-        }
+
+        IBabyInfo.GenType gen = IBabyInfo.currentBabyInfo().getGender();
+        holder.mView.setBackgroundResource(IBabyInfo.getBackground(gen));
 
         holder.mInfoView.setText(
-                generateSpannableText(
-                        Utility.getDateTimeFromMillisecond(holder.mItem.getDate()),
-                        EventsInfo.getEventDetails(holder.mItem),
-                        ""));
+            generateSpannableText(
+                Utility.getDateTimeFromMillisecond(holder.mItem.getDate()),
+                IEventInfo.getEventDetails(holder.mItem),
+                ""));
         holder.mTimeline.setImageResource(
-                getTimelineImage(
-                        holder.mItem.getDate(),
-                        BabiesInfo.get().getBabyInfoDob(BabiesInfo.getCurrentIndex())
-                ));
+            getTimelineImage(
+                holder.mItem.getDate(),
+                IBabyInfo.currentBabyInfo().getBirthDate()
+            ));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onEventInfoInteraction(holder.mItem);
-                }
+            if (null != mListener) {
+                // Notify the active callbacks interface (the activity, if the
+                // fragment is attached to one) that an item has been selected.
+                mListener.onEventInfoInteraction(holder.mItem);
+            }
             }
         });
     }
@@ -105,7 +103,7 @@ public class TimlineAdapter extends IAdapter {
         //public final TextView mDateView;
         @NonNull
         public final ImageView mTimeline;
-        public EventsInfo.EventItem mItem;
+        public IEventInfo mItem;
 
         public ViewHolder(@NonNull View view) {
             super(view);
@@ -134,7 +132,7 @@ public class TimlineAdapter extends IAdapter {
         s.setSpan(new ForegroundColorSpan(Color.BLACK), flen + 1, flen + slen + 1, 0);
         s.setSpan(new StyleSpan(Typeface.ITALIC), flen + slen + 1, flen + slen + tlen + 1, 0);
         s.setSpan(new ForegroundColorSpan(
-                ColorTemplate.getHoloBlue()), flen + slen + 1, flen + slen + tlen + 2, 0);
+            ColorTemplate.getHoloBlue()), flen + slen + 1, flen + slen + tlen + 2, 0);
         return s;
     }
 }

@@ -8,13 +8,13 @@ import java.util.ArrayList;
  * Created by umpatel on 2/5/2016.
  */
 public class ChartData {
-    public static final int M3 = 0;
-    public static final int M12 = 2;
+    private static final int M3 = 0;
+    private static final int M12 = 2;
     public static final int M60 = 10;
-    private static Integer sXAxis = 0;
-    private static Integer sYAxis = 1;
-    private static Integer sRangeMin = M3;
-    private static Integer sRangeMax = M12;
+    private static int sXAxis = 0;
+    private static int sYAxis = 1;
+    private static int sRangeMin = M3;
+    private static int sRangeMax = M12;
     public static ArrayList<String> mMonth = new ArrayList<String>()
         {{ add("Birth"); add("03 Months"); add("06 Months"); add("1.0 Year");
            add("1.5 Years"); add("2.0 Years"); add("2.5 Years"); add("3.0 Years");
@@ -47,7 +47,7 @@ public class ChartData {
         return rangeToMaxIndex(range);
     }
 
-    public static int rangeFromDobToToday(Long dob) {
+    public static int rangeFromDobToToday(long dob) {
         int months = (int) Utility.fromMiliSecondsToMonths(System.currentTimeMillis() - dob);
         return monthsToRange(months);
     }
@@ -66,31 +66,31 @@ public class ChartData {
         }
         return t;
     }
-    public static void setAxis(Integer x, Integer y) {
+    public static void setAxis(int x, int y) {
         sXAxis = x; sYAxis = y;
     }
-    public static void setXAxis(Integer x) {
+    public static void setXAxis(int x) {
         sXAxis = x;
     }
     public static ChartType getXAxis() {
         return fromInt(sXAxis);
     }
-    public static void setYAxis(Integer y) {
+    public static void setYAxis(int y) {
         sYAxis = y;
     }
     public static ChartType getYAxis() {
         return fromInt(sYAxis);
     }
-    public static Integer minRange() {
+    public static int minRange() {
         return sRangeMin;
     }
-    public static Integer maxRange() {
+    public static int maxRange() {
         return sRangeMax;
     }
-    public static void setMinRange(Integer min) {
+    public static void setMinRange(int min) {
         sRangeMin = min;
     }
-    public static void setMaxRange(Integer max) {
+    public static void setMaxRange(int max) {
         sRangeMax = max;
     }
 }

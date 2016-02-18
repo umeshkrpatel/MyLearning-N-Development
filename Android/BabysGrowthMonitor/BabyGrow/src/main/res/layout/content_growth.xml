@@ -25,7 +25,7 @@
         android:layout_marginStart="@dimen/list_margin"
         android:layout_marginRight="@dimen/list_margin"
         android:layout_marginEnd="@dimen/list_margin"
-        android:elevation="2dp"
+        android:elevation="@dimen/layout_elevation"
         tools:ignore="UnusedAttribute">
         <ImageView
             android:id="@+id/cgBabyView"
@@ -36,6 +36,7 @@
             android:layout_rowSpan="3"
             android:layout_marginRight="@dimen/list_margin"
             android:layout_marginEnd="@dimen/list_margin"
+            android:elevation="@dimen/element_elevation"
             android:background="@drawable/sg_baby_image"
             android:contentDescription="@string/nameOfBaby" />
         <TextView

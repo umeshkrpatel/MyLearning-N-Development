@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:background="@drawable/sg_bg_round_pink"
     android:layout_marginBottom="20dp"
-    >
+    android:elevation="@dimen/layout_elevation"
+    tools:ignore="UnusedAttribute">
     <TextView
         android:id="@+id/blInfo"
         android:layout_width="wrap_content"
@@ -26,6 +28,7 @@
         android:contentDescription="@string/nameOfBaby"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:elevation="@dimen/element_elevation"
         android:background="@drawable/sg_baby_image"
         />
 </RelativeLayout>

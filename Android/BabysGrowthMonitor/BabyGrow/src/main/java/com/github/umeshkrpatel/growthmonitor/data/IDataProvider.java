@@ -15,7 +15,7 @@ import android.util.Log;
 public abstract class IDataProvider extends SQLiteOpenHelper {
     private static final String TAG = "IDataProvider";
     @Nullable
-    private static IDataProvider instance = new NullObject(null);
+    private static IDataProvider instance = new NullObject();
     private static final String kDatabaseName = "GrowthData.db";
 
     private IDataProvider(Context context) {
@@ -23,13 +23,12 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
     }
 
     @NonNull
-    public static IDataProvider create(final Context context) {
+    public static void create(final Context context) {
         instance = new DataProvider(context);
-        return instance;
     }
 
     @NonNull
-    public static IDataProvider get() {
+    public static synchronized IDataProvider get() {
         assert instance != null;
         return instance;
     }
@@ -44,26 +43,35 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
 
     public abstract long addInfo(String table, ContentValues cv);
 
-    public abstract long updateInfo(String table, Integer rowId, ContentValues cv);
+    public abstract long updateInfo(String table, int rowId, ContentValues cv);
+    public abstract long updateInfo(
+            String table, ContentValues values, String whereClause, String[] whereArgs);
 
-    public abstract long addBabyInfo(
-            String name, Long dobDate, Long dobTime, String gender, String bgABO, String bgPH);
+    public abstract void deleteInfo(String table, String where, String[] whereArg);
 
-    public abstract void deleteBabyInfo(Integer id);
+    public abstract long addBabyInfo(int babyId, String name, long dobDate, long dobTime,
+                                     int gender, String bgABO, String bgPH);
 
-    public abstract long updateBabyInfo(Integer id, String name, Long dobDate, Long dobTime,
-                                        String gender, String bgABO, String bgPH);
+    public abstract void deleteBabyInfo(int id);
+
+    public abstract long updateBabyInfo(int babyId, String name, long dobDate, long dobTime,
+                                        int gender, String bgABO, String bgPH);
 
     public abstract long addGrowthInfo(
-            double weight, double height, double head, Long date, Integer baby_id);
+            double weight, double height, double head, long date, int baby_id);
 
     public abstract long addVaccinationInfo(
-            Integer vaccineType, String vaccineInfo, Long date, Integer baby_id);
+            int vaccineType, String vaccineInfo, long date, int baby_id);
+
+    public abstract void deleteVaccinationInfo(int babyId);
 
     public abstract long updateGrowthInfo(
-            Long id, Long weight, Long height, Long head, Long date, Long baby_id);
+            long id, long weight, long height, long head, long date, long baby_id);
 
     public abstract Cursor queryTable(String table);
+
+    public abstract Cursor queryTable(String table, String selection,
+                                      String[] selectionArgs);
 
     public abstract Cursor queryTable(String table, String[] columns, String selection,
                              String[] selectionArgs, String groupBy, String having,
@@ -77,71 +85,92 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
 
         public void onCreate(@NonNull SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + IDataInfo.kBabyInfoTable + " ( "
-                    + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + IDataInfo.NAME + " TEXT, "
-                    + IDataInfo.DOB_DATE + " LONG, "
-                    + IDataInfo.DOB_TIME + " LONG, "
-                    + IDataInfo.GENDER + " TEXT, "
-                    + IDataInfo.BG_ABO + " TEXT, "
-                    + IDataInfo.BG_PH + " TEXT);");
+                + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + IDataInfo.DATE + " LONG, "
+                + IDataInfo.BABY_ID + " INTEGER NOT NULL UNIQUE, "
+                + IDataInfo.BABY_NAME + " TEXT, "
+                + IDataInfo.BIRTH_TIME + " LONG, "
+                + IDataInfo.BABY_GENDER + " INTEGER, "
+                + IDataInfo.BABY_BGABO + " TEXT, "
+                + IDataInfo.BABY_BGPH + " TEXT);");
 
             db.execSQL("CREATE TABLE " + IDataInfo.kGrowthInfoTable + " ( "
-                    + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    + IDataInfo.DATE + " LONG, "
-                    + IDataInfo.BABY_ID + " INTEGER, "
-                    + IDataInfo.WEIGHT + " REAL, "
-                    + IDataInfo.HEIGHT + " REAL, "
-                    + IDataInfo.HEAD + " REAL);");
+                + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + IDataInfo.DATE + " LONG, "
+                + IDataInfo.BABY_ID + " INTEGER, "
+                + IDataInfo.WEIGHT + " REAL, "
+                + IDataInfo.HEIGHT + " REAL, "
+                + IDataInfo.HEAD + " REAL);");
 
             db.execSQL("CREATE TABLE " + IDataInfo.kLifeEventTable + " ( "
-                    + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + IDataInfo.DATE + " LONG, "
-                    + IDataInfo.BABY_ID + " INTEGER, "
-                    + IDataInfo.LE_TYPE + " INTEGER, "
-                    + IDataInfo.LE_INFO + " TEXT);");
+                + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + IDataInfo.DATE + " LONG, "
+                + IDataInfo.BABY_ID + " INTEGER, "
+                + IDataInfo.LE_TYPE + " INTEGER, "
+                + IDataInfo.LE_INFO + " TEXT);");
 
             db.execSQL("CREATE TABLE " + IDataInfo.kVaccineTable + " ( "
-                    + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + IDataInfo.DATE + " LONG, "
-                    + IDataInfo.BABY_ID + " INTEGER, "
-                    + IDataInfo.VACCINE_TYPE + " INTEGER, "
-                    + IDataInfo.VACCINE_NOTE + " TEXT, "
-                    + IDataInfo.VACCINE_DATE + " LONG);");
+                + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + IDataInfo.DATE + " LONG, "
+                + IDataInfo.BABY_ID + " INTEGER, "
+                + IDataInfo.VACCINE_TYPE + " INTEGER, "
+                + IDataInfo.VACCINE_NOTE + " TEXT, "
+                + IDataInfo.VACCINE_DATE + " LONG);");
 
             db.execSQL("CREATE TABLE " + IDataInfo.kEventTable + " ( "
-                    + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + IDataInfo.DATE + " LONG, "
-                    + IDataInfo.BABY_ID + " INTEGER, "
-                    + IDataInfo.EVENT_TYPE + " INTEGER, "
-                    + IDataInfo.EVENT_ID + " INTEGER);");
+                + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + IDataInfo.DATE + " LONG, "
+                + IDataInfo.BABY_ID + " INTEGER, "
+                + IDataInfo.EVENT_TYPE + " INTEGER, "
+                + IDataInfo.EVENT_ID + " INTEGER);");
+            close();
         }
 
         @Override
         public long addInfo(String table, ContentValues cv) {
-            Long rowId;
+            long rowId;
             SQLiteDatabase db = getWritableDatabase();
             rowId = db.insert(table, null, cv);
+            close();
             return rowId;
         }
 
         @Override
-        public long updateInfo(String table, Integer rowId, ContentValues cv) {
+        public long updateInfo(String table, int rowId, ContentValues cv) {
             SQLiteDatabase db = getWritableDatabase();
-            rowId = db.update(table, cv, IDataInfo.ID + "=" + rowId, null);
-            return rowId;
+            long ret = db.update(table, cv, IDataInfo.ID + "=" + rowId, null);
+            close();
+            return ret;
         }
 
         @Override
-        public long addBabyInfo(
-                String name, Long dobDate, Long dobTime, String gender, String bgABO, String bgPH) {
+        public long updateInfo(
+                String table, ContentValues values, String whereClause, String[] whereArgs) {
+            SQLiteDatabase db = getWritableDatabase();
+            long ret = db.update(table, values, whereClause, whereArgs);
+            close();
+            return ret;
+        }
+
+        @Override
+        public void deleteInfo(String table, String where, String[] whereArg) {
+            SQLiteDatabase db = getWritableDatabase();
+            db.delete(table, where, whereArg);
+            close();
+        }
+
+        @Override
+        public long addBabyInfo(int babyId, String name, long dobDate, long dobTime, int gender,
+                                String bgABO, String bgPH) {
             long rowId;
             ContentValues cv = new ContentValues();
-            cv.put(IDataInfo.NAME, name);
-            cv.put(IDataInfo.DOB_DATE, dobDate);
-            cv.put(IDataInfo.DOB_TIME, dobTime);
-            cv.put(IDataInfo.GENDER, gender);
-            cv.put(IDataInfo.BG_ABO, bgABO);
-            cv.put(IDataInfo.BG_PH, bgPH);
+            cv.put(IDataInfo.DATE, dobDate);
+            cv.put(IDataInfo.BABY_ID, babyId);
+            cv.put(IDataInfo.BABY_NAME, name);
+            cv.put(IDataInfo.BIRTH_TIME, dobTime);
+            cv.put(IDataInfo.BABY_GENDER, gender);
+            cv.put(IDataInfo.BABY_BGABO, bgABO);
+            cv.put(IDataInfo.BABY_BGPH, bgPH);
             rowId = addInfo(IDataInfo.kBabyInfoTable, cv);
             if (rowId > -1) {
                 long eventId;
@@ -149,13 +178,13 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
                 cv.put(IDataInfo.LE_TYPE, IDataInfo.LIFEEVENT_BORN);
                 cv.put(IDataInfo.LE_INFO, "Born");
                 cv.put(IDataInfo.DATE, dobDate);
-                cv.put(IDataInfo.BABY_ID, rowId);
+                cv.put(IDataInfo.BABY_ID, babyId);
                 eventId = addInfo(IDataInfo.kLifeEventTable, cv);
                 if (eventId > -1) {
                     cv.clear();
                     cv.put(IDataInfo.EVENT_TYPE, IDataInfo.EVENT_LIFEEVENT);
                     cv.put(IDataInfo.EVENT_ID, eventId);
-                    cv.put(IDataInfo.BABY_ID, rowId);
+                    cv.put(IDataInfo.BABY_ID, babyId);
                     cv.put(IDataInfo.DATE, dobDate);
                     addInfo(IDataInfo.kEventTable, cv);
                 }
@@ -164,27 +193,43 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
         }
 
         @Override
-        public void deleteBabyInfo(Integer id) {
-            SQLiteDatabase db = getWritableDatabase();
-            db.delete(IDataInfo.kBabyInfoTable, IDataInfo.ID + "=" + id, null);
+        public void deleteBabyInfo(int id) {
+            deleteInfo(IDataInfo.kBabyInfoTable, IDataInfo.BABY_ID + "=" + id, null);
         }
 
-        public long updateBabyInfo(Integer id, String name, Long dobDate, Long dobTime,
-                                   String gender, String bgABO, String bgPH) {
+        public long updateBabyInfo(int babyId, String name, long dobDate, long dobTime,
+                                   int gender, String bgABO, String bgPH) {
             long ret;
             ContentValues cv = new ContentValues();
-            cv.put(IDataInfo.NAME, name);
-            cv.put(IDataInfo.DOB_DATE, dobDate);
-            cv.put(IDataInfo.DOB_TIME, dobTime);
-            cv.put(IDataInfo.GENDER, gender);
-            cv.put(IDataInfo.BG_ABO, bgABO);
-            cv.put(IDataInfo.BG_PH, bgPH);
-            ret = updateInfo(IDataInfo.kBabyInfoTable, id, cv);
+            cv.put(IDataInfo.DATE, dobDate);
+            cv.put(IDataInfo.BABY_NAME, name);
+            cv.put(IDataInfo.BIRTH_TIME, dobTime);
+            cv.put(IDataInfo.BABY_GENDER, gender);
+            cv.put(IDataInfo.BABY_BGABO, bgABO);
+            cv.put(IDataInfo.BABY_BGPH, bgPH);
+            String where = IDataInfo.BABY_ID + "=" + babyId;
+            ret = updateInfo(IDataInfo.kBabyInfoTable, cv, where, null);
+            if (ret > -1) {
+                long eventId;
+                cv.clear();
+                where = IDataInfo.LE_TYPE + "=" + IDataInfo.LIFEEVENT_BORN + " AND "
+                        + IDataInfo.BABY_ID + "=" + babyId;
+                cv.put(IDataInfo.LE_INFO, "Born");
+                cv.put(IDataInfo.DATE, dobDate);
+                eventId = updateInfo(IDataInfo.kLifeEventTable, cv, where, null);
+                if (eventId > 0) {
+                    cv.clear();
+                    where = IDataInfo.EVENT_TYPE + "=" + IDataInfo.EVENT_LIFEEVENT + " AND "
+                            + IDataInfo.BABY_ID + "=" + babyId;
+                    cv.put(IDataInfo.DATE, dobDate);
+                    updateInfo(IDataInfo.kEventTable, cv, where, null);
+                }
+            }
             return ret;
         }
 
         public long addGrowthInfo(
-                double weight, double height, double head, Long date, Integer baby_id) {
+                double weight, double height, double head, long date, int baby_id) {
             long ret;
             Log.d(TAG, "Weight " + weight + " Height " + height + " Head " + head + " Date " + date);
             ContentValues cv = new ContentValues();
@@ -206,7 +251,7 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
         }
 
         public long addVaccinationInfo(
-                Integer vaccineType, String vaccineInfo, Long date, Integer baby_id) {
+                int vaccineType, String vaccineInfo, long date, int baby_id) {
             ContentValues cv = new ContentValues();
             cv.put(IDataInfo.VACCINE_TYPE, vaccineType);
             cv.put(IDataInfo.VACCINE_NOTE, vaccineInfo);
@@ -224,8 +269,13 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
             return ret;
         }
 
+        @Override
+        public void deleteVaccinationInfo(int babyId) {
+            deleteInfo(IDataInfo.kVaccineTable, IDataInfo.BABY_ID + "=" + babyId, null);
+        }
+
         public long updateGrowthInfo(
-                Long id, Long weight, Long height, Long head, Long date, Long baby_id) {
+                long id, long weight, long height, long head, long date, long baby_id) {
             long ret;
             SQLiteDatabase db = getWritableDatabase();
             ContentValues cv = new ContentValues();
@@ -235,11 +285,17 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
             cv.put(IDataInfo.DATE, date);
             cv.put(IDataInfo.BABY_ID, baby_id);
             ret = db.update(IDataInfo.kGrowthInfoTable, cv, "_ID=" + id, null);
+            close();
             return ret;
         }
 
         public Cursor queryTable(String table) {
             return queryTable(table, null, null, null, null, null, null);
+        }
+
+        @Override
+        public Cursor queryTable(String table, String selection, String[] selectionArgs) {
+            return queryTable(table, null, selection, selectionArgs, null, null, null);
         }
 
         public Cursor queryTable(String table, String[] columns, String selection,
@@ -253,8 +309,8 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
 
     private static class NullObject extends IDataProvider {
 
-        private NullObject(Context context) {
-            super(context);
+        private NullObject() {
+            super(null);
         }
 
         @Override
@@ -268,47 +324,66 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
         }
 
         @Override
-        public long updateInfo(String table, Integer rowId, ContentValues cv) {
+        public long updateInfo(String table, int rowId, ContentValues cv) {
             return 0;
+        }
+
+        @Override
+        public long updateInfo(
+                String table, ContentValues values, String whereClause, String[] whereArgs) {
+            return 0;
+        }
+
+        @Override
+        public void deleteInfo(String table, String where, String[] whereArg) {
+
         }
 
         @Override
         public long addBabyInfo(
-                String name, Long dobDate, Long dobTime, String gender, String bgABO, String bgPH) {
+                int babyId, String name, long dobDate, long dobTime, int gender, String bgABO, String bgPH) {
             return 0;
         }
 
         @Override
-        public void deleteBabyInfo(Integer id) {
-            return;
+        public void deleteBabyInfo(int id) {
         }
 
         @Override
-        public long updateBabyInfo(Integer id, String name, Long dobDate, Long dobTime,
-                                   String gender, String bgABO, String bgPH) {
+        public long updateBabyInfo(int babyId, String name, long dobDate, long dobTime,
+                                   int gender, String bgABO, String bgPH) {
             return 0;
         }
 
         @Override
         public long addGrowthInfo(
-                double weight, double height, double head, Long date, Integer baby_id) {
+                double weight, double height, double head, long date, int baby_id) {
             return 0;
         }
 
         @Override
         public long addVaccinationInfo(
-                Integer vaccineType, String vaccineInfo, Long date, Integer baby_id) {
+                int vaccineType, String vaccineInfo, long date, int baby_id) {
             return 0;
         }
 
         @Override
+        public void deleteVaccinationInfo(int babyId) {
+        }
+
+        @Override
         public long updateGrowthInfo(
-                Long id, Long weight, Long height, Long head, Long date, Long baby_id) {
+                long id, long weight, long height, long head, long date, long baby_id) {
             return 0;
         }
 
         @Override
         public Cursor queryTable(String table) {
+            return null;
+        }
+
+        @Override
+        public Cursor queryTable(String table, String selection, String[] selectionArgs) {
             return null;
         }
 

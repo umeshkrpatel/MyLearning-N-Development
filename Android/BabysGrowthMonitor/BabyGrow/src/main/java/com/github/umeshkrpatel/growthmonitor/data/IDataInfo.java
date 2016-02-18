@@ -4,23 +4,30 @@ package com.github.umeshkrpatel.growthmonitor.data;
  * Created by umpatel on 1/25/2016.
  */
 public interface IDataInfo {
+    int MAX_BABY = 5;
+
+    String ACTION_TYPE = "action_type";
+    String ACTION_EVENT = "action_event";
+    String ACTION_VALUE = "action_value";
+
     int ACTION_NEW = 0;
     int ACTION_UPDATE = 1;
+    int ACTION_DELETE = 2;
 
     /*
      * Baby's measurement like weight, height etc
      */
-    int EVENT_MEASUREMENT = 0;
+    int EVENT_MEASUREMENT = 1;
 
     /*
      * Baby's vaccination
      */
-    int EVENT_VACCINATION = 1;
+    int EVENT_VACCINATION = 2;
 
     /*
      * Baby's life event like first day of smiling, first sound etc
      */
-    int EVENT_LIFEEVENT = 2;
+    int EVENT_LIFEEVENT = 0;
 
     /*
      * List of life events
@@ -49,51 +56,49 @@ public interface IDataInfo {
      * Common rows in table
      */
     String ID = "_id";
-    Integer INDEX_ID = 0;
+    int INDEX_ID = 0;
     String DATE = "_DATE";
-    Integer INDEX_DATE = 1;
+    int INDEX_DATE = 1;
     String BABY_ID = "_BABY_ID";
-    Integer INDEX_BABY_ID = 2;
+    int INDEX_BABY_ID = 2;
 
     // Growth
     String WEIGHT = "_WEIGHT";
-    Integer INDEX_WEIGHT = 3;
+    int INDEX_WEIGHT = 3;
     String HEIGHT = "_HEIGHT";
-    Integer INDEX_HEIGHT = 4;
+    int INDEX_HEIGHT = 4;
     String HEAD = "_HEAD";
-    Integer INDEX_HEAD = 5;
+    int INDEX_HEAD = 5;
 
     // BabyInfo
-    String NAME = "_NAME";
-    Integer INDEX_NAME = 1;
-    String DOB_DATE = "_DOB_DATE";
-    Integer INDEX_DOB_DATE = 2;
-    String DOB_TIME = "_DOB_TIME";
-    Integer INDEX_DOB_TIME = 3;
-    String GENDER = "_GENDER";
-    Integer INDEX_GENDER = 4;
-    String BG_ABO = "_BG_ABO";
-    Integer INDEX_BG_ABO = 5;
-    String BG_PH = "_BG_PH";
-    Integer INDEX_BG_PH = 6;
+    String BABY_NAME = "_NAME";
+    int INDEX_BABY_NAME = 3;
+    String BIRTH_TIME = "_DOB_TIME";
+    int INDEX_BIRTH_TIME = 4;
+    String BABY_GENDER = "_GENDER";
+    int INDEX_BABY_GENDER = 5;
+    String BABY_BGABO = "_BG_ABO";
+    int INDEX_BABY_BGABO = 6;
+    String BABY_BGPH = "_BG_PH";
+    int INDEX_BABY_BGPH = 7;
 
     // Life Event
     String LE_TYPE = "_LE_TYPE";
-    Integer INDEX_LE_TYPE = 3;
+    int INDEX_LE_TYPE = 3;
     String LE_INFO = "_LE_INFO";
-    Integer INDEX_LE_INFO = 4;
+    int INDEX_LE_INFO = 4;
 
     // Event Below two row will help to map with actual event
     String EVENT_TYPE = "_EVENT_TYPE";
-    Integer INDEX_EVENT_TYPE = 3;
+    int INDEX_EVENT_TYPE = 3;
     String EVENT_ID = "_EVENT_ID";
-    Integer INDEX_EVENT_ID = 4;
+    int INDEX_EVENT_ID = 4;
 
     // Vaccination
     String VACCINE_TYPE = "_VACCINE_TYPE";
-    Integer INDEX_VACCINE_TYPE = 3;
+    int INDEX_VACCINE_TYPE = 3;
     String VACCINE_NOTE = "_VACCINE_NOTE";
-    Integer INDEX_VACCINE_NOTE = 4;
+    int INDEX_VACCINE_NOTE = 4;
     String VACCINE_DATE = "_ACTUAL_DATE";
-    Integer INDEX_VACCINE_DATE = 5;
+    int INDEX_VACCINE_DATE = 5;
 }

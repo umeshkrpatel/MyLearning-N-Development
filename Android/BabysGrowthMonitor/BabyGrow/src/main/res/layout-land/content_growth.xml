@@ -20,12 +20,13 @@
         android:layout_height="match_parent"
         android:rowCount="3"
         android:columnCount="1"
+        android:elevation="@dimen/layout_elevation"
         android:layout_marginTop="@dimen/list_margin"
         android:layout_marginLeft="@dimen/list_margin"
         android:layout_marginStart="@dimen/list_margin"
         android:layout_marginRight="@dimen/list_margin"
         android:layout_marginEnd="@dimen/list_margin"
-        >
+        tools:ignore="UnusedAttribute">
         <ImageView
             android:id="@+id/cgBabyView"
             android:layout_width="150dp"
@@ -37,6 +38,7 @@
             android:layout_marginRight="@dimen/list_margin"
             android:layout_marginEnd="@dimen/list_margin"
             android:background="@drawable/sg_baby_image"
+            android:elevation="@dimen/element_elevation"
             android:contentDescription="@string/nameOfBaby" />
         <TextView
             android:id="@+id/cgBabyName"

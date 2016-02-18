@@ -10,32 +10,27 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
+import com.github.umeshkrpatel.growthmonitor.data.IBabyInfo;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
-import com.github.umeshkrpatel.growthmonitor.data.VaccineScheduler;
 
 /**
  * Created by umpatel on 1/25/2016.
  */
 public class BabyInfoUpdateFragment extends Fragment implements View.OnClickListener {
-    /**
-     * The fragment argument representing the section number for this
-     * fragment.
-     */
-    private static final String ARG_ACTION_TYPE = "action_type";
-    private static final String ARG_INFO_ID = "info_id";
 
     private EditText etName, etDobDate, etDobTime;
     private Switch swGender;
     private String strBGAbo = "-", strBGPh = "-";
-    private String mGender = "Boy";
+    private int actionType = IDataInfo.ACTION_NEW;
+    private int actionValue = -1;
 
-    public BabyInfoUpdateFragment() {
+    private BabyInfoUpdateFragment() {
         Utility.resetDateTime();
     }
 
@@ -46,28 +41,35 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
     public static BabyInfoUpdateFragment newInstance(int sectionNumber, int infoId) {
         BabyInfoUpdateFragment fragment = new BabyInfoUpdateFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_ACTION_TYPE, sectionNumber);
-        args.putInt(ARG_INFO_ID, infoId);
+        args.putInt(IDataInfo.ACTION_TYPE, sectionNumber);
+        args.putInt(IDataInfo.ACTION_EVENT, infoId);
         fragment.setArguments(args);
         return fragment;
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            Bundle bundle = getArguments();
+            if (bundle != null) {
+                actionType = bundle.getInt(IDataInfo.ACTION_TYPE);
+                if (actionType == IDataInfo.ACTION_UPDATE) {
+                    actionValue = bundle.getInt(IDataInfo.ACTION_EVENT);
+                }
+            }
+        }
         View rootView = inflater.inflate(R.layout.baby_info_fragment, container, false);
         etName = (EditText) rootView.findViewById(R.id.baby_name);
         swGender = (Switch) rootView.findViewById(R.id.baby_gender);
         swGender.setThumbResource(R.drawable.boy_face);
-        swGender.setOnClickListener(new View.OnClickListener() {
+        swGender.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                if (swGender.isChecked()) {
-                    mGender = "Girl";
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
                     swGender.setThumbResource(R.drawable.girl_face);
                 } else {
-                    mGender = "Boy";
                     swGender.setThumbResource(R.drawable.boy_face);
                 }
             }
@@ -75,8 +77,7 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
 
         etDobDate = (EditText) rootView.findViewById(R.id.baby_dob);
         etDobTime = (EditText) rootView.findViewById(R.id.baby_dobtime);
-        etDobDate.setText(Utility.getDateTimeInFormat(Utility.getDate(), Utility.kDateInddMMyyyy));
-        etDobTime.setText(Utility.getDateTimeInFormat(Utility.getTime(), Utility.kTimeInkkmm));
+
         Spinner spBGAbo = (Spinner) rootView.findViewById(R.id.baby_bgABO);
         spBGAbo.setAdapter(new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
                 R.id.tvSpinnerList, IDataInfo.BloodGroupABO));
@@ -119,24 +120,36 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
         });
         Button btSubmit = (Button) rootView.findViewById(R.id.baby_add);
         btSubmit.setOnClickListener(this);
+        if (actionType == IDataInfo.ACTION_UPDATE) {
+            IBabyInfo info = IBabyInfo.get(actionValue);
+            etName.setText(info.getName());
+            Utility.setDate(info.getBirthDate());
+            Utility.setTime(info.getBirthTime());
+            swGender.setChecked(info.getGender() == IBabyInfo.GenType.GEN_GIRL);
+        }
+
+        etDobDate.setText(Utility.getDateTimeInFormat(Utility.getDate(), Utility.kDateInddMMyyyy));
+        etDobTime.setText(Utility.getDateTimeInFormat(Utility.getTime(), Utility.kTimeInkkmm));
+
         return rootView;
     }
 
     @Override
     public void onClick(View v) {
         String name = etName.getText().toString();
-        Long date = Utility.getDate();
-        Long time = Utility.getTime();
-        IDataProvider dp = IDataProvider.get();
-        Long id = dp.addBabyInfo(name, date, time, mGender, strBGAbo, strBGPh);
-        if (id > -1) {
+        long date = Utility.getDate();
+        long time = Utility.getTime();
+        int id;
+        if (actionType == IDataInfo.ACTION_NEW)
+            id = IBabyInfo.create(
+                name, swGender.isChecked() ? 1 : 0, date, time, strBGAbo, strBGPh);
+        else {
+            id = IBabyInfo.update(
+                actionValue, name, swGender.isChecked() ? 1 : 0, date, time, strBGAbo, strBGPh);
+        }
+        if (id > IBabyInfo.dummyId) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
-            BabiesInfo.get().updateBabyInfo();
-            if (BabiesInfo.getCurrentIndex() == -1) {
-                BabiesInfo.setCurrentIndex(0);
-            }
             getActivity().onBackPressed();
-            VaccineScheduler.scheduleVaccination(id);
         } else {
             Toast.makeText(getContext(), "Update Failed", Toast.LENGTH_SHORT).show();
         }

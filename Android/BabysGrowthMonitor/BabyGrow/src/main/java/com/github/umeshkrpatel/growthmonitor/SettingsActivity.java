@@ -15,7 +15,6 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.preference.RingtonePreference;
 import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
@@ -41,7 +40,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
+    private static final Preference.OnPreferenceChangeListener sBindPreferenceToValueListener =
             new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
@@ -106,15 +105,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * immediately updated upon calling this method. The exact display format is
      * dependent on the type of preference.
      *
-     * @see #sBindPreferenceSummaryToValueListener
+     * @see #sBindPreferenceToValueListener
      */
     private static void bindPreferenceSummaryToValue(Preference preference) {
         // Set the listener to watch for value changes.
-        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+        preference.setOnPreferenceChangeListener(sBindPreferenceToValueListener);
 
         // Trigger the listener immediately with the preference's
         // current value.
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+        sBindPreferenceToValueListener.onPreferenceChange(preference,
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
@@ -198,12 +197,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     return true;
                 }
             });
-        }
-
-        @Override
-        public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
-
-            return super.onPreferenceTreeClick(preferenceScreen, preference);
         }
 
         @Override

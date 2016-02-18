@@ -51,4 +51,7 @@
     <string name="event_vaccine">%1$s का आज निम्न का टीकाकरण हुआ है.</string>
     <string name="vaccine_pending_msg">अनुगामी टीकाकरण!</string>
     <string name="delete">delete</string>
+    <string name="gen_boy">लड़का</string>
+    <string name="gen_girl">लड़की</string>
+    <string name="gen_other">अन्य</string>
 </resources>

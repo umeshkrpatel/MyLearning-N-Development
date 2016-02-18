@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.charts.ScatterChart;
@@ -21,8 +20,9 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
 import com.github.umeshkrpatel.growthmonitor.data.ChartData;
-import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
+import com.github.umeshkrpatel.growthmonitor.data.IBabyInfo;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
+import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
 import com.github.umeshkrpatel.growthmonitor.data.IHCPercentileData;
 import com.github.umeshkrpatel.growthmonitor.data.IHPercentileData;
 import com.github.umeshkrpatel.growthmonitor.data.IWPercentileData;
@@ -40,9 +40,9 @@ public class GrowthChartFragment extends Fragment {
     private static final String TAG = "GrowthChartFragment";
     private static final String ARG_X_AXIS = "x_axis";
     private static final String ARG_Y_AXIS = "y_axis";
-    private int mKidsId = 0, mKidsGen = 0;
-    private Long mKidsDob = System.currentTimeMillis();
-    private static ArrayList<String> mXAxis = new ArrayList<>();
+    private int mBabyId = 0, mBabyGen = 0;
+    private long mBabyDob = System.currentTimeMillis();
+    private static final ArrayList<String> mXAxis = new ArrayList<>();
 
     private CombinedChart mGrowthChart = null;
     private int ixChart;
@@ -69,28 +69,29 @@ public class GrowthChartFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_growth_chart, container, false);
         mGrowthChart = (CombinedChart) rootView.findViewById(R.id.growth_chart);
 
-        mKidsId = BabiesInfo.getCurrentBabyId();
+        mBabyId = IBabyInfo.currentBabyInfo().getId();
 
         ixChart = getArguments().getInt(ARG_X_AXIS);
         iyChart = getArguments().getInt(ARG_Y_AXIS);
         ChartData.ChartType yChart = ChartData.fromInt(iyChart);
         Cursor c1 = IDataProvider.get()
-                .queryTable(IDataInfo.kBabyInfoTable, null, "_id=" + mKidsId,
-                        null, null, null, null);
+            .queryTable(IDataInfo.kBabyInfoTable, null, IDataInfo.BABY_ID + "=" + mBabyId,
+                null, null, null, null);
         if (c1 == null || c1.getCount() < 1)
             return rootView;
         if (c1.moveToNext()) {
-            mKidsDob = c1.getLong(IDataInfo.INDEX_DOB_DATE);
-            mKidsGen = c1.getInt(IDataInfo.INDEX_GENDER);
+            mBabyDob = c1.getLong(IDataInfo.INDEX_DATE);
+            mBabyGen = c1.getInt(IDataInfo.INDEX_BABY_GENDER);
         }
+        c1.close();
 
         mGrowthChart.setDescription("");
         mGrowthChart.setBackgroundColor(Color.WHITE);
         mGrowthChart.setDrawGridBackground(true);
         mGrowthChart.setDrawBarShadow(false);
         mGrowthChart.setDrawOrder(new CombinedChart.DrawOrder[]{
-                CombinedChart.DrawOrder.LINE,
-                CombinedChart.DrawOrder.SCATTER,
+            CombinedChart.DrawOrder.LINE,
+            CombinedChart.DrawOrder.SCATTER,
         });
         XAxis xAxis = mGrowthChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
@@ -104,10 +105,10 @@ public class GrowthChartFragment extends Fragment {
     }
 
     private float getYAxisMinPosition(ChartData.ChartType yChart) {
-        Integer min = ChartData.minRange();
+        int min = ChartData.minRange();
         switch (yChart) {
             case AGE:
-                return 0f;
+                return -1f;
             case WEIGHT:
                 return IWPercentileData.YAxisMin[min];
             case HEIGHT:
@@ -120,7 +121,7 @@ public class GrowthChartFragment extends Fragment {
     }
 
     private float getYAxisMaxPosition(ChartData.ChartType yChart) {
-        Integer max = ChartData.maxRange();
+        int max = ChartData.maxRange();
         switch (yChart) {
             case AGE:
                 return 53f;
@@ -136,8 +137,8 @@ public class GrowthChartFragment extends Fragment {
     }
 
     private ArrayList<String> getXAxisData(ChartData.ChartType xChart) {
-        Integer rangeMin = ChartData.minRange();
-        Integer rangeMax = ChartData.maxRange();
+        int rangeMin = ChartData.minRange();
+        int rangeMax = ChartData.maxRange();
         mXAxis.clear();
         switch (xChart) {
             case AGE:
@@ -174,19 +175,19 @@ public class GrowthChartFragment extends Fragment {
     }
 
     private LineData generateLineData(ChartData.ChartType yChart) {
-        Integer rangeMin = ChartData.minRange();
-        Integer rangeMax = ChartData.maxRange();
+        int rangeMin = ChartData.minRange();
+        int rangeMax = ChartData.maxRange();
         ArrayList<LineDataSet> dataSets = new ArrayList<>();
-        double[][] yData = IWPercentileData.Data[mKidsGen];
+        double[][] yData = IWPercentileData.Data[mBabyGen];
         switch (yChart) {
             case WEIGHT:
-                yData = IWPercentileData.Data[mKidsGen];
+                yData = IWPercentileData.Data[mBabyGen];
                 break;
             case HEIGHT:
-                yData = IHPercentileData.Data[mKidsGen];
+                yData = IHPercentileData.Data[mBabyGen];
                 break;
             case HEADCIRCUM:
-                yData = IHCPercentileData.Data[mKidsGen];
+                yData = IHCPercentileData.Data[mBabyGen];
             default:
                 break;
         }
@@ -210,22 +211,22 @@ public class GrowthChartFragment extends Fragment {
     }
 
     protected ScatterData generateScatterData(ChartData.ChartType yChart) {
-        Integer rangeMin = ChartData.minRange();
-        Integer rangeMax = ChartData.maxRange();
+        int rangeMin = ChartData.minRange();
+        int rangeMax = ChartData.maxRange();
 
         ScatterData scatterData = new ScatterData();
 
         ArrayList<Entry> entries = new ArrayList<>();
         Cursor c = IDataProvider.get()
-                .queryTable(IDataInfo.kGrowthInfoTable, null,
-                        IDataInfo.BABY_ID + "=" + mKidsId + " AND "
-                        + IDataInfo.DATE + ">="
-                            + (mKidsDob + ChartData.rangeToMinIndex(rangeMin)
-                                * Utility.kMilliSecondsInDays * 7) + " AND "
-                        + IDataInfo.DATE + "<="
-                            + (mKidsDob + ChartData.rangeToMaxIndex(rangeMax)
-                                * Utility.kMilliSecondsInDays * 7),
-                        null, null, null, null);
+            .queryTable(IDataInfo.kGrowthInfoTable, null,
+                IDataInfo.BABY_ID + "=" + mBabyId + " AND "
+                + IDataInfo.DATE + ">="
+                    + (mBabyDob + ChartData.rangeToMinIndex(rangeMin)
+                        * Utility.kMilliSecondsInDays * 7) + " AND "
+                + IDataInfo.DATE + "<="
+                    + (mBabyDob + ChartData.rangeToMaxIndex(rangeMax)
+                        * Utility.kMilliSecondsInDays * 7),
+                null, null, null, null);
         if (c == null || c.getCount() <= 0)
             return scatterData;
 
@@ -233,15 +234,16 @@ public class GrowthChartFragment extends Fragment {
         int i;
         rangeMin = ChartData.rangeToMinIndex(rangeMin);
         while (c.moveToNext()) {
-            Float data = c.getFloat(dataIndex);
-            Long day = c.getLong(IDataInfo.INDEX_DATE);
-            Integer days = Utility.fromMilliSecondsToDays(day - mKidsDob);
+            float data = c.getFloat(dataIndex);
+            long day = c.getLong(IDataInfo.INDEX_DATE);
+            int days = Utility.fromMilliSecondsToDays(day - mBabyDob);
             i = (days / 7) - rangeMin;
             Log.d(TAG, "Index " + i + " Day " + day + " data " + data);
             if (i <= 64){
                 entries.add(new Entry(data, i));
             }
         }
+        c.close();
 
         ScatterDataSet set = new ScatterDataSet(entries, "Scatter DataSet");
         set.setScatterShape(ScatterChart.ScatterShape.SQUARE);
@@ -270,13 +272,7 @@ public class GrowthChartFragment extends Fragment {
         CombinedData data = new CombinedData(getXAxisData(xChart));
 
         data.setData(generateLineData(yChart));
-        if (Utility.fromMilliSecondsToDays(System.currentTimeMillis() - mKidsDob) > 5 * 365) {
-            Toast.makeText(
-                    getContext(), "Age crosses to accepted timeline ", Toast.LENGTH_LONG)
-                    .show();
-        } else {
-            data.setData(generateScatterData(yChart));
-        }
+        data.setData(generateScatterData(yChart));
 
         mGrowthChart.setData(data);
         mGrowthChart.invalidate();

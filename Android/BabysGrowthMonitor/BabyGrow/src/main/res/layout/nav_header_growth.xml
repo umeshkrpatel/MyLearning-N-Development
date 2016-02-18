@@ -17,17 +17,19 @@
         android:orientation="horizontal"
         >
         <ImageView
-            android:id="@+id/imgBabyIcon"
+            android:id="@+id/imgBabyMain"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:paddingTop="@dimen/nav_header_vertical_spacing"
+            android:elevation="@dimen/element_elevation"
             android:contentDescription="@string/nameOfBaby" />
         <ImageView
-            android:id="@+id/imgBabyIconExt"
+            android:id="@+id/imgBabySub"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginLeft="100dp"
             android:layout_marginStart="100dp"
+            android:elevation="@dimen/element_elevation"
             android:contentDescription="@string/nameOfBaby" />
     </LinearLayout>
 

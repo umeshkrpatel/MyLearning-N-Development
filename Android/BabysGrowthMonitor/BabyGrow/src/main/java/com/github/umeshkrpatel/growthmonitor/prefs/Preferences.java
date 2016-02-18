@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
  */
 public class Preferences {
 
-    public static String kPackageName = "com.github.umeshkrpatel.growthmonitor.";
+    public static final String kPackageName = "com.github.umeshkrpatel.growthmonitor.";
 
     public static String kCurrentBabyID = kPackageName + "PREF_CURRENT_BABY";
     public static int kDefCurrentBabyID = -1;

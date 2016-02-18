@@ -28,31 +28,31 @@ public class Utility {
         DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                sDateCal.set(year, monthOfYear, dayOfMonth);
-                if (tView != null) {
-                    tView.setText(getDateTimeInFormat(getDate(), format));
-                }
+            sDateCal.set(year, monthOfYear, dayOfMonth);
+            if (tView != null) {
+                tView.setText(getDateTimeInFormat(getDate(), format));
+            }
             }
         };
 
         new DatePickerDialog(context, date, sDateCal.get(Calendar.YEAR),
-                sDateCal.get(Calendar.MONTH), sDateCal.get(Calendar.DAY_OF_MONTH)).show();
+            sDateCal.get(Calendar.MONTH), sDateCal.get(Calendar.DAY_OF_MONTH)).show();
     }
 
     public static void PopupTimePicker(final Context context, final TextView tView, final String format) {
         TimePickerDialog.OnTimeSetListener time = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                sTimeCal.set(Calendar.HOUR, hourOfDay);
-                sTimeCal.set(Calendar.MINUTE, minute);
-                if (tView != null) {
-                    tView.setText(getDateTimeInFormat(getTime(), format));
-                }
+            sTimeCal.set(Calendar.HOUR, hourOfDay);
+            sTimeCal.set(Calendar.MINUTE, minute);
+            if (tView != null) {
+                tView.setText(getDateTimeInFormat(getTime(), format));
+            }
             }
         };
 
         new TimePickerDialog(context, time, sTimeCal.get(Calendar.HOUR),
-                sTimeCal.get(Calendar.MINUTE), true).show();
+            sTimeCal.get(Calendar.MINUTE), true).show();
     }
 
     public static void resetDateTime() {
@@ -60,14 +60,20 @@ public class Utility {
         sTimeCal.setTimeInMillis(System.currentTimeMillis());
     }
 
-    public static Long getDate() {
+    public static long getDate() {
         return sDateCal.getTimeInMillis();
     }
-    public static Long getTime() {
+    public static void setDate(long date) {
+        sDateCal.setTimeInMillis(date);
+    }
+    public static long getTime() {
         return sTimeCal.getTimeInMillis();
     }
+    public static void setTime(long time) {
+        sTimeCal.setTimeInMillis(time);
+    }
 
-    public static String getDateTimeInFormat(Long milliseconds, String format) {
+    public static String getDateTimeInFormat(long milliseconds, String format) {
         if (format == null)
             format = "dd/MMM/yyyy hh:mm";
         SimpleDateFormat dateFormat = new SimpleDateFormat(format, Locale.US);
@@ -79,11 +85,35 @@ public class Utility {
         return dateFormat.format(new Date(milliseconds));
     }
 
-    public static int fromMilliSecondsToDays(Long milliseconds) {
+    public static int fromMilliSecondsToDays(long milliseconds) {
         return (int)(milliseconds/kMilliSecondsInDays);
     }
 
-    public static float fromMiliSecondsToMonths(Long milliseconds) {
+    public static float fromMiliSecondsToMonths(long milliseconds) {
         return (milliseconds/(kMilliSecondsInDays*30));
+    }
+
+    public static String fromMilliSecondsToAge(long milliseconds) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliseconds);
+        int year = calendar.get(Calendar.YEAR) - 1970;
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR);
+        int minute = calendar.get(Calendar.MINUTE);
+        int second = calendar.get(Calendar.SECOND);
+        String age = "";
+        if (year > 0)
+            age = year + "Y:";
+        if (month > 0)
+            age = age + month + "M:";
+        if (day > 0)
+            age = age + day + "D:";
+        if (hour > 0)
+            age = age + hour + "h:";
+        if (minute > 0)
+            age = age + minute + "m:";
+        age = age + second + "s";
+        return age;
     }
 }

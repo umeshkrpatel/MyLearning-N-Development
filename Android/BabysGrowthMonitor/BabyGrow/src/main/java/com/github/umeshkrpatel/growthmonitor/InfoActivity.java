@@ -27,6 +27,9 @@ public class InfoActivity extends AppCompatActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private int actionType = IDataInfo.ACTION_NEW;
+    private int actionEvent = IDataInfo.EVENT_LIFEEVENT;
+    private int actionValue = -1;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -36,6 +39,9 @@ public class InfoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        handleIntent(savedInstanceState);
+
         setContentView(R.layout.activity_add_info);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -47,6 +53,7 @@ public class InfoActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setCurrentItem(actionEvent);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
@@ -99,11 +106,11 @@ public class InfoActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return BabyInfoUpdateFragment.newInstance(IDataInfo.ACTION_NEW, 0);
+                    return BabyInfoUpdateFragment.newInstance(actionType, actionValue);
                 case 1:
-                    return GrowthInfoUpdateFragment.newInstance(IDataInfo.ACTION_NEW, 0);
+                    return GrowthInfoUpdateFragment.newInstance(actionType, actionValue);
                 case 2:
-                    return VaccineInfoUpdateFragment.newInstance(IDataInfo.ACTION_NEW, 0);
+                    return VaccineInfoUpdateFragment.newInstance(actionType, actionValue);
             }
             return null;
         }
@@ -125,6 +132,17 @@ public class InfoActivity extends AppCompatActivity {
                     return "ADD VACCINATION INFO";
             }
             return null;
+        }
+    }
+
+    void handleIntent(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            Bundle bundle = getIntent().getExtras();
+            if (bundle != null) {
+                actionType = bundle.getInt(IDataInfo.ACTION_TYPE);
+                actionEvent = bundle.getInt(IDataInfo.ACTION_EVENT);
+                actionValue = bundle.getInt(IDataInfo.ACTION_VALUE);
+            }
         }
     }
 }

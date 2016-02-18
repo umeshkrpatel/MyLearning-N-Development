@@ -20,7 +20,7 @@ public class NotificationService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        SpannableStringBuilder message = VaccineScheduler.notificationMessage();
+        SpannableStringBuilder message = IVaccines.notificationMessage();
         handleAction(message);
     }
 

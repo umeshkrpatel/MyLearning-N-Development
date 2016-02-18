@@ -1,6 +1,8 @@
 package com.github.umeshkrpatel.growthmonitor;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,6 +18,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,22 +29,23 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
 import com.github.umeshkrpatel.growthmonitor.data.IAdapter;
+import com.github.umeshkrpatel.growthmonitor.data.IBabyInfo;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
-import com.github.umeshkrpatel.growthmonitor.data.VaccineScheduler;
+import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
+import com.github.umeshkrpatel.growthmonitor.data.IEventInfo;
+import com.github.umeshkrpatel.growthmonitor.data.IVaccines;
 import com.github.umeshkrpatel.growthmonitor.prefs.Preferences;
-
-import java.util.ArrayList;
 
 public class GrowthActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        GrowthFragment.OnListFragmentInteractionListener {
+        GrowthFragment.OnListFragmentInteractionListener, View.OnClickListener {
 
-    private ImageView ivNvBabyPic, ivNvBabyPicExtra;
+    private static final String TAG = "GrowthActivity";
+    private ImageView ivNvBabyMain, ivNvBabySub;
+    private int currentBabyId = 0;
     private GridLayout glDetails;
     private TextView tvNvBabyName;
-    private int mBabyId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,40 +77,31 @@ public class GrowthActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         glDetails = (GridLayout) findViewById(R.id.glDetails);
-        ivNvBabyPic = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imgBabyIcon);
-        ivNvBabyPicExtra = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imgBabyIconExt);
+        ivNvBabyMain =
+                (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imgBabyMain);
+        ivNvBabySub =
+                (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imgBabySub);
+        ivNvBabySub.setOnClickListener(this);
+
         tvNvBabyName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.tvBabyName);
-        ivNvBabyPicExtra.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                BabiesInfo.setToNextIndex();
-                updateMainView();
-                Integer babyId = BabiesInfo.getCurrentBabyId();
-                EventsInfo info = EventsInfo.get(babyId);
-                ArrayList<EventsInfo.EventItem> eventItems = info.getList();
-                IAdapter adapter = new TimlineAdapter(eventItems, null);
-                GrowthFragment.get().setAdapter(adapter);
-            }
-        });
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.container);
         viewPager.setAdapter(sectionsPagerAdapter);
 
-        int Index = BabiesInfo.getCurrentIndex();
-        if (BabiesInfo.size() == 0 && Index > 0) {
+        if (IBabyInfo.size() == 0) {
             Intent intent = new Intent(this, InfoActivity.class);
             startActivity(intent);
-        } else {
-            updateMainView();
-            EventsInfo.create(mBabyId);
         }
     }
+
     @Override
     public void onResume() {
         super.onResume();
         updateMainView();
+        updateNavigationView();
+        IEventInfo.create(IBabyInfo.currentBabyInfo().getId());
     }
 
     @Override
@@ -118,7 +116,8 @@ public class GrowthActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            finalize();
+            this.finish();
         }
     }
 
@@ -159,7 +158,7 @@ public class GrowthActivity extends AppCompatActivity
             Intent intent = new Intent(this, InfoActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_babies_list) {
-            IAdapter adapter = new BabiesAdapter(BabiesInfo.getBabyInfoList(), this);
+            IAdapter adapter = new BabiesAdapter(IBabyInfo.getBabyInfoList(), this);
             GrowthFragment.get().setAdapter(adapter);
         } else if (id == R.id.nav_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
@@ -176,17 +175,46 @@ public class GrowthActivity extends AppCompatActivity
     }
 
     @Override
-    public void onEventInfoInteraction(EventsInfo.EventItem item) {
+    public void onEventInfoInteraction(IEventInfo item) {
 
     }
 
     @Override
-    public void onBabyInfoInteraction(BabiesInfo.BabyInfo item) {
-        Intent intent = new Intent(this, GrowthChartActivity.class);
-        intent.putExtra(GrowthChartActivity.ACTION_TYPE, IDataInfo.ACTION_UPDATE);
-        intent.putExtra(GrowthChartActivity.ACTION_VALUE1, IDataInfo.EVENT_LIFEEVENT);
-        intent.putExtra(GrowthChartActivity.ACTION_VALUE2, item.getId());
-        startActivity(intent);
+    public void onBabyInfoInteraction(int babyId, int action) {
+        if (action == IDataInfo.ACTION_UPDATE) {
+            Intent intent = new Intent(this, InfoActivity.class);
+            intent.putExtra(IDataInfo.ACTION_TYPE, IDataInfo.ACTION_UPDATE);
+            intent.putExtra(IDataInfo.ACTION_EVENT, IDataInfo.EVENT_LIFEEVENT);
+            intent.putExtra(IDataInfo.ACTION_VALUE, babyId);
+            startActivity(intent);
+        } else if (action == IDataInfo.ACTION_DELETE) {
+            IBabyInfo.delete(babyId);
+            if (IBabyInfo.size() == 0) {
+                Intent intent = new Intent(this, InfoActivity.class);
+                startActivity(intent);
+            } else {
+                updateMainView();
+                updateNavigationView();
+            }
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onClick(View v) {
+        IBabyInfo.moveToNext();
+        updateMainView();
+        updateNavigationView();
+        GrowthFragment.get().update();
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -197,14 +225,11 @@ public class GrowthActivity extends AppCompatActivity
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a GrowthChartFragment (defined as a static inner class below).
             return GrowthFragment.get();
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
             return 1;
         }
 
@@ -213,69 +238,83 @@ public class GrowthActivity extends AppCompatActivity
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "SECTION 1";
-                case 1:
-                    return "SECTION 2";
-                case 2:
-                    return "SECTION 3";
+                    return " ";
             }
             return null;
         }
     }
 
     private void updateMainView() {
-        BabiesInfo babiesInfo = BabiesInfo.get();
-        Integer Index = BabiesInfo.getCurrentIndex();
+        IBabyInfo info = IBabyInfo.currentBabyInfo();
         TextView tvBabyName = (TextView) findViewById(R.id.cgBabyName);
         TextView tvBabyDOB = (TextView) findViewById(R.id.cgBabyDob);
         ImageView ivBabyPicture = (ImageView) findViewById(R.id.cgBabyView);
-        mBabyId = babiesInfo.getBabyInfoId(Index);
-        Long dob = babiesInfo.getBabyInfoDob(Index);
-        String gen = babiesInfo.getBabyInfoGender(Index);
-        tvBabyName.setText(babiesInfo.getBabyInfoName(Index));
-        tvNvBabyName.setText(babiesInfo.getBabyInfoName(Index));
-        tvBabyDOB.setText(Utility.getDateTimeFromMillisecond(dob));
-        int genId = gen.equals("Girl")?1:0;
+        long dob = info.getBirthDate();
+
+        tvBabyDOB.setText(Utility.fromMilliSecondsToAge(System.currentTimeMillis() - dob));
+
         float age = Utility.fromMiliSecondsToMonths(System.currentTimeMillis() - dob);
-        if (gen.equals("Girl")) {
-            glDetails.setBackgroundResource(R.drawable.sg_bg_round_pink);
-        } else {
-            glDetails.setBackgroundResource(R.drawable.sg_bg_round_blue);
-        }
-        int imgR = BabiesInfo.getBabyImage(genId, age);
-        ivBabyPicture.setImageResource(imgR);
-        ivNvBabyPic.setImageResource(imgR);
-        if (babiesInfo.getBabyInfoCount() > 1) {
-            ivNvBabyPicExtra.setVisibility(View.VISIBLE);
-            Index = (Index + 1) % BabiesInfo.size();
-            dob = babiesInfo.getBabyInfoDob(Index);
-            gen = babiesInfo.getBabyInfoGender(Index);
-            genId = gen.equals("Girl")?1:0;
+        IBabyInfo.GenType gender = info.getGender();
+        tvBabyName.setText(generateSpannableText(info.getName(), gender.toString()));
+        glDetails.setBackgroundResource(IBabyInfo.getBackground(gender));
+        int imageId = IBabyInfo.getBabyImage(gender, age);
+        ivBabyPicture.setImageResource(imageId);
+        ivNvBabyMain.setImageResource(imageId);
+    }
+
+    private void updateNavigationView() {
+        IBabyInfo info = IBabyInfo.currentBabyInfo();
+        long dob = info.getBirthDate();
+
+        float age = Utility.fromMiliSecondsToMonths(System.currentTimeMillis() - dob);
+        IBabyInfo.GenType gender = info.getGender();
+        glDetails.setBackgroundResource(IBabyInfo.getBackground(gender));
+        int imageId = IBabyInfo.getBabyImage(gender, age);
+        ivNvBabyMain.setImageResource(imageId);
+        tvNvBabyName.setText(info.getName());
+        if (IBabyInfo.getBabyInfoCount() > 1) {
+            ivNvBabySub.setVisibility(View.VISIBLE);
+            info = IBabyInfo.nextBabyInfo();
+            dob = info.getBirthDate();
+            gender = info.getGender();
             age = Utility.fromMiliSecondsToMonths(System.currentTimeMillis() - dob);
-            imgR = BabiesInfo.getBabyImage(genId, age);
-            ivNvBabyPicExtra.setImageResource(imgR);
+            imageId = IBabyInfo.getBabyImage(gender, age);
+            ivNvBabySub.setImageResource(imageId);
         } else {
-            ivNvBabyPicExtra.setVisibility(View.GONE);
+            ivNvBabySub.setVisibility(View.GONE);
         }
     }
 
-    public void finish() {
-        Preferences.saveValue(Preferences.kCurrentBabyID, BabiesInfo.getCurrentIndex());
+    public void finalize() {
+        //Preferences.saveValue(Preferences.kCurrentBabyID, IBabyInfo.getCurrentIndex());
     }
 
     private void initialize() {
         Preferences.create(getPreferences(MODE_PRIVATE));
 
-        BabiesInfo.setCurrentIndex(
-                Preferences.readValue(Preferences.kCurrentBabyID, Preferences.kDefCurrentBabyID));
+        //IBabyInfo.setCurrentIndex(
+        //        Preferences.readValue(Preferences.kCurrentBabyID, Preferences.kDefCurrentBabyID));
 
         ResourceReader.create(this);
 
         IDataProvider.create(this);
-        VaccineScheduler.create(this);
-        BabiesInfo babiesInfo = BabiesInfo.create();
-        for (int i = 0; i < BabiesInfo.size(); i++) {
-            EventsInfo.create(babiesInfo.getBabyInfoId(i));
+        IVaccines.create(this);
+        if (IBabyInfo.update() > 0) {
+            for (IBabyInfo info : IBabyInfo.getBabyInfoList()) {
+                IEventInfo.create(info.getId());
+            }
         }
+    }
+    @NonNull
+    private static SpannableString generateSpannableText(
+            @NonNull String name, @NonNull String gen) {
+        int flen = name.length();
+        SpannableString s = new SpannableString(name + '(' + gen + ')');
+        s.setSpan(new RelativeSizeSpan(1f), 0, flen, 0);
+        s.setSpan(new ForegroundColorSpan(Color.BLACK), 0, flen, 0);
+        s.setSpan(new StyleSpan(Typeface.NORMAL), flen, s.length(), 0);
+        s.setSpan(new ForegroundColorSpan(Color.MAGENTA), flen, s.length(), 0);
+        s.setSpan(new RelativeSizeSpan(.6f), flen, s.length(), 0);
+        return s;
     }
 }

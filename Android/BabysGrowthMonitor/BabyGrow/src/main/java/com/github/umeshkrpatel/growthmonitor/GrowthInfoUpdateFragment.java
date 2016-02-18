@@ -7,13 +7,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
+import com.github.umeshkrpatel.growthmonitor.data.IBabyInfo;
+import com.github.umeshkrpatel.growthmonitor.data.IGrowthInfo;
+import com.github.umeshkrpatel.growthmonitor.data.ISpinnerAdapter;
 
 import java.util.ArrayList;
 
@@ -30,7 +31,6 @@ public class GrowthInfoUpdateFragment extends Fragment implements View.OnClickLi
 
     private Spinner mBabyInfo;
     private EditText mWeight, mHeight, mHead, mDate;
-    private Button mSubmit;
 
     public GrowthInfoUpdateFragment() {
     }
@@ -74,38 +74,34 @@ public class GrowthInfoUpdateFragment extends Fragment implements View.OnClickLi
             }
         });
 
-        mSubmit = (Button) rootView.findViewById(R.id.btnGrowth);
+        Button mSubmit = (Button) rootView.findViewById(R.id.btnGrowth);
         mSubmit.setOnClickListener(this);
-        ArrayList<BabiesInfo.BabyInfo> babyInfos = BabiesInfo.getBabyInfoList();
-        ArrayAdapter<BabiesInfo.BabyInfo> babyInfoArrayAdapter =
-                new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
-                        R.id.tvSpinnerList, babyInfos);
-        mBabyInfo.setAdapter(babyInfoArrayAdapter);
+        ArrayList<IBabyInfo> babyInfos = IBabyInfo.getBabyInfoList();
+        //ArrayAdapter<IBabyInfo> babyInfoArrayAdapter =
+        //        new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
+        //                R.id.tvSpinnerList, babyInfos);
+        //mBabyInfo.setAdapter(babyInfoArrayAdapter);
+        mBabyInfo.setAdapter(new ISpinnerAdapter(getContext(), 0, babyInfos, null));
         return rootView;
     }
 
     @Override
     public void onClick(View v) {
         Double weight, height, head;
-        Long date;
-        BabiesInfo.BabyInfo babyInfo = (BabiesInfo.BabyInfo)mBabyInfo.getSelectedItem();
+        long date;
+        IBabyInfo babyInfo = (IBabyInfo) mBabyInfo.getSelectedItem();
         weight = Double.parseDouble(mWeight.getText().toString());
         height = Double.parseDouble(mHeight.getText().toString());
         head = Double.parseDouble(mHead.getText().toString());
         date = Utility.getDate();
-        if (date < babyInfo.mDob) {
+        if (date < babyInfo.getBirthDate()) {
             Toast.makeText(getContext(), "Invalid Date", Toast.LENGTH_LONG).show();
             mDate.setTextColor(Color.RED);
             return;
         }
-        IDataProvider dp = IDataProvider.get();
-        if (dp.addGrowthInfo(weight, height, head, date, babyInfo.mId) > -1 ) {
+
+        if (IGrowthInfo.create(babyInfo.getId(), weight, height, head, date)) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
-            EventsInfo info = EventsInfo.get(babyInfo.mId);
-            if ( info == null) {
-                info = EventsInfo.create(babyInfo.mId);
-            }
-            info.update();
             getActivity().onBackPressed();
         } else {
             Toast.makeText(getContext(), "Update Failed", Toast.LENGTH_SHORT).show();
