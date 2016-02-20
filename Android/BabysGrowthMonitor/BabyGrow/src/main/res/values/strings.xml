@@ -95,4 +95,7 @@
     <string name="gen_girl">girl</string>
     <string name="gen_boy">boy</string>
     <string name="gen_other">other</string>
+
+    <string name="allSelected">All Selected</string>
+    <string name="noneSelected">Select Items</string>
 </resources>

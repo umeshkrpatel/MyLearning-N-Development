@@ -22,7 +22,6 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
         super(context, kDatabaseName, null, 2);
     }
 
-    @NonNull
     public static void create(final Context context) {
         instance = new DataProvider(context);
     }

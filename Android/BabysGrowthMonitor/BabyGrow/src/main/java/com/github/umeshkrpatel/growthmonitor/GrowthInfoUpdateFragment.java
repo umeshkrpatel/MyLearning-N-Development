@@ -77,10 +77,7 @@ public class GrowthInfoUpdateFragment extends Fragment implements View.OnClickLi
         Button mSubmit = (Button) rootView.findViewById(R.id.btnGrowth);
         mSubmit.setOnClickListener(this);
         ArrayList<IBabyInfo> babyInfos = IBabyInfo.getBabyInfoList();
-        //ArrayAdapter<IBabyInfo> babyInfoArrayAdapter =
-        //        new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
-        //                R.id.tvSpinnerList, babyInfos);
-        //mBabyInfo.setAdapter(babyInfoArrayAdapter);
+
         mBabyInfo.setAdapter(new ISpinnerAdapter(getContext(), 0, babyInfos, null));
         return rootView;
     }

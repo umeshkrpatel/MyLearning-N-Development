@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.github.umeshkrpatel.growthmonitor.data.IBabyInfo;
 import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
+import com.github.umeshkrpatel.growthmonitor.data.ISpinnerAdapter;
 import com.github.umeshkrpatel.growthmonitor.data.IVaccines;
 import com.github.umeshkrpatel.multispinner.MultiSpinner;
 
@@ -83,16 +84,15 @@ public class VaccineInfoUpdateFragment extends Fragment
         Button btSubmit = (Button) view.findViewById(R.id.btnVaccine);
         btSubmit.setOnClickListener(this);
         ArrayList<IBabyInfo> babyInfos = IBabyInfo.getBabyInfoList();
-        ArrayAdapter<IBabyInfo> babyInfoArrayAdapter =
-                new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
-                        R.id.tvSpinnerList, babyInfos);
-        spBabyInfo.setAdapter(babyInfoArrayAdapter);
+        spBabyInfo.setAdapter(new ISpinnerAdapter(getContext(), 0, babyInfos, null));
 
         MultiSpinner vaccineList = (MultiSpinner) view.findViewById(R.id.etVaccineType);
         vaccineList.setAdapter(
-                new ArrayAdapter<>(
-                        getContext(), R.layout.spinner_listview, R.id.tvSpinnerList, vaccineTypes),
-                false, this);
+            new ArrayAdapter<>(
+                getContext(), R.layout.spinner_listview, R.id.tvSpinnerList, vaccineTypes),
+            false, this);
+        vaccineList.setAllText(ResourceReader.getString(R.string.allSelected));
+        vaccineList.setDefaultText(ResourceReader.getString(R.string.noneSelected));
         return view;
     }
 

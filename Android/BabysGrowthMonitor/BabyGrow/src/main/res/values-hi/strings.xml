@@ -54,4 +54,6 @@
     <string name="gen_boy">लड़का</string>
     <string name="gen_girl">लड़की</string>
     <string name="gen_other">अन्य</string>
+    <string name="allSelected">सभी चयनित</string>
+    <string name="noneSelected">विकल्प चुनें</string>
 </resources>

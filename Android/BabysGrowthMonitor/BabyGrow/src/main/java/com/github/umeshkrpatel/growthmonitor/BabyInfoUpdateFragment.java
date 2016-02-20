@@ -30,7 +30,7 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
     private int actionType = IDataInfo.ACTION_NEW;
     private int actionValue = -1;
 
-    private BabyInfoUpdateFragment() {
+    public BabyInfoUpdateFragment() {
         Utility.resetDateTime();
     }
 

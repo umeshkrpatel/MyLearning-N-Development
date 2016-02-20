@@ -91,37 +91,38 @@ public class GrowthChartActivity extends AppCompatActivity
         mXAxisBar = (Spinner) navigationView.getHeaderView(0).findViewById(R.id.sbXAxis);
         mXAxisBar.setOnItemSelectedListener(this);
         assert sChartList != null;
-        mXAxisBar.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_listview,
-                R.id.tvSpinnerList, sChartList));
+        mXAxisBar.setAdapter(
+            new ArrayAdapter<>(this, R.layout.spinner_listview, R.id.tvSpinnerList, sChartList));
         mXAxisBar.setSelection(ChartData.minRange());
 
         mYAxisBar = (Spinner) navigationView.getHeaderView(0).findViewById(R.id.sbYAxis);
         mYAxisBar.setOnItemSelectedListener(this);
-        mYAxisBar.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_listview,
-                R.id.tvSpinnerList, sChartList));
+        mYAxisBar.setAdapter(
+            new ArrayAdapter<>(this, R.layout.spinner_listview, R.id.tvSpinnerList, sChartList));
         mYAxisBar.setSelection(ChartData.maxRange());
+
         Button btnUpdate = (Button) navigationView.getHeaderView(0).findViewById(R.id.nvBtnUpdate);
         btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChartData.setMinRange(mXAxisBar.getSelectedItemPosition());
-                ChartData.setMaxRange(mYAxisBar.getSelectedItemPosition());
-                int pos = mSectionsPagerAdapter.getCurrentPosition();
-                GrowthChartFragment gf;
-                if (pos != 1) {
-                    gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(pos);
+            ChartData.setMinRange(mXAxisBar.getSelectedItemPosition());
+            ChartData.setMaxRange(mYAxisBar.getSelectedItemPosition());
+            int pos = mSectionsPagerAdapter.getCurrentPosition();
+            GrowthChartFragment gf;
+            if (pos != 1) {
+                gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(pos);
+                gf.updateChart();
+                gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(1);
+                gf.updateChart();
+            } else {
+                for (int i = 0; i < sFragmentCount; i++) {
+                    gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(i);
                     gf.updateChart();
-                    gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(1);
-                    gf.updateChart();
-                } else {
-                    for (int i = 0; i < sFragmentCount; i++) {
-                        gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(i);
-                        gf.updateChart();
-                    }
                 }
+            }
 
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.chart_drawer_layout);
-                drawer.closeDrawer(GravityCompat.END);
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.chart_drawer_layout);
+            drawer.closeDrawer(GravityCompat.END);
             }
         });
 
@@ -130,9 +131,6 @@ public class GrowthChartActivity extends AppCompatActivity
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
 
         // Set up the ViewPager with the sections adapter.
-        /*
-      The {@link ViewPager} that will host the section contents.
-     */
         viewPager = (ViewPager) findViewById(R.id.container);
         viewPager.setAdapter(mSectionsPagerAdapter);
 
@@ -143,8 +141,8 @@ public class GrowthChartActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(@NonNull View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
             }
         });
 
@@ -242,8 +240,8 @@ public class GrowthChartActivity extends AppCompatActivity
         @NonNull
         @Override
         public CharSequence getPageTitle(int position) {
-            return mContext.getResources().getString(R.string.age)
-                    + "-" + mContext.getResources().getString(mNameIDs[position]);
+            return mContext.getResources().getString(R.string.age) + "-"
+                + mContext.getResources().getString(mNameIDs[position]);
         }
         @Override
         public void setPrimaryItem(ViewGroup container, int position, Object object) {

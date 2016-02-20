@@ -18,16 +18,13 @@ import java.util.ArrayList;
 public class ISpinnerAdapter extends ArrayAdapter<IBabyInfo> {
 
     private final Context ctx;
-    private String[] contentArray;
-    private ArrayList<IBabyInfo> conA;
-    //private int[] imageArray;
+    private ArrayList<IBabyInfo> contentArray;
 
     public ISpinnerAdapter(Context context, int resource, ArrayList<IBabyInfo> objects,
                            int[] imageArray) {
         super(context, R.layout.spinner_babylist, R.id.tvSpinnerList, objects);
         this.ctx = context;
-        this.conA = objects;
-        //this.imageArray = imageArray;
+        this.contentArray = objects;
     }
 
     @Override
@@ -46,10 +43,14 @@ public class ISpinnerAdapter extends ArrayAdapter<IBabyInfo> {
         View row = inflater.inflate(R.layout.spinner_babylist, parent, false);
 
         TextView textView = (TextView) row.findViewById(R.id.tvSpinnerList);
-        textView.setText(conA.get(position).getName());
+        IBabyInfo info = contentArray.get(position);
+        textView.setText(info.getName());
 
         ImageView imageView = (ImageView)row.findViewById(R.id.ivSpinnerList);
-        imageView.setImageResource(R.drawable.ic_face_girl);
+        if (info.getGender() == IBabyInfo.GenType.GEN_GIRL)
+            imageView.setImageResource(R.drawable.girl_face);
+        else
+            imageView.setImageResource(R.drawable.boy_face);
 
         return row;
     }
