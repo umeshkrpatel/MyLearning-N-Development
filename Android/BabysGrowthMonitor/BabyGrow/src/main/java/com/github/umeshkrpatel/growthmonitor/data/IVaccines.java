@@ -58,37 +58,20 @@ public abstract class IVaccines {
         return mappedVaccine;
     }
 
+    public static boolean[] getVaccineSelection(int value) {
+        boolean[] result = new boolean[vaccineMap.size()];
+        for (int i = 0; i < vaccineMap.size(); i++) {
+            result[i] = (value & vaccineMap.get(i)) != 0;
+        }
+        return result;
+    }
+
     public static SpannableStringBuilder getVaccineNames(int index) {
         SpannableStringBuilder vaccines = new SpannableStringBuilder();
-        if ( (index|BCG) != 0) {
-            vaccines.append("\n").append(vaccineList[0]);
-        }
-        if ( (index|OPV) != 0) {
-            vaccines.append("\n").append(vaccineList[1]);
-        }
-        if ( (index|IPV) != 0) {
-            vaccines.append("\n").append(vaccineList[2]);
-        }
-        if ( (index|HEPB) != 0) {
-            vaccines.append("\n").append(vaccineList[3]);
-        }
-        if ( (index|HIB) != 0) {
-            vaccines.append("\n").append(vaccineList[4]);
-        }
-        if ( (index|PCV) != 0) {
-            vaccines.append("\n").append(vaccineList[5]);
-        }
-        if ( (index|DTP) != 0) {
-            vaccines.append("\n").append(vaccineList[6]);
-        }
-        if ( (index|RVV) != 0) {
-            vaccines.append("\n").append(vaccineList[7]);
-        }
-        if ( (index|MMR) != 0) {
-            vaccines.append("\n").append(vaccineList[8]);
-        }
-        if ( (index|TCV) != 0) {
-            vaccines.append("\n").append(vaccineList[9]);
+        for (int i = 0; i < vaccineMap.size(); i++) {
+            if ((index & vaccineMap.get(i)) != 0) {
+                vaccines.append("\n").append(vaccineList[i]);
+            }
         }
         return vaccines;
     }
@@ -132,7 +115,7 @@ public abstract class IVaccines {
                     switch (info.action) {
                         case IDataInfo.ACTION_NEW:
                             long dueDate = date + vc.mDays * Utility.kMilliSecondsInDays;
-                            dp.addVaccinationInfo(vc.mType, "", dueDate, info.getId());
+                            dp.addOrUpdateVaccination(-1, vc.mType, "", dueDate, info.getId(), 1);
                             IVaccines.get().createAlarm(dueDate);
                             break;
                         case IDataInfo.ACTION_DELETE:
@@ -202,6 +185,45 @@ public abstract class IVaccines {
         @Override
         public void createAlarm(long date) {
 
+        }
+    }
+
+    public static IVaccineInfo get(int id) {
+        return new IVaccineInfo(id);
+    }
+
+    public static class IVaccineInfo {
+        private int mID;
+        private int mValue = 0;
+        private long mDate = System.currentTimeMillis();
+        private String mNotes = "";
+        private boolean mIsAlarm = false;
+        public IVaccineInfo(int id) {
+            mID = id;
+            String where = IDataInfo.ID + "=" + mID;
+            Cursor c = IDataProvider.get().queryTable(IDataInfo.kVaccineTable, where, null);
+            if (c != null && c.getCount() > 0 && c.moveToNext()) {
+                mValue = c.getInt(IDataInfo.INDEX_VACCINE_TYPE);
+                mDate = c.getLong(IDataInfo.INDEX_DATE);
+                mNotes = c.getString(IDataInfo.INDEX_VACCINE_NOTE);
+                mIsAlarm = (c.getInt(IDataInfo.INDEX_VACCINE_ISALARM) == 1);
+            }
+        }
+
+        public int getValue() {
+            return mValue;
+        }
+
+        public long getDate() {
+            return mDate;
+        }
+
+        public String getNotes() {
+            return mNotes;
+        }
+
+        public boolean isAlarm() {
+            return mIsAlarm;
         }
     }
 }

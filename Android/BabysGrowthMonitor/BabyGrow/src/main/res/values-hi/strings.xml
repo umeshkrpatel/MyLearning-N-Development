@@ -8,7 +8,7 @@
     <string name="pref_header_notifications">सूचनाएं</string>
     <string name="pref_ringtone_silent">शांत</string>
     <string name="title_activity_add_info">शिशु की जानकारी जोड़ें</string>
-    <string name="title_activity_baby_info">नई शिशु की जानकारी</string>
+    <string name="title_activity_baby_info">शिशु की जानकारी</string>
     <string name="title_activity_growth_chart">शिशु के विकास की रूपरेखा</string>
     <string name="submit">सुरक्षित</string>
     <string name="settings">समायोजन</string>
@@ -24,7 +24,7 @@
     <string name="viewGrowthChart">विकास की रूपरेखा</string>
     <string name="allBabyLists">सभी बच्चों की सूची</string>
     <string name="communicate">सूचित करना</string>
-    <string name="share">Share</string>
+    <string name="timeline">समय-सारणी</string>
     <string name="send">भेजें</string>
     <string name="bloodGroupOfBaby">रक्त समूह</string>
     <string name="start_from">प्रारंभ</string>
@@ -56,4 +56,12 @@
     <string name="gen_other">अन्य</string>
     <string name="allSelected">सभी चयनित</string>
     <string name="noneSelected">विकल्प चुनें</string>
+    <string name="babyInfo">शिशु की जानकारी</string>
+    <string name="growthInfo">विकास की जानकारी</string>
+    <string name="vaccineInfo">टीकाकरण की जानकारी</string>
+    <string name="deleteBabyConfirm">क्या आप %s की जानकारी मिटाना चाहते हैं?</string>
+    <string name="no">नहीं</string>
+    <string name="yes">हाँ</string>
+    <string name="ageInfo">%1$d वर्ष %2$d महीने %3$d दिन %4$d घंटे %5$d मिनट</string>
+    <string name="lifeEventBorn">दुनिया में आपका स्वागत, आज %1$s का जन्म हुआ है!!</string>
 </resources>

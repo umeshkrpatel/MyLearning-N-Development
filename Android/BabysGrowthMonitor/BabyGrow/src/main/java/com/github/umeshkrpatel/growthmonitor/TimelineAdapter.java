@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public class TimelineAdapter extends IAdapter {
 
     private final ArrayList<IEventInfo> mValues;
-    private final GrowthActivity mListener;
+    private final IInfoFragment mListener;
     private static final int[] sTimeLineImageIDs = new int[] {
         R.drawable.life_newborn, R.drawable.life_3months, R.drawable.life_6months,
         R.drawable.life_1years, R.drawable.life_2years
@@ -46,7 +46,8 @@ public class TimelineAdapter extends IAdapter {
         return sTimeLineImageIDs[timelineId];
     }
 
-    public TimelineAdapter(ArrayList<IEventInfo> items, GrowthActivity listener) {
+    public TimelineAdapter(ArrayList<IEventInfo> items,
+                           IInfoFragment listener) {
         mValues = items;
         mListener = listener;
     }
@@ -55,7 +56,7 @@ public class TimelineAdapter extends IAdapter {
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.timeline_listview, parent, false);
+            .inflate(R.layout.timeline_listview, parent, false);
         return new ViewHolder(view);
     }
 
@@ -70,22 +71,24 @@ public class TimelineAdapter extends IAdapter {
         holder.mInfoView.setText(
             generateSpannableText(
                 Utility.getDateTimeFromMillisecond(holder.mItem.getDate()),
-                IEventInfo.getEventDetails(holder.mItem),
-                ""));
+                IEventInfo.getEventDetails(holder.mItem), ""
+            )
+        );
         holder.mTimeline.setImageResource(
             getTimelineImage(
                 holder.mItem.getDate(),
                 IBabyInfo.currentBabyInfo().getBirthDate()
             ));
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-            if (null != mListener) {
-                // Notify the active callbacks interface (the activity, if the
-                // fragment is attached to one) that an item has been selected.
-                mListener.onEventInfoInteraction(holder.mItem);
-            }
+            public boolean onLongClick(View v) {
+                if (null != mListener) {
+                    // Notify the active callbacks interface (the activity, if the
+                    // fragment is attached to one) that an item has been selected.
+                    mListener.onEventInfoInteraction(holder.mItem);
+                }
+                return true;
             }
         });
     }

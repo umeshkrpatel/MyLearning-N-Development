@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -19,18 +18,22 @@ import android.widget.Toast;
 import com.github.umeshkrpatel.growthmonitor.data.IBabyInfo;
 import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by umpatel on 1/25/2016.
  */
-public class BabyInfoUpdateFragment extends Fragment implements View.OnClickListener {
+public class AddOrUpdateBaby extends Fragment implements View.OnClickListener {
 
+    private static IInfoFragment mListener;
     private EditText etName, etDobDate, etDobTime;
     private Switch swGender;
-    private String strBGAbo = "-", strBGPh = "-";
+    private Spinner mBloodGroup;
     private int actionType = IDataInfo.ACTION_NEW;
     private int actionValue = -1;
 
-    public BabyInfoUpdateFragment() {
+    public AddOrUpdateBaby() {
         Utility.resetDateTime();
     }
 
@@ -38,11 +41,12 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static BabyInfoUpdateFragment newInstance(int sectionNumber, int infoId) {
-        BabyInfoUpdateFragment fragment = new BabyInfoUpdateFragment();
+    public static AddOrUpdateBaby getOrCreate(IInfoFragment listener, int type, int value) {
+        AddOrUpdateBaby fragment = new AddOrUpdateBaby();
+        mListener = listener;
         Bundle args = new Bundle();
-        args.putInt(IDataInfo.ACTION_TYPE, sectionNumber);
-        args.putInt(IDataInfo.ACTION_EVENT, infoId);
+        args.putInt(IDataInfo.ACTION_TYPE, type);
+        args.putInt(IDataInfo.ACTION_VALUE, value);
         fragment.setArguments(args);
         return fragment;
     }
@@ -51,13 +55,11 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            Bundle bundle = getArguments();
-            if (bundle != null) {
-                actionType = bundle.getInt(IDataInfo.ACTION_TYPE);
-                if (actionType == IDataInfo.ACTION_UPDATE) {
-                    actionValue = bundle.getInt(IDataInfo.ACTION_EVENT);
-                }
+        Bundle bundle = getArguments();
+        if (savedInstanceState == null && bundle != null) {
+            actionType = bundle.getInt(IDataInfo.ACTION_TYPE);
+            if (actionType == IDataInfo.ACTION_UPDATE) {
+                actionValue = bundle.getInt(IDataInfo.ACTION_VALUE);
             }
         }
         View rootView = inflater.inflate(R.layout.baby_info_fragment, container, false);
@@ -78,34 +80,11 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
         etDobDate = (EditText) rootView.findViewById(R.id.baby_dob);
         etDobTime = (EditText) rootView.findViewById(R.id.baby_dobtime);
 
-        Spinner spBGAbo = (Spinner) rootView.findViewById(R.id.baby_bgABO);
-        spBGAbo.setAdapter(new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
-                R.id.tvSpinnerList, IDataInfo.BloodGroupABO));
-        spBGAbo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                strBGAbo = parent.getItemAtPosition(position).toString();
-            }
+        mBloodGroup = (Spinner) rootView.findViewById(R.id.baby_bgABO);
+        List<IBabyInfo.BloodGroup> bloodGroups = Arrays.asList(IBabyInfo.BloodGroup.values());
+        mBloodGroup.setAdapter(new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
+            R.id.tvSpinnerList, bloodGroups));
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                strBGAbo = "-";
-            }
-        });
-        Spinner spBGPh = (Spinner) rootView.findViewById(R.id.baby_bgPH);
-        spBGPh.setAdapter(new ArrayAdapter<>(getContext(), R.layout.spinner_listview,
-                R.id.tvSpinnerList, IDataInfo.BloodGroupPH));
-        spBGPh.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                strBGPh = parent.getItemAtPosition(position).toString();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                strBGPh = "-";
-            }
-        });
         etDobDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,32 +99,28 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
         });
         Button btSubmit = (Button) rootView.findViewById(R.id.baby_add);
         btSubmit.setOnClickListener(this);
-        if (actionType == IDataInfo.ACTION_UPDATE) {
-            IBabyInfo info = IBabyInfo.get(actionValue);
-            etName.setText(info.getName());
-            Utility.setDate(info.getBirthDate());
-            Utility.setTime(info.getBirthTime());
-            swGender.setChecked(info.getGender() == IBabyInfo.GenType.GEN_GIRL);
-        }
 
-        etDobDate.setText(Utility.getDateTimeInFormat(Utility.getDate(), Utility.kDateInddMMyyyy));
-        etDobTime.setText(Utility.getDateTimeInFormat(Utility.getTime(), Utility.kTimeInkkmm));
-
+        updateView();
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateView();
     }
 
     @Override
     public void onClick(View v) {
         String name = etName.getText().toString();
-        long date = Utility.getDate();
-        long time = Utility.getTime();
+        long date = Utility.getDateTime();
         int id;
         if (actionType == IDataInfo.ACTION_NEW)
             id = IBabyInfo.create(
-                name, swGender.isChecked() ? 1 : 0, date, time, strBGAbo, strBGPh);
+                name, swGender.isChecked() ? 1 : 0, date, mBloodGroup.getSelectedItemPosition());
         else {
-            id = IBabyInfo.update(
-                actionValue, name, swGender.isChecked() ? 1 : 0, date, time, strBGAbo, strBGPh);
+            id = IBabyInfo.update(actionValue, name, swGender.isChecked() ? 1 : 0, date,
+                mBloodGroup.getSelectedItemPosition());
         }
         if (id > IBabyInfo.dummyId) {
             Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
@@ -153,6 +128,18 @@ public class BabyInfoUpdateFragment extends Fragment implements View.OnClickList
         } else {
             Toast.makeText(getContext(), "Update Failed", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void updateView() {
+
+        IBabyInfo info = IBabyInfo.get(actionValue);
+        etName.setText(info.getName());
+        swGender.setChecked(info.getGender() == IBabyInfo.GenType.GEN_GIRL);
+        Utility.setDateTime(info.getBirthDate());
+
+        mBloodGroup.setSelection(info.getBloodGroup().toInt(), true);
+        etDobDate.setText(Utility.getDateTimeInFormat(Utility.kDateInddMMyyyy));
+        etDobTime.setText(Utility.getDateTimeInFormat(Utility.kTimeInkkmm));
     }
 }
 

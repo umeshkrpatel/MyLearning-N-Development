@@ -13,6 +13,12 @@ public interface IDataInfo {
     int ACTION_NEW = 0;
     int ACTION_UPDATE = 1;
     int ACTION_DELETE = 2;
+    int ACTION_GET = 3;
+
+    /*
+     * Baby's life event like first day of smiling, first sound etc
+     */
+    int EVENT_LIFEEVENT = 0;
 
     /*
      * Baby's measurement like weight, height etc
@@ -25,11 +31,6 @@ public interface IDataInfo {
     int EVENT_VACCINATION = 2;
 
     /*
-     * Baby's life event like first day of smiling, first sound etc
-     */
-    int EVENT_LIFEEVENT = 0;
-
-    /*
      * List of life events
      */
     int LIFEEVENT_BORN = 0;
@@ -40,8 +41,6 @@ public interface IDataInfo {
     int LIFEEVENT_CALLMUMMY = 5;
     int LIFEEVENT_CALLPAPA = 6;
     int LIFEEVENT_OTHERS = 7;
-    String[] BloodGroupABO = new String[] {"-", "A", "B", "AB", "O"};
-    String[] BloodGroupPH = new String[] {"-", "V+", "V-"};
 
     /*
      * Tables
@@ -73,14 +72,16 @@ public interface IDataInfo {
     // BabyInfo
     String BABY_NAME = "_NAME";
     int INDEX_BABY_NAME = 3;
-    String BIRTH_TIME = "_DOB_TIME";
-    int INDEX_BIRTH_TIME = 4;
     String BABY_GENDER = "_GENDER";
-    int INDEX_BABY_GENDER = 5;
+    int INDEX_BABY_GENDER = 4;
     String BABY_BGABO = "_BG_ABO";
-    int INDEX_BABY_BGABO = 6;
-    String BABY_BGPH = "_BG_PH";
-    int INDEX_BABY_BGPH = 7;
+    int INDEX_BABY_BGABO = 5;
+    String THEME_START_COLOR = "_START_COLOR";
+    int INDEX_START_COLOR = 6;
+    String THEME_CENTER_COLOR = "_CENTER_COLOR";
+    int INDEX_CENTER_COLOR = 7;
+    String THEME_END_COLOR = "_END_COLOR";
+    int INDEX_END_COLOR = 8;
 
     // Life Event
     String LE_TYPE = "_LE_TYPE";
@@ -99,6 +100,6 @@ public interface IDataInfo {
     int INDEX_VACCINE_TYPE = 3;
     String VACCINE_NOTE = "_VACCINE_NOTE";
     int INDEX_VACCINE_NOTE = 4;
-    String VACCINE_DATE = "_ACTUAL_DATE";
-    int INDEX_VACCINE_DATE = 5;
+    String VACCINE_ISALARM = "_VACCINE_ISALARM";
+    int INDEX_VACCINE_ISALARM = 5;
 }

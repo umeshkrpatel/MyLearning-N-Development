@@ -25,6 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:textStyle="bold"
+        android:textSize="15sp"
         android:paddingTop="@dimen/list_margin"
         android:paddingStart="@dimen/list_margin"
         android:paddingLeft="@dimen/list_margin"
@@ -35,7 +36,8 @@
     <TextView
         android:id="@+id/blvBabyAge"
         android:layout_width="wrap_content"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
         android:paddingStart="@dimen/list_margin"
         android:paddingLeft="@dimen/list_margin"
         android:paddingBottom="@dimen/list_margin"

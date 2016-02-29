@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public abstract class IEventInfo {
+
     @NonNull
     private static final HashMap<Integer, ArrayList<IEventInfo>> mEventTimeline = new HashMap<>();
 
@@ -33,7 +34,8 @@ public abstract class IEventInfo {
         }
     }
 
-    public static ArrayList<IEventInfo> get(final int babyId) {
+    public static ArrayList<IEventInfo> get(int babyId) {
+        babyId = babyId < 0? IBabyInfo.currentBabyInfo().getId() : babyId;
         return mEventTimeline.get(babyId);
     }
 
@@ -45,62 +47,63 @@ public abstract class IEventInfo {
     public static SpannableStringBuilder getEventDetails(@NonNull IEventInfo item) {
         Cursor c = null;
         SpannableStringBuilder message = new SpannableStringBuilder();
+        IBabyInfo info = IBabyInfo.currentBabyInfo();
+        String pronoun1, pronoun2;
+        if (IBabyInfo.currentBabyInfo().getGender() == IBabyInfo.GenType.GEN_GIRL) {
+            pronoun1 = ResourceReader.getString(R.string.she);
+            pronoun2 = ResourceReader.getString(R.string.her);
+        } else {
+            pronoun1 = ResourceReader.getString(R.string.he);
+            pronoun2 = ResourceReader.getString(R.string.his);
+        }
+
         switch (item.getEventType()) {
             case IDataInfo.EVENT_MEASUREMENT:
                 c = IDataProvider.get()
-                        .queryTable(IDataInfo.kGrowthInfoTable, null,
-                                IDataInfo.ID + "=" + item.getEventID(), null, null, null, null);
-                if (c != null && c.getCount() > 0) {
-                    if (c.moveToNext()) {
-                        String msg = ResourceReader.getString(R.string.event_measurment);
-                        String pronoun1, pronoun2;
-                        if (IBabyInfo.currentBabyInfo().getGender() == IBabyInfo.GenType.GEN_GIRL) {
-                            pronoun1 = ResourceReader.getString(R.string.she);
-                            pronoun2 = ResourceReader.getString(R.string.her);
-                        } else {
-                            pronoun1 = ResourceReader.getString(R.string.he);
-                            pronoun2 = ResourceReader.getString(R.string.his);
-                        }
-                        msg = String.format(msg, pronoun1,
-                                c.getFloat(IDataInfo.INDEX_WEIGHT),
-                                c.getFloat(IDataInfo.INDEX_HEIGHT),
-                                pronoun2,
-                                c.getFloat(IDataInfo.INDEX_HEAD)
-                                );
-                        message.append(msg);
-                    }
+                    .queryTable(IDataInfo.kGrowthInfoTable, null,
+                        IDataInfo.ID + "=" + item.getEventID(), null, null, null, null);
+                if (c != null && c.getCount() > 0 && c.moveToNext()) {
+                    String msg = ResourceReader.getString(R.string.event_measurment);
+                    msg = String.format(msg, pronoun1,
+                        c.getFloat(IDataInfo.INDEX_WEIGHT),
+                        c.getFloat(IDataInfo.INDEX_HEIGHT),
+                        pronoun2,
+                        c.getFloat(IDataInfo.INDEX_HEAD)
+                    );
+                    message.append(msg);
                 }
                 break;
+
             case IDataInfo.EVENT_LIFEEVENT:
                 c = IDataProvider.get()
-                        .queryTable(IDataInfo.kLifeEventTable, null,
-                                IDataInfo.ID + "=" + item.getEventID(), null, null, null, null);
-                if (c != null && c.getCount() > 0) {
-                    if (c.moveToNext()) {
-                        return message.append("She has her first ")
-                                .append((char) c.getInt(IDataInfo.INDEX_LE_TYPE))
-                                .append(" today");
-                    }
-                }
-                break;
-            case IDataInfo.EVENT_VACCINATION:
-                c = IDataProvider.get()
-                        .queryTable(IDataInfo.kVaccineTable, null,
-                                IDataInfo.ID + "=" + item.getEventID(), null, null, null, null);
-                if (c != null && c.getCount() > 0) {
-                    if (c.moveToNext()) {
-                        String msg = ResourceReader.getString(R.string.event_vaccine);
-                        IBabyInfo info = IBabyInfo.currentBabyInfo();
+                    .queryTable(IDataInfo.kLifeEventTable, null,
+                        IDataInfo.ID + "=" + item.getEventID(), null, null, null, null);
+                if (c != null && c.getCount() > 0 && c.moveToNext()) {
+                    if (c.getInt(IDataInfo.INDEX_LE_TYPE) == IDataInfo.LIFEEVENT_BORN) {
+                        String msg = ResourceReader.getString(R.string.lifeEventBorn);
                         msg = String.format(msg, info.getName());
                         message.append(msg);
-                        message.append(
-                                IVaccines.getVaccineNames(
-                                        c.getInt(IDataInfo.INDEX_VACCINE_TYPE)
-                                )
-                        );
+                        break;
+                    } else {
+                        message.append("Some lifeevent!");
                     }
                 }
                 break;
+
+            case IDataInfo.EVENT_VACCINATION:
+                c = IDataProvider.get()
+                    .queryTable(IDataInfo.kVaccineTable, null,
+                        IDataInfo.ID + "=" + item.getEventID(), null, null, null, null);
+                if (c != null && c.getCount() > 0 && c.moveToNext()) {
+                    String msg = ResourceReader.getString(R.string.event_vaccine);
+                    msg = String.format(msg, info.getName());
+                    message.append(msg);
+                    message.append(
+                        IVaccines.getVaccineNames(c.getInt(IDataInfo.INDEX_VACCINE_TYPE))
+                    );
+                }
+                break;
+
             default:
                 break;
         }
@@ -170,7 +173,7 @@ public abstract class IEventInfo {
 
         @Override
         public long getDate() {
-            return 0;
+            return System.currentTimeMillis();
         }
 
         @Override
@@ -198,7 +201,8 @@ public abstract class IEventInfo {
                     if (eInfo.getEventID() > -1) {
                         where = where + " AND " + IDataInfo.EVENT_ID + "=" + eInfo.getEventID();
                     }
-                    Cursor c = IDataProvider.get().queryTable(IDataInfo.kEventTable, null, where, null,
+                    Cursor c = IDataProvider.get()
+                        .queryTable(IDataInfo.kEventTable, null, where, null,
                             null, null, IDataInfo.DATE + " DESC");
                     if (c == null || c.getCount() == 0) {
                         info.add(new EmptyEvent());
@@ -206,12 +210,12 @@ public abstract class IEventInfo {
                     }
                     while (c.moveToNext()) {
                         info.add(
-                                new EventInfo(
-                                        c.getInt(IDataInfo.INDEX_ID),
-                                        c.getLong(IDataInfo.INDEX_DATE),
-                                        c.getInt(IDataInfo.INDEX_EVENT_TYPE),
-                                        c.getInt(IDataInfo.INDEX_EVENT_ID)
-                                )
+                            new EventInfo(
+                                c.getInt(IDataInfo.INDEX_ID),
+                                c.getLong(IDataInfo.INDEX_DATE),
+                                c.getInt(IDataInfo.INDEX_EVENT_TYPE),
+                                c.getInt(IDataInfo.INDEX_EVENT_ID)
+                            )
                         );
                     }
                     c.close();

@@ -28,4 +28,16 @@
         <item>@string/TCV</item>
     </string-array>
 
+    <string-array name="bloodGroups">
+        <item>@string/noneSelected</item>
+        <item>A+</item>
+        <item>B+</item>
+        <item>AB+</item>
+        <item>O+</item>
+        <item>A-</item>
+        <item>B-</item>
+        <item>AB-</item>
+        <item>O-</item>
+    </string-array>
+
 </resources>

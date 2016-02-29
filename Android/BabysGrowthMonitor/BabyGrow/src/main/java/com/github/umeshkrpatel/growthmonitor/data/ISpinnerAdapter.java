@@ -20,8 +20,7 @@ public class ISpinnerAdapter extends ArrayAdapter<IBabyInfo> {
     private final Context ctx;
     private ArrayList<IBabyInfo> contentArray;
 
-    public ISpinnerAdapter(Context context, int resource, ArrayList<IBabyInfo> objects,
-                           int[] imageArray) {
+    public ISpinnerAdapter(Context context, ArrayList<IBabyInfo> objects) {
         super(context, R.layout.spinner_babylist, R.id.tvSpinnerList, objects);
         this.ctx = context;
         this.contentArray = objects;

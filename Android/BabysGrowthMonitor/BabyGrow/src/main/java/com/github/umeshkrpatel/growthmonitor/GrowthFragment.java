@@ -20,13 +20,13 @@ import java.util.ArrayList;
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link IInfoFragment}
  * interface.
  */
 public class GrowthFragment extends Fragment {
 
     @Nullable
-    private GrowthActivity mListener;
+    private static IInfoFragment mListener;
     private RecyclerView mView;
 
     /**
@@ -35,7 +35,9 @@ public class GrowthFragment extends Fragment {
      */
     public static GrowthFragment instance;
 
-    public static GrowthFragment get() {
+    public static GrowthFragment getOrCreate(IInfoFragment listener) {
+        if (listener != null)
+            mListener = listener;
         if (instance == null)
             instance = new GrowthFragment();
         return instance;
@@ -64,28 +66,17 @@ public class GrowthFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnListFragmentInteractionListener {
-        void onEventInfoInteraction(IEventInfo item);
-        void onBabyInfoInteraction(int babyId, int action);
-    }
-
     public void setAdapter(IAdapter adapter) {
-        mView.setAdapter(adapter);
+        if (mView != null) {
+            mView.setAdapter(adapter);
+        }
     }
 
     public void update() {
-        int babyId = IBabyInfo.currentBabyInfo().getId();
-        ArrayList<IEventInfo> eventItems = IEventInfo.get(babyId);
-        mView.setAdapter(new TimelineAdapter(eventItems, mListener));
+        if (mView != null) {
+            int babyId = IBabyInfo.currentBabyInfo().getId();
+            ArrayList<IEventInfo> eventItems = IEventInfo.get(babyId);
+            mView.setAdapter(new TimelineAdapter(eventItems, mListener));
+        }
     }
 }

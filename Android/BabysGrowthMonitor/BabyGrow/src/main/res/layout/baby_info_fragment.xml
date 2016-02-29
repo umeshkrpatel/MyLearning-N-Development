@@ -16,7 +16,7 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:orientation="vertical"
         android:elevation="@dimen/layout_elevation"
-        tools:context=".BabyInfoUpdateFragment">
+        tools:context=".AddOrUpdateBaby">
 
         <TextView
             android:layout_marginTop="10dp"

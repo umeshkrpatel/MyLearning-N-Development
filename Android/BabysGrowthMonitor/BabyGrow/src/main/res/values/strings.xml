@@ -55,10 +55,10 @@
     <string name="viewGrowthChart">View Growth Chart</string>
     <string name="allBabyLists">All Babies List</string>
     <string name="communicate">Communicate</string>
-    <string name="share">Share</string>
+    <string name="timeline">Timeline</string>
     <string name="send">Send</string>
     <string name="age">Age</string>
-    <string name="event_measurment">%1$s is %2$.2fkg heavy, %3$.2f cm tall and %4$s has become %5$.2f cm big</string>
+    <string name="event_measurment">%1$s is %2$.2fkg heavy, %3$.2f cm tall and %4$s head has become %5$.2f cm big</string>
     <string name="she">She</string>
     <string name="he">He</string>
     <string name="her">her</string>
@@ -98,4 +98,16 @@
 
     <string name="allSelected">All Selected</string>
     <string name="noneSelected">Select Items</string>
+
+    <string name="babyInfo">Baby\'s Information</string>
+    <string name="growthInfo">Growth\'s Information</string>
+    <string name="vaccineInfo">Vaccination\'s Information</string>
+    <string name="title_activity_baby_info">Baby\'s Information</string>
+
+    <string name="deleteBabyConfirm">Do you want to delete %s\'s information?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="ageInfo">%1$d Year(s) %2$d Month(s) %3$d Day(s) %4$d Hour(s) %5$d Minute(s)</string>
+    <string name="lifeEventBorn">Welcome to the world, %1$s born today!!</string>
 </resources>

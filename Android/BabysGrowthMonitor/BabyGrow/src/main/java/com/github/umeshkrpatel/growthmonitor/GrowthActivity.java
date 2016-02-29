@@ -1,17 +1,15 @@
 package com.github.umeshkrpatel.growthmonitor;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -36,16 +34,19 @@ import com.github.umeshkrpatel.growthmonitor.data.IDataProvider;
 import com.github.umeshkrpatel.growthmonitor.data.IEventInfo;
 import com.github.umeshkrpatel.growthmonitor.data.IVaccines;
 import com.github.umeshkrpatel.growthmonitor.prefs.Preferences;
+import com.github.umeshkrpatel.growthmonitor.utils.IShapeUtils;
 
 public class GrowthActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        GrowthFragment.OnListFragmentInteractionListener, View.OnClickListener {
+        IInfoFragment, View.OnClickListener {
 
     private static final String TAG = "GrowthActivity";
     private ImageView ivNvBabyMain, ivNvBabySub;
-    private int currentBabyId = 0;
     private GridLayout glDetails;
     private TextView tvNvBabyName;
+    private GrowthPagerAdapter mPagerAdapter;
+    private ViewPager mViewPager;
+    private boolean mIsTimeline = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +63,7 @@ public class GrowthActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(@NonNull View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                onBabyInfoInteraction(-1, IDataInfo.ACTION_NEW);
             }
         });
 
@@ -85,10 +85,11 @@ public class GrowthActivity extends AppCompatActivity
 
         tvNvBabyName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.tvBabyName);
 
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        mPagerAdapter =
+            new GrowthPagerAdapter(getSupportFragmentManager(), this);
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.container);
-        viewPager.setAdapter(sectionsPagerAdapter);
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mPagerAdapter);
 
         if (IBabyInfo.size() == 0) {
             Intent intent = new Intent(this, InfoActivity.class);
@@ -115,6 +116,9 @@ public class GrowthActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        }
+        if (!mIsTimeline) {
+            updateTimeline();
         } else {
             finalize();
             this.finish();
@@ -155,18 +159,19 @@ public class GrowthActivity extends AppCompatActivity
             Intent intent = new Intent(this, GrowthChartActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_babies) {
-            Intent intent = new Intent(this, InfoActivity.class);
-            startActivity(intent);
+            updateBabyInfo();
         } else if (id == R.id.nav_babies_list) {
+            mIsTimeline = false;
+            mViewPager.setAdapter(mPagerAdapter);
             IAdapter adapter = new BabiesAdapter(IBabyInfo.getBabyInfoList(), this);
-            GrowthFragment.get().setAdapter(adapter);
+            GrowthFragment.getOrCreate(this).setAdapter(adapter);
         } else if (id == R.id.nav_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_share) {
-
+        } else if (id == R.id.nav_timeline) {
+            updateTimeline();
         } else if (id == R.id.nav_send) {
-
+            // mViewPager.setAdapter(mPagerAdapter);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -176,7 +181,7 @@ public class GrowthActivity extends AppCompatActivity
 
     @Override
     public void onEventInfoInteraction(IEventInfo item) {
-
+        updateBabyInfo(IDataInfo.ACTION_UPDATE, item.getEventType(), item.getEventID());
     }
 
     @Override
@@ -196,7 +201,25 @@ public class GrowthActivity extends AppCompatActivity
                 updateMainView();
                 updateNavigationView();
             }
+        } else {
+            Intent intent = new Intent(this, InfoActivity.class);
+            startActivity(intent);
         }
+    }
+
+    @Override
+    public void onUpdateBabyInfo() {
+        updateTimeline();
+    }
+
+    @Override
+    public void onUpdateGrowthInfo() {
+        updateTimeline();
+    }
+
+    @Override
+    public void onUpdateVaccineInfo() {
+        updateTimeline();
     }
 
     @Override
@@ -214,34 +237,7 @@ public class GrowthActivity extends AppCompatActivity
         IBabyInfo.moveToNext();
         updateMainView();
         updateNavigationView();
-        GrowthFragment.get().update();
-    }
-
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return GrowthFragment.get();
-        }
-
-        @Override
-        public int getCount() {
-            return 1;
-        }
-
-        @Nullable
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return " ";
-            }
-            return null;
-        }
+        updateTimeline();
     }
 
     private void updateMainView() {
@@ -251,7 +247,7 @@ public class GrowthActivity extends AppCompatActivity
         ImageView ivBabyPicture = (ImageView) findViewById(R.id.cgBabyView);
         long dob = info.getBirthDate();
 
-        tvBabyDOB.setText(Utility.fromMilliSecondsToAge(System.currentTimeMillis() - dob));
+        tvBabyDOB.setText(Utility.fromMilliSecondsToAge(dob));
 
         float age = Utility.fromMiliSecondsToMonths(System.currentTimeMillis() - dob);
         IBabyInfo.GenType gender = info.getGender();
@@ -262,13 +258,14 @@ public class GrowthActivity extends AppCompatActivity
         ivNvBabyMain.setImageResource(imageId);
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void updateNavigationView() {
         IBabyInfo info = IBabyInfo.currentBabyInfo();
         long dob = info.getBirthDate();
 
         float age = Utility.fromMiliSecondsToMonths(System.currentTimeMillis() - dob);
         IBabyInfo.GenType gender = info.getGender();
-        glDetails.setBackgroundResource(IBabyInfo.getBackground(gender));
+        glDetails.setBackground(IShapeUtils.gradientDrawable(info.getId()));
         int imageId = IBabyInfo.getBabyImage(gender, age);
         ivNvBabyMain.setImageResource(imageId);
         tvNvBabyName.setText(info.getName());
@@ -285,10 +282,11 @@ public class GrowthActivity extends AppCompatActivity
         }
     }
 
-    public void finalize() {
+    protected void finalize() {
         //Preferences.saveValue(Preferences.kCurrentBabyID, IBabyInfo.getCurrentIndex());
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void initialize() {
         Preferences.create(getPreferences(MODE_PRIVATE));
 
@@ -296,6 +294,9 @@ public class GrowthActivity extends AppCompatActivity
         //        Preferences.readValue(Preferences.kCurrentBabyID, Preferences.kDefCurrentBabyID));
 
         ResourceReader.create(this);
+        GradientDrawable drawable =
+            (GradientDrawable) getResources().getDrawable(R.drawable.sg_bg_round_blue, null);
+        IShapeUtils.setGradientDrawables(drawable);
 
         IDataProvider.create(this);
         IVaccines.create(this);
@@ -316,5 +317,27 @@ public class GrowthActivity extends AppCompatActivity
         s.setSpan(new ForegroundColorSpan(Color.MAGENTA), flen, s.length(), 0);
         s.setSpan(new RelativeSizeSpan(.6f), flen, s.length(), 0);
         return s;
+    }
+
+    private void updateTimeline() {
+        mIsTimeline = true;
+        mViewPager.setAdapter(mPagerAdapter);
+        IBabyInfo info = IBabyInfo.currentBabyInfo();
+        IAdapter adapter = new TimelineAdapter(IEventInfo.get(info.getId()), this);
+        GrowthFragment.getOrCreate(this).setAdapter(adapter);
+    }
+
+    private void updateBabyInfo() {
+        mIsTimeline = false;
+        InfoPagerAdapter adapter =
+            new InfoPagerAdapter(getSupportFragmentManager(), this);
+        mViewPager.setAdapter(adapter);
+    }
+    private void updateBabyInfo(int type, int event, int value) {
+        mIsTimeline = false;
+        InfoPagerAdapter adapter =
+            new InfoPagerAdapter(getSupportFragmentManager(), this, type, event, value);
+        adapter.notifyDataSetChanged();
+        mViewPager.setAdapter(adapter);
     }
 }

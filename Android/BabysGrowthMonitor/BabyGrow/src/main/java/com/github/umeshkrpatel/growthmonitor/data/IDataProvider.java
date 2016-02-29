@@ -9,6 +9,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.github.umeshkrpatel.growthmonitor.utils.IShapeUtils;
+
 /**
  * Created by umpatel on 1/25/2016.
  */
@@ -48,24 +50,25 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
 
     public abstract void deleteInfo(String table, String where, String[] whereArg);
 
-    public abstract long addBabyInfo(int babyId, String name, long dobDate, long dobTime,
-                                     int gender, String bgABO, String bgPH);
+    public abstract long addBabyInfo(int babyId, String name, long dobDate,
+                                     int gender, IBabyInfo.BloodGroup bloodGroup);
 
     public abstract void deleteBabyInfo(int id);
 
-    public abstract long updateBabyInfo(int babyId, String name, long dobDate, long dobTime,
-                                        int gender, String bgABO, String bgPH);
+    public abstract long updateBabyInfo(int babyId, String name, long dobDate,
+                                        int gender, IBabyInfo.BloodGroup bloodGroup);
+    public abstract long updateThemeInfo(int babyId, int startColor, int centerColor, int endColor);
 
     public abstract long addGrowthInfo(
             double weight, double height, double head, long date, int baby_id);
 
-    public abstract long addVaccinationInfo(
-            int vaccineType, String vaccineInfo, long date, int baby_id);
+    public abstract long addOrUpdateVaccination(
+        int id, int vaccineType, String vaccineInfo, long date, int babyId, int isAlarm);
 
     public abstract void deleteVaccinationInfo(int babyId);
 
     public abstract long updateGrowthInfo(
-            long id, long weight, long height, long head, long date, long baby_id);
+            long id, double weight, double height, double head, long date, long baby_id);
 
     public abstract Cursor queryTable(String table);
 
@@ -88,10 +91,12 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
                 + IDataInfo.DATE + " LONG, "
                 + IDataInfo.BABY_ID + " INTEGER NOT NULL UNIQUE, "
                 + IDataInfo.BABY_NAME + " TEXT, "
-                + IDataInfo.BIRTH_TIME + " LONG, "
                 + IDataInfo.BABY_GENDER + " INTEGER, "
-                + IDataInfo.BABY_BGABO + " TEXT, "
-                + IDataInfo.BABY_BGPH + " TEXT);");
+                + IDataInfo.BABY_BGABO + " INTEGER, "
+                + IDataInfo.THEME_START_COLOR + " INTEGER, "
+                + IDataInfo.THEME_CENTER_COLOR + " INTEGER, "
+                + IDataInfo.THEME_END_COLOR + " INTEGER);"
+            );
 
             db.execSQL("CREATE TABLE " + IDataInfo.kGrowthInfoTable + " ( "
                 + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -99,14 +104,16 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
                 + IDataInfo.BABY_ID + " INTEGER, "
                 + IDataInfo.WEIGHT + " REAL, "
                 + IDataInfo.HEIGHT + " REAL, "
-                + IDataInfo.HEAD + " REAL);");
+                + IDataInfo.HEAD + " REAL);"
+            );
 
             db.execSQL("CREATE TABLE " + IDataInfo.kLifeEventTable + " ( "
                 + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + IDataInfo.DATE + " LONG, "
                 + IDataInfo.BABY_ID + " INTEGER, "
                 + IDataInfo.LE_TYPE + " INTEGER, "
-                + IDataInfo.LE_INFO + " TEXT);");
+                + IDataInfo.LE_INFO + " TEXT);"
+            );
 
             db.execSQL("CREATE TABLE " + IDataInfo.kVaccineTable + " ( "
                 + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -114,15 +121,16 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
                 + IDataInfo.BABY_ID + " INTEGER, "
                 + IDataInfo.VACCINE_TYPE + " INTEGER, "
                 + IDataInfo.VACCINE_NOTE + " TEXT, "
-                + IDataInfo.VACCINE_DATE + " LONG);");
+                + IDataInfo.VACCINE_ISALARM + " INTEGER DEFAULT 0);"
+            );
 
             db.execSQL("CREATE TABLE " + IDataInfo.kEventTable + " ( "
-                + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + IDataInfo.DATE + " LONG, "
-                + IDataInfo.BABY_ID + " INTEGER, "
-                + IDataInfo.EVENT_TYPE + " INTEGER, "
-                + IDataInfo.EVENT_ID + " INTEGER);");
-            close();
+                    + IDataInfo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + IDataInfo.DATE + " LONG, "
+                    + IDataInfo.BABY_ID + " INTEGER, "
+                    + IDataInfo.EVENT_TYPE + " INTEGER, "
+                    + IDataInfo.EVENT_ID + " INTEGER);"
+            );
         }
 
         @Override
@@ -130,46 +138,39 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
             long rowId;
             SQLiteDatabase db = getWritableDatabase();
             rowId = db.insert(table, null, cv);
-            close();
             return rowId;
         }
 
         @Override
         public long updateInfo(String table, int rowId, ContentValues cv) {
-            SQLiteDatabase db = getWritableDatabase();
-            long ret = db.update(table, cv, IDataInfo.ID + "=" + rowId, null);
-            close();
-            return ret;
+            return getWritableDatabase().update(table, cv, IDataInfo.ID + "=" + rowId, null);
         }
 
         @Override
         public long updateInfo(
                 String table, ContentValues values, String whereClause, String[] whereArgs) {
-            SQLiteDatabase db = getWritableDatabase();
-            long ret = db.update(table, values, whereClause, whereArgs);
-            close();
-            return ret;
+            return getWritableDatabase().update(table, values, whereClause, whereArgs);
         }
 
         @Override
         public void deleteInfo(String table, String where, String[] whereArg) {
-            SQLiteDatabase db = getWritableDatabase();
-            db.delete(table, where, whereArg);
-            close();
+            getWritableDatabase().delete(table, where, whereArg);
         }
 
         @Override
-        public long addBabyInfo(int babyId, String name, long dobDate, long dobTime, int gender,
-                                String bgABO, String bgPH) {
+        public long addBabyInfo(int babyId, String name, long dobDate, int gender,
+                                IBabyInfo.BloodGroup bloodGroup) {
             long rowId;
+            int color = gender==0? IShapeUtils.COLOR_BLUE:IShapeUtils.COLOR_PINK;
             ContentValues cv = new ContentValues();
             cv.put(IDataInfo.DATE, dobDate);
             cv.put(IDataInfo.BABY_ID, babyId);
             cv.put(IDataInfo.BABY_NAME, name);
-            cv.put(IDataInfo.BIRTH_TIME, dobTime);
             cv.put(IDataInfo.BABY_GENDER, gender);
-            cv.put(IDataInfo.BABY_BGABO, bgABO);
-            cv.put(IDataInfo.BABY_BGPH, bgPH);
+            cv.put(IDataInfo.BABY_BGABO, bloodGroup.toInt());
+            cv.put(IDataInfo.THEME_START_COLOR, color + IShapeUtils.COLOR_SHADER);
+            cv.put(IDataInfo.THEME_CENTER_COLOR, color);
+            cv.put(IDataInfo.THEME_END_COLOR, color + IShapeUtils.COLOR_SHADER);
             rowId = addInfo(IDataInfo.kBabyInfoTable, cv);
             if (rowId > -1) {
                 long eventId;
@@ -196,16 +197,14 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
             deleteInfo(IDataInfo.kBabyInfoTable, IDataInfo.BABY_ID + "=" + id, null);
         }
 
-        public long updateBabyInfo(int babyId, String name, long dobDate, long dobTime,
-                                   int gender, String bgABO, String bgPH) {
+        public long updateBabyInfo(int babyId, String name, long dobDate,
+                                   int gender, IBabyInfo.BloodGroup bloodGroup) {
             long ret;
             ContentValues cv = new ContentValues();
             cv.put(IDataInfo.DATE, dobDate);
             cv.put(IDataInfo.BABY_NAME, name);
-            cv.put(IDataInfo.BIRTH_TIME, dobTime);
             cv.put(IDataInfo.BABY_GENDER, gender);
-            cv.put(IDataInfo.BABY_BGABO, bgABO);
-            cv.put(IDataInfo.BABY_BGPH, bgPH);
+            cv.put(IDataInfo.BABY_BGABO, bloodGroup.toInt());
             String where = IDataInfo.BABY_ID + "=" + babyId;
             ret = updateInfo(IDataInfo.kBabyInfoTable, cv, where, null);
             if (ret > -1) {
@@ -225,6 +224,16 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
                 }
             }
             return ret;
+        }
+
+        @Override
+        public long updateThemeInfo(int babyId, int startColor, int centerColor, int endColor) {
+            ContentValues cv = new ContentValues();
+            cv.put(IDataInfo.THEME_START_COLOR, startColor);
+            cv.put(IDataInfo.THEME_CENTER_COLOR, centerColor);
+            cv.put(IDataInfo.THEME_END_COLOR, endColor);
+            String where = IDataInfo.BABY_ID + "=" + babyId;
+            return updateInfo(IDataInfo.kBabyInfoTable, cv, where, null);
         }
 
         public long addGrowthInfo(
@@ -249,21 +258,26 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
             return ret;
         }
 
-        public long addVaccinationInfo(
-                int vaccineType, String vaccineInfo, long date, int baby_id) {
+        public long addOrUpdateVaccination(
+            int id, int vaccineType, String vaccineInfo, long date, int babyId, int isAlarm) {
             ContentValues cv = new ContentValues();
+            cv.put(IDataInfo.DATE, date);
+            cv.put(IDataInfo.BABY_ID, babyId);
             cv.put(IDataInfo.VACCINE_TYPE, vaccineType);
             cv.put(IDataInfo.VACCINE_NOTE, vaccineInfo);
-            cv.put(IDataInfo.DATE, date);
-            cv.put(IDataInfo.BABY_ID, baby_id);
+            cv.put(IDataInfo.VACCINE_ISALARM, isAlarm);
+            if (id > 0) {
+                String where = IDataInfo.ID + "=" + id;
+                return updateInfo(IDataInfo.kVaccineTable, cv, where, null);
+            }
             long ret = addInfo(IDataInfo.kVaccineTable, cv);
-            if (ret > -1) {
+            if (ret > -1 && isAlarm == 0) {
                 cv.clear();
                 cv.put(IDataInfo.EVENT_TYPE, IDataInfo.EVENT_VACCINATION);
                 cv.put(IDataInfo.EVENT_ID, ret);
-                cv.put(IDataInfo.BABY_ID, baby_id);
+                cv.put(IDataInfo.BABY_ID, babyId);
                 cv.put(IDataInfo.DATE, date);
-                return addInfo(IDataInfo.kEventTable, cv);
+                addInfo(IDataInfo.kEventTable, cv);
             }
             return ret;
         }
@@ -274,7 +288,7 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
         }
 
         public long updateGrowthInfo(
-                long id, long weight, long height, long head, long date, long baby_id) {
+                long id, double weight, double height, double head, long date, long baby_id) {
             long ret;
             SQLiteDatabase db = getWritableDatabase();
             ContentValues cv = new ContentValues();
@@ -284,7 +298,6 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
             cv.put(IDataInfo.DATE, date);
             cv.put(IDataInfo.BABY_ID, baby_id);
             ret = db.update(IDataInfo.kGrowthInfoTable, cv, "_ID=" + id, null);
-            close();
             return ret;
         }
 
@@ -340,7 +353,7 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
 
         @Override
         public long addBabyInfo(
-                int babyId, String name, long dobDate, long dobTime, int gender, String bgABO, String bgPH) {
+            int babyId, String name, long dobDate, int gender, IBabyInfo.BloodGroup bloodGroup) {
             return 0;
         }
 
@@ -349,8 +362,13 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
         }
 
         @Override
-        public long updateBabyInfo(int babyId, String name, long dobDate, long dobTime,
-                                   int gender, String bgABO, String bgPH) {
+        public long updateBabyInfo(int babyId, String name, long dobDate,
+                                   int gender, IBabyInfo.BloodGroup bloodGroup) {
+            return 0;
+        }
+
+        @Override
+        public long updateThemeInfo(int babyId, int startColor, int centerColor, int endColor) {
             return 0;
         }
 
@@ -361,8 +379,8 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
         }
 
         @Override
-        public long addVaccinationInfo(
-                int vaccineType, String vaccineInfo, long date, int baby_id) {
+        public long addOrUpdateVaccination(
+            int id, int vaccineType, String vaccineInfo, long date, int babyId, int isAlarm) {
             return 0;
         }
 
@@ -372,7 +390,7 @@ public abstract class IDataProvider extends SQLiteOpenHelper {
 
         @Override
         public long updateGrowthInfo(
-                long id, long weight, long height, long head, long date, long baby_id) {
+                long id, double weight, double height, double head, long date, long baby_id) {
             return 0;
         }
 

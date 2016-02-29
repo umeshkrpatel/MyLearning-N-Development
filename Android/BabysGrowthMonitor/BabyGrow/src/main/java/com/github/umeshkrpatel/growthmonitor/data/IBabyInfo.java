@@ -2,11 +2,11 @@ package com.github.umeshkrpatel.growthmonitor.data;
 
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.github.umeshkrpatel.growthmonitor.R;
 import com.github.umeshkrpatel.growthmonitor.ResourceReader;
+import com.github.umeshkrpatel.growthmonitor.utils.IShapeUtils;
 
 import java.util.ArrayList;
 
@@ -39,17 +39,41 @@ public abstract class IBabyInfo {
         }
     }
 
+    public enum BloodGroup {
+        BG_NONE(0, "-"),
+        A_POS(1, "A+"), B_POS(2, "B+"), AB_POS(3, "AB+"), O_POS(4, "O+"),
+        A_NEG(5, "A+"), B_NEG(6, "B+"), AB_NEG(7, "AB+"), O_NEG(8, "O+"),
+        ;
+        private final int mID;
+        private final String mValue;
+        BloodGroup(int id, String value) {
+            mID = id; mValue = value;
+        }
+
+        @Override
+        public String toString() {
+            return mValue;
+        }
+
+        public int toInt() {
+            return mID;
+        }
+
+        public static BloodGroup fromInt(int id) {
+            id = (id < 0 || id > 8) ? 0 : id;
+            return BloodGroup.values()[id];
+        }
+    }
+
     public int action = IDataInfo.ACTION_NEW;
     public abstract int getId();
     public abstract String getName();
     public abstract GenType getGender();
     public abstract long getBirthDate();
-    public abstract long getBirthTime();
-    public abstract String getBloodGroup();
-    public abstract String getBloodGroupABO();
-    public abstract String getBloodGroupPh();
-    public abstract void updateInfo(String name, int gender, long birthDate, long birthTime,
-                                    String bloodGroupABO, String bloodGroupPh);
+    public abstract BloodGroup getBloodGroup();
+    public abstract boolean isActive();
+    public abstract void setActive(boolean active);
+    public abstract void updateInfo(String name, int gender, long birthDate, int bloodGroup);
 
     private static final IBabyInfo[] babyInfoList =  {
         new EmptyBaby(), new EmptyBaby(), new EmptyBaby(),
@@ -84,6 +108,7 @@ public abstract class IBabyInfo {
     }
 
     public static IBabyInfo get(int babyId) {
+        babyId = babyId < 0 ? mCurrentIndex : babyId;
         return babyInfoList[babyId];
     }
 
@@ -96,14 +121,14 @@ public abstract class IBabyInfo {
         return dummyId;
     }
 
-    public static int create(String name, int gender, long birthDate, long birthTime,
-                             String bloodGroupABO, String bloodGroupPh) {
+    public static int create(String name, int gender, long birthDate,
+                             int bloodGroup) {
         int id = findFreeId();
         if (id == dummyId)
             return dummyId;
 
         IBabyInfo info = create(id);
-        info.updateInfo(name, gender, birthDate, birthTime, bloodGroupABO, bloodGroupPh);
+        info.updateInfo(name, gender, birthDate, bloodGroup);
         Scheduler scheduler = new Scheduler();
         if (scheduler.doInBackground(get(id)) > dummyId) {
             IVaccines.schedule(info);
@@ -116,10 +141,10 @@ public abstract class IBabyInfo {
     }
 
     public static int update(int babyId, String name, int gender, long birthDate,
-                             long birthTime, String bloodGroupABO, String bloodGroupPh) {
+                             int bloodGroup) {
         IBabyInfo info = get(babyId);
         info.action = IDataInfo.ACTION_UPDATE;
-        info.updateInfo(name, gender, birthDate, birthTime, bloodGroupABO, bloodGroupPh);
+        info.updateInfo(name, gender, birthDate, bloodGroup);
         Scheduler scheduler = new Scheduler();
         if (scheduler.doInBackground(get(babyId)) > dummyId)
             return babyId;
@@ -143,9 +168,12 @@ public abstract class IBabyInfo {
                 info.updateInfo(c.getString(IDataInfo.INDEX_BABY_NAME),
                     c.getInt(IDataInfo.INDEX_BABY_GENDER),
                     c.getLong(IDataInfo.INDEX_DATE),
-                    c.getLong(IDataInfo.INDEX_BIRTH_TIME),
-                    c.getString(IDataInfo.INDEX_BABY_BGABO),
-                    c.getString(IDataInfo.INDEX_BABY_BGPH));
+                    c.getInt(IDataInfo.INDEX_BABY_BGABO)
+                );
+                IShapeUtils.setGradientColor(info.getId(),
+                    c.getInt(IDataInfo.INDEX_START_COLOR),
+                    c.getInt(IDataInfo.INDEX_CENTER_COLOR),
+                    c.getInt(IDataInfo.INDEX_END_COLOR));
             }
         }
         return mCurrentSize;
@@ -202,18 +230,6 @@ public abstract class IBabyInfo {
         return IBabyInfo.getBabyInfoCount();
     }
 
-    public static void RemoveBabyInfo(int babyId) {
-        IBabyInfo info = get(babyId);
-        info.action = IDataInfo.ACTION_DELETE;
-        Scheduler scheduler = new Scheduler();
-        scheduler.execute(info);
-    }
-
-    @NonNull
-    public static IBabyInfo[] getBabyInfo() {
-        return babyInfoList;
-    }
-
     public static ArrayList<IBabyInfo> getBabyInfoList() {
         ArrayList<IBabyInfo> infos = new ArrayList<>();
         for (IBabyInfo info: babyInfoList) {
@@ -227,9 +243,10 @@ public abstract class IBabyInfo {
     // Overwritten Methods
     private static class BabyInfo extends IBabyInfo {
         final int mBabyId;
-        String mName, mBloodGroupABO, mBloodGroupPh;
-        long mBirthDate, mBirthTime;
-        int mGender;
+        String mName;
+        long mBirthDate;
+        int mGender, mBloodGroup;
+        boolean mIsActive = false;
         public BabyInfo(int babyId) {
             mBabyId = babyId;
         }
@@ -260,30 +277,25 @@ public abstract class IBabyInfo {
         }
 
         @Override
-        public long getBirthTime() {
-            return mBirthTime;
+        public BloodGroup getBloodGroup() {
+            return BloodGroup.fromInt(mBloodGroup);
         }
 
         @Override
-        public String getBloodGroup() {
-            return mBloodGroupABO + " " + mBloodGroupPh;
+        public boolean isActive() {
+            return mCurrentIndex == mBabyId || mIsActive;
         }
 
         @Override
-        public String getBloodGroupABO() {
-            return mBloodGroupABO;
+        public void setActive(boolean active) {
+            mIsActive = active;
         }
 
         @Override
-        public String getBloodGroupPh() {
-            return mBloodGroupPh;
-        }
-
-        @Override
-        public void updateInfo(String name, int gender, long birthDate, long birthTime,
-                               String bloodGroupABO, String bloodGroupPh) {
-            mName = name; mGender = gender; mBirthDate = birthDate; mBirthTime = birthTime;
-            mBloodGroupABO = bloodGroupABO; mBloodGroupPh = bloodGroupPh;
+        public void updateInfo(String name, int gender, long birthDate,
+                               int bloodGroup) {
+            mName = name; mGender = gender; mBirthDate = birthDate;
+            mBloodGroup = bloodGroup;
         }
     }
 
@@ -310,28 +322,22 @@ public abstract class IBabyInfo {
         }
 
         @Override
-        public long getBirthTime() {
-            return 0L;
+        public BloodGroup getBloodGroup() {
+            return BloodGroup.fromInt(0);
         }
 
         @Override
-        public String getBloodGroup() {
-            return "--";
+        public boolean isActive() {
+            return false;
         }
 
         @Override
-        public String getBloodGroupABO() {
-            return "-";
+        public void setActive(boolean active) {
+
         }
 
         @Override
-        public String getBloodGroupPh() {
-            return "-";
-        }
-
-        @Override
-        public void updateInfo(String name, int gender, long birthDate, long birthTime,
-                               String bloodGroupABO, String bloodGroupPh) {
+        public void updateInfo(String name, int gender, long birthDate, int bloodGroup) {
 
         }
     }
@@ -344,12 +350,12 @@ public abstract class IBabyInfo {
             for (IBabyInfo info: babyInfos) {
                 if (info.action == IDataInfo.ACTION_NEW)
                     ret = dp.addBabyInfo(
-                        info.getId(), info.getName(), info.getBirthDate(), info.getBirthTime(),
-                        info.getGender().toInt(), info.getBloodGroupABO(), info.getBloodGroupPh());
+                        info.getId(), info.getName(), info.getBirthDate(),
+                        info.getGender().toInt(), info.getBloodGroup());
                 else if (info.action == IDataInfo.ACTION_UPDATE) {
                     ret = dp.updateBabyInfo(
-                            info.getId(), info.getName(), info.getBirthDate(), info.getBirthTime(),
-                            info.getGender().toInt(), info.getBloodGroupABO(), info.getBloodGroupPh());
+                            info.getId(), info.getName(), info.getBirthDate(),
+                            info.getGender().toInt(), info.getBloodGroup());
                 }
                 else if (info.action == IDataInfo.ACTION_DELETE) {
                     dp.deleteBabyInfo(info.getId());
