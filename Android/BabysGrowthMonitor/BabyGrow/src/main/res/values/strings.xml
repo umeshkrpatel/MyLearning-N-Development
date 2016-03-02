@@ -110,4 +110,10 @@
 
     <string name="ageInfo">%1$d Year(s) %2$d Month(s) %3$d Day(s) %4$d Hour(s) %5$d Minute(s)</string>
     <string name="lifeEventBorn">Welcome to the world, %1$s born today!!</string>
+
+    <string name="ageRangeFilter">Age Range</string>
+    <string name="filters">Filters</string>
+    <string name="compareBabies">Compare Babies</string>
+    <string name="chartTypeDotted">Dotted Chart</string>
+    <string name="chartTypeLined">Line Chart</string>
 </resources>

@@ -29,7 +29,6 @@ import android.widget.Spinner;
 
 import com.github.umeshkrpatel.growthmonitor.data.ChartData;
 import com.github.umeshkrpatel.growthmonitor.data.IBabyInfo;
-import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 import com.github.umeshkrpatel.multispinner.MultiSpinner;
 
 import java.util.ArrayList;
@@ -42,6 +41,7 @@ public class GrowthChartActivity extends AppCompatActivity
 
     @Nullable
     private static String[] sChartList = null;
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -51,13 +51,13 @@ public class GrowthChartActivity extends AppCompatActivity
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private ViewPager viewPager;
     private Spinner mXAxisBar, mYAxisBar;
     private MultiSpinner msSpinner;
+    private int mChartType = 1;
 
     @NonNull
-    private static final ChartData.ChartType[] dChart = new ChartData.ChartType[] {
-        ChartData.ChartType.WEIGHT, ChartData.ChartType.HEIGHT, ChartData.ChartType.HEADCIRCUM,
+    private static final ChartData.AxisType[] dChart = new ChartData.AxisType[] {
+        ChartData.AxisType.WEIGHT, ChartData.AxisType.HEIGHT, ChartData.AxisType.HEADSIZE,
     };
 
     @NonNull
@@ -107,7 +107,7 @@ public class GrowthChartActivity extends AppCompatActivity
         msSpinner =
             (MultiSpinner) navigationView.getHeaderView(0).findViewById(R.id.msAllBaby);
         msSpinner.setAdapter(
-            new ArrayAdapter<IBabyInfo>(
+            new ArrayAdapter<>(
                 this, R.layout.spinner_listview, R.id.tvSpinnerList, IBabyInfo.getBabyInfoList()),
             false, this);
 
@@ -117,22 +117,7 @@ public class GrowthChartActivity extends AppCompatActivity
             public void onClick(View v) {
                 ChartData.setMinRange(mXAxisBar.getSelectedItemPosition());
                 ChartData.setMaxRange(mYAxisBar.getSelectedItemPosition());
-                int pos = mSectionsPagerAdapter.getCurrentPosition();
-                GrowthChartFragment gf;
-                if (pos != 1) {
-                    gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(pos);
-                    gf.updateChart();
-                    gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(1);
-                    gf.updateChart();
-                } else {
-                    for (int i = 0; i < sFragmentCount; i++) {
-                        gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(i);
-                        gf.updateChart();
-                    }
-                }
-
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.chart_drawer_layout);
-                drawer.closeDrawer(GravityCompat.END);
+                updateChart();
             }
         });
 
@@ -141,7 +126,7 @@ public class GrowthChartActivity extends AppCompatActivity
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
 
         // Set up the ViewPager with the sections adapter.
-        viewPager = (ViewPager) findViewById(R.id.container);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.container);
         viewPager.setAdapter(mSectionsPagerAdapter);
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -151,12 +136,10 @@ public class GrowthChartActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(@NonNull View view) {
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
             }
         });
-
-        handleIntent(savedInstanceState);
     }
 
 
@@ -184,7 +167,20 @@ public class GrowthChartActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        return false;
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.navRangeFilter:
+                break;
+            case R.id.navBabyCompare:
+                break;
+            case R.id.navChartType:
+                ChartData.toggleChartType();
+                item.setIcon(ChartData.chartID());
+                item.setTitle(ChartData.chartTitle());
+                updateChart();
+                break;
+        }
+        return true;
     }
 
     @Override
@@ -241,7 +237,9 @@ public class GrowthChartActivity extends AppCompatActivity
             super(fm);
             mContext = context;
             for (int i = 0; i < sFragmentCount; i++) {
-                mf.add(GrowthChartFragment.newInstance(ChartData.ChartType.AGE, dChart[i]));
+                mf.add(GrowthChartFragment.getOrCreate(
+                    ChartData.AxisType.AGE, dChart[i])
+                );
             }
         }
 
@@ -274,19 +272,21 @@ public class GrowthChartActivity extends AppCompatActivity
         }
     }
 
-    void handleIntent(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            Bundle bundle = getIntent().getExtras();
-            if (bundle != null) {
-                int actionType = bundle.getInt(IDataInfo.ACTION_TYPE);
-                if (actionType == IDataInfo.ACTION_UPDATE) {
-                    int actionEvent = bundle.getInt(IDataInfo.ACTION_EVENT);
-                    int actionValue = bundle.getInt(IDataInfo.ACTION_VALUE);
-                    if (actionEvent == IDataInfo.EVENT_LIFEEVENT) {
-                        viewPager.setCurrentItem(actionEvent);
-                    }
-                }
+    private void updateChart() {
+        int pos = mSectionsPagerAdapter.getCurrentPosition();
+        GrowthChartFragment gf;
+        if (pos != 1) {
+            gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(pos);
+            gf.updateChart();
+            gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(1);
+            gf.updateChart();
+        } else {
+            for (int i = 0; i < sFragmentCount; i++) {
+                gf = (GrowthChartFragment) mSectionsPagerAdapter.getItem(i);
+                gf.updateChart();
             }
         }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.chart_drawer_layout);
+        drawer.closeDrawer(GravityCompat.END);
     }
 }

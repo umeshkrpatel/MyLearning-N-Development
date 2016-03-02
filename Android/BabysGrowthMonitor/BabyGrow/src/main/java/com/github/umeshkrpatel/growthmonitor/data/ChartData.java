@@ -1,5 +1,6 @@
 package com.github.umeshkrpatel.growthmonitor.data;
 
+import com.github.umeshkrpatel.growthmonitor.R;
 import com.github.umeshkrpatel.growthmonitor.Utility;
 
 import java.util.ArrayList;
@@ -15,6 +16,12 @@ public class ChartData {
     private static int sYAxis = 1;
     private static int sRangeMin = M3;
     private static int sRangeMax = M12;
+    private static int sChartType = 0;
+    private static int[] sChartID =
+        {R.drawable.ic_menu_growth, R.drawable.ic_menu_dotted_chart};
+    private static int[] sChartTitle =
+        {R.string.chartTypeLined, R.string.chartTypeDotted};
+
     public static ArrayList<String> mMonth = new ArrayList<String>()
         {{ add("Birth"); add("03 Months"); add("06 Months"); add("1.0 Year");
            add("1.5 Years"); add("2.0 Years"); add("2.5 Years"); add("3.0 Years");
@@ -52,17 +59,33 @@ public class ChartData {
         return monthsToRange(months);
     }
 
-    public enum ChartType {
+    public static int chartType() {
+        return sChartType;
+    }
+
+    public static void toggleChartType() {
+        sChartType = sChartType == 0 ? 1 : 0;
+    }
+
+    public static int chartID() {
+        return sChartID[sChartType];
+    }
+
+    public static int chartTitle() {
+        return sChartTitle[sChartType];
+    }
+
+    public enum AxisType {
         AGE,
         WEIGHT,
         HEIGHT,
-        HEADCIRCUM
+        HEADSIZE,
     }
 
-    public static ChartType fromInt(int value) {
-        ChartType t = ChartType.values()[value];
+    public static AxisType fromInt(int value) {
+        AxisType t = AxisType.values()[value];
         if (t == null) {
-            t = ChartType.AGE;
+            t = AxisType.AGE;
         }
         return t;
     }
@@ -72,13 +95,13 @@ public class ChartData {
     public static void setXAxis(int x) {
         sXAxis = x;
     }
-    public static ChartType getXAxis() {
+    public static AxisType getXAxis() {
         return fromInt(sXAxis);
     }
     public static void setYAxis(int y) {
         sYAxis = y;
     }
-    public static ChartType getYAxis() {
+    public static AxisType getYAxis() {
         return fromInt(sYAxis);
     }
     public static int minRange() {

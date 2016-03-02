@@ -64,4 +64,9 @@
     <string name="yes">हाँ</string>
     <string name="ageInfo">%1$d वर्ष %2$d महीने %3$d दिन %4$d घंटे %5$d मिनट</string>
     <string name="lifeEventBorn">दुनिया में आपका स्वागत, आज %1$s का जन्म हुआ है!!</string>
+    <string name="filters">संपादक</string>
+    <string name="ageRangeFilter">आयु सीमा</string>
+    <string name="compareBabies">बच्चों की तुलना</string>
+    <string name="chartTypeDotted">बिंदीदार रूपरेखा</string>
+    <string name="chartTypeLined">रेखांकित रुपरेखा</string>
 </resources>

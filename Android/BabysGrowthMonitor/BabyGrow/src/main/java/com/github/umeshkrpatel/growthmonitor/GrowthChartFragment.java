@@ -55,8 +55,8 @@ public class GrowthChartFragment extends Fragment {
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static GrowthChartFragment newInstance(ChartData.ChartType xAxis,
-                                                  ChartData.ChartType yAxis) {
+    public static GrowthChartFragment getOrCreate(ChartData.AxisType xAxis,
+                                                  ChartData.AxisType yAxis) {
         GrowthChartFragment fragment = new GrowthChartFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_X_AXIS, xAxis.ordinal());
@@ -93,7 +93,7 @@ public class GrowthChartFragment extends Fragment {
         updateChart();
     }
 
-    private float getYAxisMinPosition(ChartData.ChartType yChart) {
+    private float getYAxisMinPosition(ChartData.AxisType yChart) {
         int min = ChartData.minRange();
         switch (yChart) {
             case AGE:
@@ -102,14 +102,14 @@ public class GrowthChartFragment extends Fragment {
                 return IWPercentileData.YAxisMin[min];
             case HEIGHT:
                 return IHPercentileData.YAxisMin[min];
-            case HEADCIRCUM:
+            case HEADSIZE:
                 return IHCPercentileData.YAxisMin[min];
             default:
                 return 0f;
         }
     }
 
-    private float getYAxisMaxPosition(ChartData.ChartType yChart) {
+    private float getYAxisMaxPosition(ChartData.AxisType yChart) {
         int max = ChartData.maxRange();
         switch (yChart) {
             case AGE:
@@ -118,14 +118,14 @@ public class GrowthChartFragment extends Fragment {
                 return IWPercentileData.YAxisMax[max];
             case HEIGHT:
                 return IHPercentileData.YAxisMax[max];
-            case HEADCIRCUM:
+            case HEADSIZE:
                 return IHCPercentileData.YAxisMax[max];
             default:
                 return 53f;
         }
     }
 
-    private ArrayList<String> getXAxisData(ChartData.ChartType xChart) {
+    private ArrayList<String> getXAxisData(ChartData.AxisType xChart) {
         int rangeMin = ChartData.minRange();
         int rangeMax = ChartData.maxRange();
         mXAxis.clear();
@@ -151,7 +151,7 @@ public class GrowthChartFragment extends Fragment {
                     mXAxis.add(i + "");
                 }
                 break;
-            case HEADCIRCUM:
+            case HEADSIZE:
                 for (float i = IHCPercentileData.YAxisMin[rangeMin] - 1;
                      i < IHCPercentileData.YAxisMin[rangeMax] + 1;
                      i += 0.125f ) {
@@ -163,12 +163,12 @@ public class GrowthChartFragment extends Fragment {
         return mXAxis;
     }
 
-    private LineData generateLineData(ChartData.ChartType yChart) {
+    private LineData generateLineData(ChartData.AxisType yChart) {
         int rangeMin = ChartData.minRange();
         int rangeMax = ChartData.maxRange();
         int babyGen = IBabyInfo.currentBabyInfo().getGender().toInt();
         if (babyGen == IBabyInfo.GenType.GEN_OTHER.toInt())
-            return null;
+            babyGen = 0;
 
         ArrayList<LineDataSet> dataSets = new ArrayList<>();
         double[][] yData = IWPercentileData.Data[babyGen];
@@ -179,7 +179,7 @@ public class GrowthChartFragment extends Fragment {
             case HEIGHT:
                 yData = IHPercentileData.Data[babyGen];
                 break;
-            case HEADCIRCUM:
+            case HEADSIZE:
                 yData = IHCPercentileData.Data[babyGen];
             default:
                 break;
@@ -197,13 +197,13 @@ public class GrowthChartFragment extends Fragment {
             LineDataSet set = new LineDataSet(entries, "");
             set.setColor(Color.rgb(138, 46, 47));
             set.setDrawCircles(false);
-            set.setLineWidth(ds % 13 == 0 ? 2.0f : 1.0f);
+            set.setLineWidth(ds % 13 == 0 ? 1.0f : 0.7f);
             dataSets.add(set);
         }
         return new LineData(mXAxis, dataSets);
     }
 
-    protected ScatterData generateScatterData(ChartData.ChartType yChart) {
+    protected ScatterData generateScatterData(ChartData.AxisType yChart) {
         int rangeMin = ChartData.minRange();
         int rangeMax = ChartData.maxRange();
 
@@ -258,9 +258,62 @@ public class GrowthChartFragment extends Fragment {
         return scatterData;
     }
 
+    protected LineData generateLineDataForData(ChartData.AxisType yChart, LineData lineData) {
+        int rangeMin = ChartData.minRange();
+        int rangeMax = ChartData.maxRange();
+
+        legendColor.clear(); legendLabel.clear();
+
+        ArrayList<Entry> entries;
+        for (IBabyInfo info : IBabyInfo.getBabyInfoList()) {
+            if (!info.isActive())
+                continue;
+            entries =  new ArrayList<>();
+            Cursor c = IDataProvider.get()
+                .queryTable(IDataInfo.kGrowthInfoTable, null,
+                    IDataInfo.BABY_ID + "=" + info.getId() + " AND "
+                        + IDataInfo.DATE + ">="
+                        + (info.getBirthDate() + ChartData.rangeToMinIndex(rangeMin)
+                        * Utility.kMilliSecondsInDays * 7) + " AND "
+                        + IDataInfo.DATE + "<="
+                        + (info.getBirthDate() + ChartData.rangeToMaxIndex(rangeMax)
+                        * Utility.kMilliSecondsInDays * 7),
+                    null, null, null, null);
+            if (c == null || c.getCount() <= 0)
+                continue;
+
+            int dataIndex = yChart.ordinal() + IDataInfo.INDEX_BABY_ID;
+            int i;
+            rangeMin = ChartData.rangeToMinIndex(rangeMin);
+            while (c.moveToNext()) {
+                float data = c.getFloat(dataIndex);
+                long day = c.getLong(IDataInfo.INDEX_DATE);
+                int days = Utility.fromMilliSecondsToDays(day - info.getBirthDate());
+                i = (days / 7) - rangeMin;
+                Log.d(TAG, "Index " + i + " Day " + day + " data " + data);
+                if (i <= 64) {
+                    entries.add(new Entry(data, i));
+                }
+            }
+            c.close();
+
+            LineDataSet set = new LineDataSet(entries, info.getName());
+            set.setColor(IShapeUtils.getColor(info.getId()));
+            legendLabel.add(info.getName());
+            legendColor.add(IShapeUtils.getColor(info.getId()));
+            set.setValueTextSize(10f);
+            set.setLineWidth(2.0f);
+            lineData.addDataSet(set);
+        }
+
+        return lineData;
+    }
+
     public void updateChart() {
-        ChartData.ChartType xChart = ChartData.fromInt(ixChart);
-        ChartData.ChartType yChart = ChartData.fromInt(iyChart);
+        int chartType = ChartData.chartType();
+
+        ChartData.AxisType xChart = ChartData.fromInt(ixChart);
+        ChartData.AxisType yChart = ChartData.fromInt(iyChart);
 
         YAxis leftAxis = mGrowthChart.getAxisLeft();
         leftAxis.setStartAtZero(false);
@@ -274,9 +327,16 @@ public class GrowthChartFragment extends Fragment {
 
         CombinedData data = new CombinedData(getXAxisData(xChart));
 
-        data.setData(generateLineData(yChart));
-        data.setData(generateScatterData(yChart));
+        LineData lineData = generateLineData(yChart);
+        if (chartType == 0) {
+            data.setData(lineData);
+            data.setData(generateScatterData(yChart));
+        } else {
+            lineData = generateLineDataForData(yChart, lineData);
+            data.setData(lineData);
+        }
         mGrowthChart.getLegend().setCustom(legendColor, legendLabel);
+        mGrowthChart.animateX(4000);
 
         mGrowthChart.setData(data);
         mGrowthChart.invalidate();
