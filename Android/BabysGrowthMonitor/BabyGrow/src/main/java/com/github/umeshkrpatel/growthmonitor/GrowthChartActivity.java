@@ -1,6 +1,8 @@
 package com.github.umeshkrpatel.growthmonitor;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,24 +20,23 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.Spinner;
 
 import com.github.umeshkrpatel.growthmonitor.data.ChartData;
 import com.github.umeshkrpatel.growthmonitor.data.IBabyInfo;
 import com.github.umeshkrpatel.multispinner.MultiSpinner;
+import com.github.umeshkrpatel.rangeselector.RangeSelector;
 
 import java.util.ArrayList;
 
 public class GrowthChartActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        AdapterView.OnItemSelectedListener, MultiSpinner.MultiSpinnerListener {
+        MultiSpinner.MultiSpinnerListener {
 
     private static final String TAG = "GrowthChartActivity";
 
@@ -51,9 +52,9 @@ public class GrowthChartActivity extends AppCompatActivity
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private Spinner mXAxisBar, mYAxisBar;
+    //private Spinner mXAxisBar, mYAxisBar;
+    private RangeSelector mRangeSelector;
     private MultiSpinner msSpinner;
-    private int mChartType = 1;
 
     @NonNull
     private static final ChartData.AxisType[] dChart = new ChartData.AxisType[] {
@@ -82,44 +83,45 @@ public class GrowthChartActivity extends AppCompatActivity
 
         createChartList(this);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.chart_drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.chart_drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            this, drawer, toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+        };
+
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawer.isDrawerOpen(GravityCompat.END)) {
+                    drawer.closeDrawer(GravityCompat.END);
+                } else {
+                    drawer.openDrawer(GravityCompat.END);
+                }
+            }
+        });
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.gcNavView);
         navigationView.setNavigationItemSelectedListener(this);
 
-        mXAxisBar = (Spinner) navigationView.getHeaderView(0).findViewById(R.id.sbXAxis);
-        mXAxisBar.setOnItemSelectedListener(this);
-        assert sChartList != null;
-        mXAxisBar.setAdapter(
-            new ArrayAdapter<>(this, R.layout.spinner_listview, R.id.tvSpinnerList, sChartList));
-        mXAxisBar.setSelection(ChartData.minRange());
-
-        mYAxisBar = (Spinner) navigationView.getHeaderView(0).findViewById(R.id.sbYAxis);
-        mYAxisBar.setOnItemSelectedListener(this);
-        mYAxisBar.setAdapter(
-            new ArrayAdapter<>(this, R.layout.spinner_listview, R.id.tvSpinnerList, sChartList));
-        mYAxisBar.setSelection(ChartData.maxRange());
-
-        msSpinner =
-            (MultiSpinner) navigationView.getHeaderView(0).findViewById(R.id.msAllBaby);
-        msSpinner.setAdapter(
-            new ArrayAdapter<>(
-                this, R.layout.spinner_listview, R.id.tvSpinnerList, IBabyInfo.getBabyInfoList()),
-            false, this);
-
-        Button btnUpdate = (Button) navigationView.getHeaderView(0).findViewById(R.id.nvBtnUpdate);
-        btnUpdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ChartData.setMinRange(mXAxisBar.getSelectedItemPosition());
-                ChartData.setMaxRange(mYAxisBar.getSelectedItemPosition());
-                updateChart();
-            }
-        });
+//        msSpinner =
+//            (MultiSpinner) navigationView.getHeaderView(0).findViewById(R.id.msAllBaby);
+//        msSpinner.setAdapter(
+//            new ArrayAdapter<>(
+//                this, R.layout.spinner_listview, R.id.tvSpinnerList, IBabyInfo.getBabyInfoList()),
+//            false, this);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -170,9 +172,13 @@ public class GrowthChartActivity extends AppCompatActivity
         int id = item.getItemId();
         switch (id) {
             case R.id.navRangeFilter:
+                createRangeSelector();
                 break;
+
             case R.id.navBabyCompare:
+                createBabyCompareList();
                 break;
+
             case R.id.navChartType:
                 ChartData.toggleChartType();
                 item.setIcon(ChartData.chartID());
@@ -180,34 +186,9 @@ public class GrowthChartActivity extends AppCompatActivity
                 updateChart();
                 break;
         }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.chart_drawer_layout);
+        drawer.closeDrawer(GravityCompat.END);
         return true;
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if (parent == mXAxisBar) {
-            assert sChartList != null;
-            if (position == (sChartList.length - 1)) {
-                mXAxisBar.setSelection(position - 1);
-                return;
-            }
-            if (position >= mYAxisBar.getSelectedItemPosition()) {
-                mYAxisBar.setSelection(position + 1, true);
-            }
-        } else {
-            if (position == 0) {
-                mYAxisBar.setSelection(position + 1);
-                return;
-            }
-            if (position <= mXAxisBar.getSelectedItemPosition()) {
-                mXAxisBar.setSelection(position - 1, true);
-            }
-        }
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
     }
 
     @Override
@@ -286,7 +267,42 @@ public class GrowthChartActivity extends AppCompatActivity
                 gf.updateChart();
             }
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.chart_drawer_layout);
-        drawer.closeDrawer(GravityCompat.END);
+    }
+
+    private void createRangeSelector() {
+        if (sChartList == null) {
+            return;
+        }
+
+        mRangeSelector =
+          new RangeSelector(this, this)
+            .setAdapter(
+              new ArrayAdapter<>(
+                this, R.layout.spinner_listview, R.id.tvSpinnerList, sChartList)
+            );
+        mRangeSelector.setTitle(android.R.string.dialog_alert_title)
+          .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                  ChartData.setMinRange(mRangeSelector.getMinRange());
+                  ChartData.setMaxRange(mRangeSelector.getMaxRange());
+                  updateChart();
+              }
+          })
+          .setNegativeButton(R.string.no, null);
+        mRangeSelector.show();
+    }
+
+    private void createBabyCompareList() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View babyListView = inflater.inflate(R.layout.layout_multispineer, null);
+        builder.setView(babyListView);
+        msSpinner = (MultiSpinner) babyListView.findViewById(R.id.alertMultiSpinner);
+        msSpinner.setAdapter(
+          new ArrayAdapter<>(
+            this, R.layout.spinner_listview, R.id.tvSpinnerList, IBabyInfo.getBabyInfoList()),
+          false, this);
+        builder.create().show();
     }
 }

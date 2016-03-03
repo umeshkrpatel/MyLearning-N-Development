@@ -336,7 +336,7 @@ public class GrowthChartFragment extends Fragment {
             data.setData(lineData);
         }
         mGrowthChart.getLegend().setCustom(legendColor, legendLabel);
-        mGrowthChart.animateX(4000);
+        mGrowthChart.animateX(2000);
 
         mGrowthChart.setData(data);
         mGrowthChart.invalidate();
