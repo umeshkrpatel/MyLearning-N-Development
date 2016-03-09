@@ -180,19 +180,20 @@ public class GrowthActivity extends AppCompatActivity
     }
 
     @Override
-    public void onEventInfoInteraction(IEventInfo item) {
-        updateBabyInfo(IDataInfo.ACTION_UPDATE, item.getEventType(), item.getEventID());
+    public void onEventInfoInteraction(IEventInfo item, int action) {
+        if (action == IDataInfo.ACTION_DELETE) {
+            IEventInfo.delete(IBabyInfo.currentBabyInfo().getId(), item.getEventID());
+        } else {
+            if (IDataInfo.EVENT_LIFEEVENT == item.getEventType())
+                onBabyInfoInteraction(IBabyInfo.currentBabyInfo().getId(), action);
+            else
+                updateBabyInfo(action, item.getEventType(), item.getEventID());
+        }
     }
 
     @Override
     public void onBabyInfoInteraction(int babyId, int action) {
-        if (action == IDataInfo.ACTION_UPDATE) {
-            Intent intent = new Intent(this, InfoActivity.class);
-            intent.putExtra(IDataInfo.ACTION_TYPE, IDataInfo.ACTION_UPDATE);
-            intent.putExtra(IDataInfo.ACTION_EVENT, IDataInfo.EVENT_LIFEEVENT);
-            intent.putExtra(IDataInfo.ACTION_VALUE, babyId);
-            startActivity(intent);
-        } else if (action == IDataInfo.ACTION_DELETE) {
+        if (action == IDataInfo.ACTION_DELETE) {
             IBabyInfo.delete(babyId);
             if (IBabyInfo.size() == 0) {
                 Intent intent = new Intent(this, InfoActivity.class);
@@ -203,6 +204,9 @@ public class GrowthActivity extends AppCompatActivity
             }
         } else {
             Intent intent = new Intent(this, InfoActivity.class);
+            intent.putExtra(IDataInfo.ACTION_TYPE, action);
+            intent.putExtra(IDataInfo.ACTION_EVENT, IDataInfo.EVENT_LIFEEVENT);
+            intent.putExtra(IDataInfo.ACTION_VALUE, babyId);
             startActivity(intent);
         }
     }

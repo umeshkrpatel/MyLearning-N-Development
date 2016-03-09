@@ -12,7 +12,7 @@ public interface IInfoFragment {
     int GROWTHINFO = 4;
     int VACCINEINFO = 5;
 
-    void onEventInfoInteraction(IEventInfo item);
+    void onEventInfoInteraction(IEventInfo item, int action);
     void onBabyInfoInteraction(int babyId, int action);
     void onUpdateBabyInfo();
     void onUpdateGrowthInfo();

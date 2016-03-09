@@ -108,7 +108,8 @@ public abstract class IBabyInfo {
     }
 
     public static IBabyInfo get(int babyId) {
-        babyId = babyId < 0 ? mCurrentIndex : babyId;
+        if (babyId < 0)
+            return new EmptyBaby();
         return babyInfoList[babyId];
     }
 

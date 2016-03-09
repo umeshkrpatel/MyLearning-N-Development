@@ -58,6 +58,7 @@ public class AddOrUpdateBaby extends Fragment implements View.OnClickListener {
         Bundle bundle = getArguments();
         if (savedInstanceState == null && bundle != null) {
             actionType = bundle.getInt(IDataInfo.ACTION_TYPE);
+            actionValue = -1;
             if (actionType == IDataInfo.ACTION_UPDATE) {
                 actionValue = bundle.getInt(IDataInfo.ACTION_VALUE);
             }
@@ -131,7 +132,6 @@ public class AddOrUpdateBaby extends Fragment implements View.OnClickListener {
     }
 
     private void updateView() {
-
         IBabyInfo info = IBabyInfo.get(actionValue);
         etName.setText(info.getName());
         swGender.setChecked(info.getGender() == IBabyInfo.GenType.GEN_GIRL);

@@ -1,10 +1,10 @@
 package com.github.umeshkrpatel.growthmonitor;
 
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
@@ -64,10 +64,12 @@ public class BabiesAdapter extends IAdapter {
         return mValues.size();
     }
 
-    public class ViewHolder extends IAdapter.IViewHolder implements View.OnLongClickListener, View.OnTouchListener {
+    public class ViewHolder extends IAdapter.IViewHolder
+      implements View.OnLongClickListener, View.OnTouchListener, View.OnClickListener {
         public final View mView;
         public final TextView mInfoView, mAgeView;
-        public final ImageView mTimeline, mBabyRemove;
+        public final ImageView mTimeline;
+        public final View mBackgroundView, mForegroundView;
         public IBabyInfo mItem;
         private float X1 = 0, X2 = 0;
         private static final float sDistance = 200;
@@ -75,34 +77,13 @@ public class BabiesAdapter extends IAdapter {
         public ViewHolder(@NonNull View view) {
             super(view);
             mView = view;
+            mForegroundView = view.findViewById(R.id.viewForeground);
             mInfoView = (TextView) view.findViewById(R.id.blvBabyName);
             mAgeView = (TextView) view.findViewById(R.id.blvBabyAge);
             mTimeline = (ImageView) view.findViewById(R.id.blvBabyImage);
-            mBabyRemove = (ImageView) view.findViewById(R.id.blvBabyRemove);
             mView.setOnLongClickListener(this);
             mView.setOnTouchListener(this);
-            mBabyRemove.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String msg = ResourceReader.getString(R.string.deleteBabyConfirm);
-                    msg = String.format(msg, mItem.getName());
-                    new AlertDialog.Builder(mView.getContext())
-                        .setTitle(android.R.string.dialog_alert_title).setMessage(msg)
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (mListener != null) {
-                                    mListener.onBabyInfoInteraction(mItem.getId(),
-                                        IDataInfo.ACTION_DELETE
-                                    );
-                                }
-                                mValues = IBabyInfo.getBabyInfoList();
-                                notifyItemRemoved(getAdapterPosition());
-                            }
-                        })
-                        .setNegativeButton(R.string.no, null).show();
-                }
-            });
+            mBackgroundView = view.findViewById(R.id.viewBackground);
         }
 
         @NonNull
@@ -113,8 +94,7 @@ public class BabiesAdapter extends IAdapter {
 
         @Override
         public boolean onLongClick(View v) {
-            if (mListener != null)
-                mListener.onBabyInfoInteraction(mItem.getId(), IDataInfo.ACTION_UPDATE);
+            changeView();
             return true;
         }
 
@@ -134,6 +114,62 @@ public class BabiesAdapter extends IAdapter {
                 }
             }
             return false;
+        }
+
+        private void changeView() {
+            if (mBackgroundView.getVisibility() != View.VISIBLE) {
+                mView.setBackgroundResource(R.drawable.sg_bg_editor);
+                mBackgroundView.setVisibility(View.VISIBLE);
+                mForegroundView.setVisibility(View.GONE);
+                ImageView edit = (ImageView) mView.findViewById(R.id.itemEdit);
+                edit.setOnClickListener(this);
+                ImageView delete = (ImageView) mView.findViewById(R.id.itemDelete);
+                delete.setOnClickListener(this);
+                ImageView back = (ImageView) mView.findViewById(R.id.itemBack);
+                back.setOnClickListener(this);
+            }
+        }
+
+        @Override
+        public void onClick(View v) {
+            int viewId = v.getId();
+            switch (viewId) {
+                case R.id.itemEdit: {
+                    if (mListener != null)
+                        mListener.onBabyInfoInteraction(mItem.getId(), IDataInfo.ACTION_UPDATE);
+                }
+                break;
+
+                case R.id.itemDelete: {
+                    String msg = ResourceReader.getString(R.string.deleteBabyConfirm);
+                    msg = String.format(msg, mItem.getName());
+                    new AlertDialog.Builder(mView.getContext())
+                      .setTitle(android.R.string.dialog_alert_title).setMessage(msg)
+                      .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                          @Override
+                          public void onClick(DialogInterface dialog, int which) {
+                              if (mListener != null) {
+                                  mListener.onBabyInfoInteraction(
+                                    mItem.getId(), IDataInfo.ACTION_DELETE
+                                  );
+                              }
+                              mValues = IBabyInfo.getBabyInfoList();
+                              notifyItemRemoved(getAdapterPosition());
+                          }
+                      })
+                      .setNegativeButton(R.string.no, null)
+                      .show();
+                }
+                break;
+
+                case R.id.itemBack: {
+                    mBackgroundView.setVisibility(View.GONE);
+                    mForegroundView.setVisibility(View.VISIBLE);
+                    IBabyInfo.GenType gen = mItem.getGender();
+                    mView.setBackgroundResource(IBabyInfo.getBackground(gen));
+                }
+                break;
+            }
         }
     }
     @NonNull

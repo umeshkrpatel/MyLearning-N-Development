@@ -11,7 +11,7 @@ import android.widget.SpinnerAdapter;
 
 import java.util.ArrayList;
 
-/**
+/*
  * Created by umpatel on 2/29/2016.
  */
 public class RangeSelector extends AlertDialog.Builder implements AdapterView.OnItemSelectedListener {

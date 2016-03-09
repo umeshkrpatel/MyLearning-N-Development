@@ -1,34 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:background="@drawable/sg_bg_round_pink"
-    android:layout_marginBottom="20dp"
-    android:elevation="@dimen/layout_elevation"
-    tools:ignore="UnusedAttribute">
-    <TextView
-        android:id="@+id/blInfo"
-        android:layout_width="wrap_content"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_height="wrap_content"
+     android:layout_width="match_parent"
+     android:background="@drawable/sg_bg_round_pink"
+     android:layout_marginBottom="20dp"
+     android:elevation="@dimen/layout_elevation"
+    >
+
+    <include layout="@layout/recycler_editor_layout"/>
+
+    <RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/viewForeground"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:layout_marginLeft="@dimen/list_margin"
-        android:layout_marginStart="@dimen/list_margin"
-        android:layout_marginRight="110dp"
-        android:layout_marginEnd="110dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textAppearance="?attr/textAppearanceListItem"
-        />
-    <ImageView
-        android:id="@+id/ivTimeline"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/nameOfBaby"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:elevation="@dimen/element_elevation"
-        android:background="@drawable/sg_baby_image"
-        />
-</RelativeLayout>
+        android:orientation="horizontal"
+        tools:ignore="UnusedAttribute">
+        <TextView
+            android:id="@+id/blInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_marginLeft="@dimen/list_margin"
+            android:layout_marginStart="@dimen/list_margin"
+            android:layout_marginRight="110dp"
+            android:layout_marginEnd="110dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:textAppearance="?attr/textAppearanceListItem"
+            />
+        <ImageView
+            android:id="@+id/ivTimeline"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/nameOfBaby"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:elevation="@dimen/element_elevation"
+            android:background="@drawable/sg_baby_image"
+            />
+    </RelativeLayout>
+</FrameLayout>

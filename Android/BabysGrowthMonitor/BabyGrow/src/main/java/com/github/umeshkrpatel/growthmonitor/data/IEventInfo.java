@@ -25,12 +25,29 @@ public abstract class IEventInfo {
     }
 
     public static void delete(final int babyId) {
+        delete(babyId, -1);
+    }
+
+    public static void delete(final int babyId, int eventId) {
         if (mEventTimeline.containsKey(babyId)) {
             Scheduler scheduler = new Scheduler();
-            IEventInfo info = new EmptyEvent(babyId);
+            IEventInfo info = new EmptyEvent(babyId, eventId);
             info.action = IDataInfo.ACTION_DELETE;
             scheduler.doInBackground(info);
-            mEventTimeline.remove(babyId);
+            if (eventId == -1)
+                mEventTimeline.remove(babyId);
+            else {
+                ArrayList<IEventInfo> babyInfo = mEventTimeline.get(babyId);
+                int i = 0; boolean found = false;
+                for (i = 0; i < babyInfo.size(); i++) {
+                    if (babyInfo.get(i).getEventID() == eventId) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found)
+                    babyInfo.remove(i);
+            }
         }
     }
 
@@ -220,6 +237,9 @@ public abstract class IEventInfo {
                     }
                     c.close();
                 } else {
+                    if (eInfo.getEventID() != -1) {
+                        where = where + " AND " + IDataInfo.EVENT_ID + "=" + eInfo.getEventID();
+                    }
                     IDataProvider.get().deleteInfo(IDataInfo.kEventTable, where, null);
                 }
             }

@@ -1,58 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/blvRelLayout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:background="@drawable/sg_bg_round_pink"
-    android:layout_marginBottom="20dp"
-    android:elevation="@dimen/layout_elevation"
-    tools:ignore="UnusedAttribute">
-    <ImageView
-        android:id="@+id/blvBabyImage"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:contentDescription="@string/nameOfBaby"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:elevation="@dimen/element_elevation"
-        android:foregroundGravity="clip_horizontal"
-        android:background="@drawable/sg_baby_image"
-        tools:ignore="UnusedAttribute" />
-    <TextView
-        android:id="@+id/blvBabyName"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:textStyle="bold"
-        android:textSize="15sp"
-        android:paddingTop="@dimen/list_margin"
-        android:paddingStart="@dimen/list_margin"
-        android:paddingLeft="@dimen/list_margin"
-        android:layout_toRightOf="@+id/blvBabyImage"
-        android:layout_toEndOf="@+id/blvBabyImage"
-        android:textAppearance="?attr/textAppearanceListItem"
-        />
-    <TextView
-        android:id="@+id/blvBabyAge"
-        android:layout_width="wrap_content"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_height="wrap_content"
+     android:layout_width="match_parent"
+     android:background="@drawable/sg_bg_round_pink"
+     android:layout_marginBottom="20dp"
+     android:elevation="@dimen/layout_elevation"
+    >
+
+    <include layout="@layout/recycler_editor_layout"/>
+
+    <RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/viewForeground"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="10sp"
-        android:paddingStart="@dimen/list_margin"
-        android:paddingLeft="@dimen/list_margin"
-        android:paddingBottom="@dimen/list_margin"
-        android:layout_toRightOf="@+id/blvBabyImage"
-        android:layout_toEndOf="@+id/blvBabyImage"
-        android:layout_below="@+id/blvBabyName"
-        android:textAppearance="?attr/textAppearanceListItem"
-        />
-    <ImageView
-        android:id="@+id/blvBabyRemove"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:src="@drawable/ic_action_delete"
-        android:elevation="@dimen/element_elevation"
-        android:contentDescription="@string/delete" />
-</RelativeLayout>
+        android:orientation="horizontal"
+        tools:ignore="UnusedAttribute">
+        <ImageView
+            android:id="@+id/blvBabyImage"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:contentDescription="@string/nameOfBaby"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:elevation="@dimen/element_elevation"
+            android:foregroundGravity="clip_horizontal"
+            android:background="@drawable/sg_baby_image"
+            tools:ignore="UnusedAttribute" />
+        <TextView
+            android:id="@+id/blvBabyName"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:paddingTop="@dimen/list_margin"
+            android:paddingStart="@dimen/list_margin"
+            android:paddingLeft="@dimen/list_margin"
+            android:layout_toRightOf="@+id/blvBabyImage"
+            android:layout_toEndOf="@+id/blvBabyImage"
+            android:textAppearance="?attr/textAppearanceListItem"
+            />
+        <TextView
+            android:id="@+id/blvBabyAge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:paddingStart="@dimen/list_margin"
+            android:paddingLeft="@dimen/list_margin"
+            android:paddingBottom="@dimen/list_margin"
+            android:layout_toRightOf="@+id/blvBabyImage"
+            android:layout_toEndOf="@+id/blvBabyImage"
+            android:layout_below="@+id/blvBabyName"
+            android:textAppearance="?attr/textAppearanceListItem"
+            />
+    </RelativeLayout>
+</FrameLayout>

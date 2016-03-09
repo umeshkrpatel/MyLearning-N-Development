@@ -18,7 +18,7 @@ import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 import com.github.umeshkrpatel.growthmonitor.data.IGrowthInfo;
 import com.github.umeshkrpatel.growthmonitor.data.IValidator;
 
-/**
+/*
  * Created by umpatel on 1/25/2016.
  */
 public class AddOrUpdateGrowth extends Fragment

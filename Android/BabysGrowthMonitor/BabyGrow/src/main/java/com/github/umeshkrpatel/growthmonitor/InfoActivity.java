@@ -76,7 +76,7 @@ public class InfoActivity extends AppCompatActivity implements IInfoFragment {
     }
 
     @Override
-    public void onEventInfoInteraction(IEventInfo item) {
+    public void onEventInfoInteraction(IEventInfo item, int action) {
 
     }
 
