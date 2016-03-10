@@ -91,7 +91,7 @@ public class GrowthActivity extends AppCompatActivity
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mPagerAdapter);
 
-        if (IBabyInfo.size() == 0) {
+        if (IBabyInfo.count() == 0) {
             Intent intent = new Intent(this, InfoActivity.class);
             startActivity(intent);
         }
@@ -195,7 +195,7 @@ public class GrowthActivity extends AppCompatActivity
     public void onBabyInfoInteraction(int babyId, int action) {
         if (action == IDataInfo.ACTION_DELETE) {
             IBabyInfo.delete(babyId);
-            if (IBabyInfo.size() == 0) {
+            if (IBabyInfo.count() == 0) {
                 Intent intent = new Intent(this, InfoActivity.class);
                 startActivity(intent);
             } else {
@@ -273,7 +273,7 @@ public class GrowthActivity extends AppCompatActivity
         int imageId = IBabyInfo.getBabyImage(gender, age);
         ivNvBabyMain.setImageResource(imageId);
         tvNvBabyName.setText(info.getName());
-        if (IBabyInfo.getBabyInfoCount() > 1) {
+        if (IBabyInfo.count() > 1) {
             ivNvBabySub.setVisibility(View.VISIBLE);
             info = IBabyInfo.nextBabyInfo();
             dob = info.getBirthDate();

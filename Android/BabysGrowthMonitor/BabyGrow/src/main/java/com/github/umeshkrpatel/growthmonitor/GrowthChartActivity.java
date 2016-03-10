@@ -3,6 +3,7 @@ package com.github.umeshkrpatel.growthmonitor;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,7 +21,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,14 +29,13 @@ import android.widget.ArrayAdapter;
 
 import com.github.umeshkrpatel.growthmonitor.data.ChartData;
 import com.github.umeshkrpatel.growthmonitor.data.IBabyInfo;
-import com.github.umeshkrpatel.multispinner.MultiSpinner;
 import com.github.umeshkrpatel.rangeselector.RangeSelector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class GrowthChartActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-        MultiSpinner.MultiSpinnerListener {
+    implements NavigationView.OnNavigationItemSelectedListener, OnMultiChoiceClickListener {
 
     private static final String TAG = "GrowthChartActivity";
 
@@ -52,9 +51,8 @@ public class GrowthChartActivity extends AppCompatActivity
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    //private Spinner mXAxisBar, mYAxisBar;
     private RangeSelector mRangeSelector;
-    private MultiSpinner msSpinner;
+    private HashMap<Integer, Integer> mIndexToId;
 
     @NonNull
     private static final ChartData.AxisType[] dChart = new ChartData.AxisType[] {
@@ -116,12 +114,9 @@ public class GrowthChartActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.gcNavView);
         navigationView.setNavigationItemSelectedListener(this);
 
-//        msSpinner =
-//            (MultiSpinner) navigationView.getHeaderView(0).findViewById(R.id.msAllBaby);
-//        msSpinner.setAdapter(
-//            new ArrayAdapter<>(
-//                this, R.layout.spinner_listview, R.id.tvSpinnerList, IBabyInfo.getBabyInfoList()),
-//            false, this);
+        MenuItem item = navigationView.getMenu().findItem(R.id.navChartType);
+        item.setIcon(ChartData.chartID());
+        item.setTitle(ChartData.chartTitle());
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -192,16 +187,8 @@ public class GrowthChartActivity extends AppCompatActivity
     }
 
     @Override
-    public void onItemsSelected(boolean[] selected) {
-        for (IBabyInfo info : IBabyInfo.getBabyInfoList()) {
-            info.setActive(false);
-        }
-        for (int i = 0; i < selected.length; i++) {
-            if (selected[i]) {
-                IBabyInfo info = (IBabyInfo) msSpinner.getAdapter().getItem(i);
-                info.setActive(true);
-            }
-        }
+    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+        IBabyInfo.get(mIndexToId.get(which)).setActive(isChecked);
     }
 
     /**
@@ -274,6 +261,9 @@ public class GrowthChartActivity extends AppCompatActivity
             return;
         }
 
+        int[] rangeSelection = new int[2];
+        rangeSelection[0] = ChartData.minRange();
+        rangeSelection[1] = ChartData.maxRange();
         mRangeSelector =
           new RangeSelector(this, this)
             .setAdapter(
@@ -290,19 +280,39 @@ public class GrowthChartActivity extends AppCompatActivity
               }
           })
           .setNegativeButton(R.string.no, null);
+        mRangeSelector.setRangeSelection(rangeSelection);
         mRangeSelector.show();
     }
 
     private void createBabyCompareList() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        View babyListView = inflater.inflate(R.layout.layout_multispineer, null);
-        builder.setView(babyListView);
-        msSpinner = (MultiSpinner) babyListView.findViewById(R.id.alertMultiSpinner);
-        msSpinner.setAdapter(
-          new ArrayAdapter<>(
-            this, R.layout.spinner_listview, R.id.tvSpinnerList, IBabyInfo.getBabyInfoList()),
-          false, this);
-        builder.create().show();
+
+        String choices[] = new String[IBabyInfo.count()];
+        boolean[] selection = new boolean[IBabyInfo.count()];
+        mIndexToId = new HashMap<>();
+        ArrayList<IBabyInfo> infos = IBabyInfo.getBabyInfoList();
+
+        for (int i = 0; i < choices.length; i++) {
+            choices[i] = infos.get(i).getName();
+            mIndexToId.put(i, infos.get(i).getId());
+            selection[i] = infos.get(i).isActive();
+        }
+
+        builder.setMultiChoiceItems(choices, selection, this);
+
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                updateChart();
+            }
+        });
+
+        builder.show();
     }
 }

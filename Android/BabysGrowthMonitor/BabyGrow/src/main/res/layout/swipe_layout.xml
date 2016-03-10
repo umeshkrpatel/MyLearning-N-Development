@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/sg_swipe"
+    >
+    <TextView
+        android:id="@+id/swipeEdit"
+        android:text="EDIT"
+        android:textSize="35sp"
+        android:textAlignment="center"
+        android:textColor="@color/blue"
+        android:textStyle="bold"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        />
+    <TextView
+        android:id="@+id/swipeDelete"
+        android:text="DELETE"
+        android:textColor="@color/blue"
+        android:textStyle="bold"
+        android:textSize="35sp"
+        android:textAlignment="center"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        />
+
+</LinearLayout>

@@ -223,12 +223,8 @@ public abstract class IBabyInfo {
         mCurrentIndex = (mCurrentIndex + 1) % IDataInfo.MAX_BABY;
     }
 
-    public static int getBabyInfoCount() {
+    public static int count() {
         return mCurrentSize;
-    }
-
-    public static int size() {
-        return IBabyInfo.getBabyInfoCount();
     }
 
     public static ArrayList<IBabyInfo> getBabyInfoList() {

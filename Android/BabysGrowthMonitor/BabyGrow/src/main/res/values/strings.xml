@@ -116,4 +116,5 @@
     <string name="compareBabies">Compare Babies</string>
     <string name="chartTypeDotted">Dotted Chart</string>
     <string name="chartTypeLined">Line Chart</string>
+    <string name="title_activity_color_picker">ColorPickerActivity</string>
 </resources>

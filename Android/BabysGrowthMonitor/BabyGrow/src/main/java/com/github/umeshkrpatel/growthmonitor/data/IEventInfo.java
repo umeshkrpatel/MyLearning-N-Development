@@ -29,18 +29,22 @@ public abstract class IEventInfo {
     }
 
     public static void delete(final int babyId, int eventId) {
+        IEventInfo info = new EmptyEvent(babyId, eventId);
+        delete(babyId, info);
+    }
+
+    public static void delete(int babyId, IEventInfo info) {
         if (mEventTimeline.containsKey(babyId)) {
             Scheduler scheduler = new Scheduler();
-            IEventInfo info = new EmptyEvent(babyId, eventId);
             info.action = IDataInfo.ACTION_DELETE;
             scheduler.doInBackground(info);
-            if (eventId == -1)
+            if (info.getEventID() == -1)
                 mEventTimeline.remove(babyId);
             else {
                 ArrayList<IEventInfo> babyInfo = mEventTimeline.get(babyId);
                 int i = 0; boolean found = false;
                 for (i = 0; i < babyInfo.size(); i++) {
-                    if (babyInfo.get(i).getEventID() == eventId) {
+                    if (babyInfo.get(i).getEventID() == info.getEventID()) {
                         found = true;
                         break;
                     }
@@ -195,7 +199,7 @@ public abstract class IEventInfo {
 
         @Override
         public int getEventType() {
-            return 0;
+            return -1;
         }
 
         @Override
@@ -239,6 +243,22 @@ public abstract class IEventInfo {
                 } else {
                     if (eInfo.getEventID() != -1) {
                         where = where + " AND " + IDataInfo.EVENT_ID + "=" + eInfo.getEventID();
+                    }
+                    switch (eInfo.getEventType()) {
+                        case IDataInfo.EVENT_VACCINATION:
+                            IDataProvider.get().deleteInfo(IDataInfo.kVaccineTable, where, null);
+                            break;
+                        case IDataInfo.EVENT_LIFEEVENT:
+                            IDataProvider.get().deleteInfo(IDataInfo.kLifeEventTable, where, null);
+                            break;
+                        case IDataInfo.EVENT_MEASUREMENT:
+                            IDataProvider.get().deleteInfo(IDataInfo.kGrowthInfoTable, where, null);
+                            break;
+                        default:
+                            IDataProvider.get().deleteInfo(IDataInfo.kGrowthInfoTable, where, null);
+                            IDataProvider.get().deleteInfo(IDataInfo.kLifeEventTable, where, null);
+                            IDataProvider.get().deleteInfo(IDataInfo.kVaccineTable, where, null);
+                            break;
                     }
                     IDataProvider.get().deleteInfo(IDataInfo.kEventTable, where, null);
                 }

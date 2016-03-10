@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import com.github.umeshkrpatel.growthmonitor.data.IAdapter;
 import com.github.umeshkrpatel.growthmonitor.data.IBabyInfo;
 import com.github.umeshkrpatel.growthmonitor.data.IEventInfo;
+import com.github.umeshkrpatel.growthmonitor.data.ItemCallbackHelper;
 
 import java.util.ArrayList;
 
@@ -56,6 +57,7 @@ public class GrowthFragment extends Fragment {
             int babyId = IBabyInfo.currentBabyInfo().getId();
             ArrayList<IEventInfo> eventItems = IEventInfo.create(babyId);
             mView.setAdapter(new TimelineAdapter(eventItems, mListener));
+            ItemCallbackHelper.attachToRecyclerView(mView);
         }
         return view;
     }

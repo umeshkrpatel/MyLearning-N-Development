@@ -23,7 +23,7 @@ import com.github.umeshkrpatel.growthmonitor.data.IDataInfo;
 
 import java.util.ArrayList;
 
-/**
+/*
  * Created by umpatel on 2/9/2016.
  */
 public class BabiesAdapter extends IAdapter {
@@ -67,9 +67,9 @@ public class BabiesAdapter extends IAdapter {
     public class ViewHolder extends IAdapter.IViewHolder
       implements View.OnLongClickListener, View.OnTouchListener, View.OnClickListener {
         public final View mView;
+        public final View mBackgroundView, mForegroundView;
         public final TextView mInfoView, mAgeView;
         public final ImageView mTimeline;
-        public final View mBackgroundView, mForegroundView;
         public IBabyInfo mItem;
         private float X1 = 0, X2 = 0;
         private static final float sDistance = 200;
@@ -127,6 +127,11 @@ public class BabiesAdapter extends IAdapter {
                 delete.setOnClickListener(this);
                 ImageView back = (ImageView) mView.findViewById(R.id.itemBack);
                 back.setOnClickListener(this);
+            } else {
+                mBackgroundView.setVisibility(View.GONE);
+                mForegroundView.setVisibility(View.VISIBLE);
+                IBabyInfo.GenType gen = mItem.getGender();
+                mView.setBackgroundResource(IBabyInfo.getBackground(gen));
             }
         }
 
